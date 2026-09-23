@@ -3,9 +3,9 @@ import { Calendar, Clock, MapPin, Trophy, ArrowRight, Zap } from 'lucide-react';
 
 import { useNavigate } from "react-router-dom";
 
-import tech_trek from "../../assets/posters/tech_trek.png"
+import membership from "../../assets/posters/membership.png"
 
-const CodexiaEventSection = () => {
+const Membership = () => {
   const navigate = useNavigate(); 
   return (
     <section className="relative w-full py-24 bg-transparent overflow-hidden text-neutral-200 selection:bg-purple-500/30">
@@ -43,7 +43,7 @@ const CodexiaEventSection = () => {
             <div className="relative w-full h-full rounded-2xl overflow-hidden bg-neutral-900 z-10">
               {/* Placeholder Image: Use an abstract tech image */}
               <img 
-                src={tech_trek}
+                src={membership}
                 alt="Codexia Event Poster" 
                 className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500 scale-100 group-hover:scale-105"
               />
@@ -57,7 +57,7 @@ const CodexiaEventSection = () => {
                   <Zap className="w-4 h-4 fill-current" />
                   <span className="text-xs font-mono uppercase tracking-widest">Sipna Coders Club</span>
                 </div>
-                <h3 className="text-2xl font-bold text-white tracking-tight">Tech Trek 2026</h3>
+                <h3 className="text-2xl font-bold text-white tracking-tight">Coders Community</h3>
               </div>
 
               {/* Glass Reflection Effect */}
@@ -88,16 +88,16 @@ const CodexiaEventSection = () => {
 
           {/* Headline Typography */}
           <h2 className="text-5xl md:text-7xl font-bold tracking-tighter text-white mb-6 leading-[0.9]">
-            Tech Trek <span className="text-transparent bg-clip-text bg-gradient-to-br from-purple-400 to-indigo-500">v2.0</span>
+            Join Coders Community <span className="text-transparent bg-clip-text bg-gradient-to-br from-purple-400 to-indigo-500"></span>
           </h2>
 
-          <p className="text-neutral-400 text-lg md:text-xl leading-relaxed max-w-2xl mb-10 font-light">
+          {/* <p className="text-neutral-400 text-lg md:text-xl leading-relaxed max-w-2xl mb-10 font-light">
             CONFUSED ABOUT WHICH TECH DOMAIN TO CHOOSE?,
             Your technology journey starts with exploring the right path.
-          </p>
+          </p> */}
 
           {/* HUD Data Grid: The "Technical" Details */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+          {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
             <InfoCard 
               icon={<Calendar className="w-4 h-4 text-purple-400" />} 
               label="DATE" 
@@ -108,31 +108,31 @@ const CodexiaEventSection = () => {
               label="DURATION" 
               value="1:30hr" 
             />
-            {/* <InfoCard 
+            <InfoCard 
               icon={<Trophy className="w-4 h-4 text-yellow-400" />} 
               label="PRIZE POOL" 
               value="₹3,500 INR + Certificate" 
-            /> */}
+            />
              <InfoCard 
               icon={<MapPin className="w-4 h-4 text-emerald-400" />} 
               label="VENUE" 
               value="CSE Seminar Hall, Block B" 
             />
-          </div>
+          </div> */}
 
           {/* Magnetic Call To Action */}
           <div className="flex flex-wrap gap-4">
             <button 
             onClick={() =>
   window.open(
-    "https://forms.gle/nEXwvBZPGdARbwi37",
+    "https://forms.gle/JJd8cno31C1ExZMh8",
     "_blank",
     "noopener,noreferrer"
   )
 }
             className="group relative px-8 py-4 bg-white text-black font-bold text-sm tracking-wide rounded-lg overflow-hidden transition-transform hover:scale-[1.02] active:scale-[0.98]">
               <span className="relative z-10 flex items-center gap-2">
-                INITIALIZE REGISTRATION <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                Become The Part Of Community <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </span>
               {/* Shimmer Effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-neutral-200/50 to-transparent w-full h-full -translate-x-full group-hover:animate-shimmer z-0 pointer-events-none" />
@@ -164,4 +164,4 @@ const InfoCard = ({ icon, label, value }) => (
 
 
 
-export default CodexiaEventSection;
+export default Membership;

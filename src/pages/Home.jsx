@@ -7,6 +7,7 @@ import { Terminal, Cpu, Globe, Code2, ArrowRight, ChevronRight, Layers, Zap } fr
 import NavBar from '../components/navbars/NavBar';
 
 import CodexiaEventSection from '../components/upcomingEvent/CodexiaEventSection';
+import Membership from '../components/upcomingEvent/Membership';
 
 import LogoNav from '../components/navbars/LogoNav';
 
@@ -91,9 +92,15 @@ const HomePage = () => {
 
           <div className="flex flex-wrap gap-4">
             <button
-              onClick={() => navigate("/register")}
+              onClick={() =>
+  window.open(
+    "https://forms.gle/5a85cYhy9zy8Jw5s9",
+    "_blank",
+    "noopener,noreferrer"
+  )
+}
               className="px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-lg transition-all flex items-center gap-2 group">
-              Start_Sequence
+              Join Coders Community
               <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
             <button
@@ -157,6 +164,16 @@ const HomePage = () => {
         "
       >
         <CodexiaEventSection />
+      </section>
+
+      <section id="section2"
+        className="
+            relative
+            w-full
+            overflow-visible
+        "
+      >
+        <Membership />
       </section>
 
       <section
