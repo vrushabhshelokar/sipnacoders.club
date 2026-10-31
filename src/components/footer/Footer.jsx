@@ -34,10 +34,10 @@ const Footer = () => {
           <div className="lg:col-span-4 flex gap-8 md:gap-12 text-sm">
             <div className="flex flex-col gap-2">
               <h4 className="font-semibold text-zinc-100 text-xs uppercase tracking-wider mb-1">Index</h4>
-              <a href="/" className="hover:text-cyan-400 transition-colors">Home</a>
-              <a href="/events" className="hover:text-cyan-400 transition-colors">Events</a>
-              <a href="/connect" className="hover:text-cyan-400 transition-colors">Connect</a>
-              <a href="/team" className="hover:text-cyan-400 transition-colors">Team</a>
+              <Link to="/" className="hover:text-cyan-400 transition-colors">Home</Link>
+              <Link to="/events" className="hover:text-cyan-400 transition-colors">Events</Link>
+              <Link to="/connect" className="hover:text-cyan-400 transition-colors">Connect</Link>
+              <Link to="/team" className="hover:text-cyan-400 transition-colors">Team</Link>
             </div>
             {/* <div className="flex flex-col gap-2">
               <h4 className="font-semibold text-zinc-100 text-xs uppercase tracking-wider mb-1">System</h4>

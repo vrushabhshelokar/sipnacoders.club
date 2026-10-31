@@ -1,16 +1,22 @@
 import React from 'react';
 import TeamCard from '../components/common/TeamCards';
 
-import pranav from "../assets/people/pranav.jpg"
-import preet from "../assets/people/preet.jpg"
+import ashay from "../assets/people/ashay.jpg"
 import vrushabh from "../assets/people/vrush.jpg"
 import shreya from "../assets/people/shreya.jpg"
-import vaishnavi from "../assets/people/vaishnavi.jpg"
-import nandita from "../assets/people/nandita.jpg"
+import srushti from "../assets/people/srushti.jpg"
+import atharva from "../assets/people/atharva.jpg"
 import ritesh from "../assets/people/ritesh.jpg"
 import sakshi from "../assets/people/sakshi.jpg"
 import harshdeep from "../assets/people/harshdeep.jpg"
-import disha from "../assets/people/disha.jpg"
+import uday from "../assets/people/uday.jpg"
+import chitra from "../assets/people/chitra.jpg"
+import mahi from "../assets/people/mahi.jpg"
+import pranav from "../assets/people/pranav.jpg"
+
+
+
+
 
 import images from "../assets/people/images.jpg"
 
@@ -19,97 +25,98 @@ import NavBar from "../components/navbars/NavBar";
 
 // Sample Data Structure
 const CORE_TEAM = [
-  {
-    name: "Pranav Raut",
-    role: "President",
-    img: pranav,
-    status: "3rd CSE",
-    socials: {
-      linkedin: "https://www.linkedin.com/in/rautpranav13/",
-      instagram: "https://www.instagram.com/raut.pranav13/",
-    },
-  },
-  {
-    name: "Prit Thombare",
-    role: "Vice President",
-    img: preet,
-    status: "3rd CSE",
-    socials: {
-      linkedin: "https://www.linkedin.com/in/pritthombare/",
-      instagram: "https://www.instagram.com/gaauureeee/",
-    },
-  },
-  {
+    {
     name: "Vrushabh Shelokar",
-    role: "Technical Head (Frontend & UI)",
+    role: "President",
     img: vrushabh,
-    status: "2nd CSE",
+    status: "3rd CSE",
     socials: {
-      linkedin: "https://www.linkedin.com/in/vrushabhshelokar/",
+      linkedin: "https://www.linkedin.com/in/vrushabh-shelokar",
       instagram: "https://www.instagram.com/vrush_1337/",
     },
   },
-  {
-    name: "Vaishnavi Jaiswal",
-    role: "Secretary",
-    img: vaishnavi,
+    {
+    name: "Ritesh Pawar",
+    role: "Vice President",
+    img: ritesh,
     status: "—",
+    socials: {
+      linkedin: "https://www.linkedin.com/in/ritesh-pawar-694730353",
+    },
+  },
+  {
+    name: "Pranav Raut",
+    role: "Advisor",
+    img: pranav,
+    status: "4th CSE",
+    socials: {
+      linkedin: "https://www.linkedin.com/in/rautpranav13?utm_source=share_via&utm_content=profile&utm_medium=member_android",
+    },
+  },
+  {
+    name: "Sakshi Bawankar",
+    role: "Secretary",
+    img: sakshi,
+    status: "—",
+    socials: {},
+  },
+  {
+    name: "Ashay Deshpande",
+    role: "Executive Member",
+    img: ashay,
+    status: "2nd IT",
+    socials: {
+      linkedin: "https://www.linkedin.com/in/ashay-deshpande-554683387?utm_source=share_via&utm_content=profile&utm_medium=member_android",
+      instagram: "https://www.instagram.com/nextup_ashay?mdxt=ZDF0OXFnZW5tNW9m",
+    },
+  },
+  {
+    name: "Harshdip Patil",
+    role: "Technical Head",
+    img: harshdeep,
+    status: "3rd CSE",
     socials: {},
   },
   {
     name: "Shreya Gulhane",
     role: "Public Relation Officer",
     img: shreya,
-    status: "—",
+    status: "3rd CSE",
     socials: {},
   },
   {
-    name: "Nandita Sahu",
-    role: "Public Relation Officer",
-    img: nandita,
-    status: "—",
+    name: "Mahi Sahu",
+    role: "Executive Member",
+    img: mahi,
+    status: "3rd CSE",
     socials: {},
   },
   {
     name: "Uday Shivarkar",
     role: "Treasurer",
-    img: images,
-    status: "—",
+    img: uday,
+    status: "3rd CSE",
     socials: {},
   },
   {
-    name: "Ritesh Pawar",
-    role: "Executive Head",
-    img: ritesh,
-    status: "—",
+    name: "Chitra Bankar",
+    role: "Student Advisor",
+    img: chitra,
+    status: "3rd CSE",
     socials: {},
   },
   {
-    name: "Sakshi Bawankar",
+    name: "Shrushti Deshbhratar",
     role: "Executive Member",
-    img: sakshi,
-    status: "—",
+    img: srushti,
+    status: "3rd IT",
     socials: {},
   },
   {
-    name: "Harshdip Patil",
+    name: "Atharva Khule",
     role: "Executive Member",
-    img: harshdeep,
-    status: "—",
-    socials: {},
-  },
-  {
-    name: "Amrita Dahake",
-    role: "Executive Member",
-    img: images,
-    status: "—",
-    socials: {},
-  },
-  {
-    name: "Disha Deshmukh",
-    role: "Executive Member",
-    img: disha,
-    status: "—",
+    img: atharva,
+    status: "2nd CSE",
     socials: {},
   },
 ];
