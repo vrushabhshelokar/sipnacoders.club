@@ -45,15 +45,6 @@ const CORE_TEAM = [
     },
   },
   {
-    name: "Pranav Raut",
-    role: "Advisor",
-    img: pranav,
-    status: "4th CSE",
-    socials: {
-      linkedin: "https://www.linkedin.com/in/rautpranav13?utm_source=share_via&utm_content=profile&utm_medium=member_android",
-    },
-  },
-  {
     name: "Sakshi Bawankar",
     role: "Secretary",
     img: sakshi,
@@ -61,14 +52,11 @@ const CORE_TEAM = [
     socials: {},
   },
   {
-    name: "Ashay Deshpande",
-    role: "Executive Member",
-    img: ashay,
-    status: "2nd IT",
-    socials: {
-      linkedin: "https://www.linkedin.com/in/ashay-deshpande-554683387?utm_source=share_via&utm_content=profile&utm_medium=member_android",
-      instagram: "https://www.instagram.com/nextup_ashay?mdxt=ZDF0OXFnZW5tNW9m",
-    },
+    name: "Uday Shivarkar",
+    role: "Treasurer",
+    img: uday,
+    status: "3rd CSE",
+    socials: {},
   },
   {
     name: "Harshdip Patil",
@@ -85,27 +73,6 @@ const CORE_TEAM = [
     socials: {},
   },
   {
-    name: "Mahi Sahu",
-    role: "Executive Member",
-    img: mahi,
-    status: "3rd CSE",
-    socials: {},
-  },
-  {
-    name: "Uday Shivarkar",
-    role: "Treasurer",
-    img: uday,
-    status: "3rd CSE",
-    socials: {},
-  },
-  {
-    name: "Chitra Bankar",
-    role: "Student Advisor",
-    img: chitra,
-    status: "3rd CSE",
-    socials: {},
-  },
-  {
     name: "Shrushti Deshbhratar",
     role: "Executive Member",
     img: srushti,
@@ -113,11 +80,46 @@ const CORE_TEAM = [
     socials: {},
   },
   {
+    name: "Mahi Sahu",
+    role: "Executive Member",
+    img: mahi,
+    status: "3rd CSE",
+    socials: {},
+  },
+  
+  {
+    name: "Chitra Bankar",
+    role: "Student Advisor",
+    img: chitra,
+    status: "3rd CSE",
+    socials: {},
+  },
+  
+  {
+    name: "Ashay Deshpande",
+    role: "Executive Member",
+    img: ashay,
+    status: "2nd IT",
+    socials: {
+      linkedin: "https://www.linkedin.com/in/ashay-deshpande-554683387?utm_source=share_via&utm_content=profile&utm_medium=member_android",
+      instagram: "https://www.instagram.com/nextup_ashay?mdxt=ZDF0OXFnZW5tNW9m",
+    },
+  },
+  {
     name: "Atharva Khule",
     role: "Executive Member",
     img: atharva,
     status: "2nd CSE",
     socials: {},
+  },
+  {
+    name: "Pranav Raut",
+    role: "Advisor",
+    img: pranav,
+    status: "4th CSE",
+    socials: {
+      linkedin: "https://www.linkedin.com/in/rautpranav13?utm_source=share_via&utm_content=profile&utm_medium=member_android",
+    },
   },
 ];
 
