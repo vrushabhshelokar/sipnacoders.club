@@ -6,7 +6,7 @@ import { Terminal, Cpu, Globe, Code2, ArrowRight, ChevronRight, Layers, Zap } fr
 
 import NavBar from '../components/navbars/NavBar';
 
-import CodexiaEventSection from '../components/upcomingEvent/CodexiaEventSection';
+
 import Membership from '../components/upcomingEvent/Membership';
 
 import LogoNav from '../components/navbars/LogoNav';
@@ -163,7 +163,7 @@ const HomePage = () => {
             overflow-visible
         "
       >
-        <CodexiaEventSection />
+        
       </section>
 
       <section id="section2"
@@ -245,10 +245,10 @@ const HomePage = () => {
       <section className="border-y border-white/5 bg-white/[0.02]">
         <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-2 md:grid-cols-4 gap-8">
           {[
-            { label: 'Participants', value: '400+' },
-            { label: 'Event_Conducted', value: '5+' },
+            { label: 'Participants', value: '600+' },
+            { label: 'Event_Conducted', value: '9+' },
             { label: 'Lines_Of_Code', value: '' },
-            { label: 'Workshops', value: '2' }
+            { label: 'Workshops', value: '4' }
           ].map((stat, i) => (
             <div key={i} className="text-center md:text-left">
               <div className="text-3xl font-mono font-bold text-white mb-1">{stat.value}</div>
