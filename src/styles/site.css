@@ -905,3 +905,40 @@ a.s-contact:hover { transform: translateY(-3px); border-color: var(--border-2); 
   .s-tools-row[aria-hidden] { display: none; }
   .s-faq-a, .s-faq-plus, .s-faq-plus::before, .s-faq-plus::after { transition: none; }
 }
+
+/* =====================================================================
+   CAMPUS AMBASSADORS (team page)
+   ===================================================================== */
+.s-ambs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.s-amb { position: relative; isolation: isolate; overflow: hidden; padding: 26px; border-radius: 26px; border: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(255, 255, 255, .035), rgba(255, 255, 255, .012)), rgba(8, 10, 14, .78); }
+.s-amb::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: linear-gradient(90deg, var(--c1), var(--c2)); }
+.s-amb::after { content: ''; position: absolute; z-index: -1; width: 360px; height: 360px; right: -130px; top: -170px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(76, 141, 255, .16), transparent); background: radial-gradient(closest-side, color-mix(in srgb, var(--c1) 24%, transparent), transparent); }
+.s-amb-top { display: flex; align-items: center; gap: 20px; }
+.s-amb-photo { flex: none; width: 112px; height: 132px; padding: 2px; border-radius: 20px; background: linear-gradient(140deg, var(--c1), var(--c2)); box-shadow: 0 18px 40px -22px var(--c1); }
+.s-amb-photo img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 18px; background: #0d1016; }
+.s-amb-who { min-width: 0; }
+.s-amb-who h3 { margin: 0; font: 700 23px/1.15 var(--display); letter-spacing: -.02em; color: #fff; }
+.s-amb-who p { margin: 4px 0 12px; font-size: 14px; color: var(--muted); }
+.s-amb-badges { display: flex; flex-wrap: wrap; gap: 8px; }
+.s-amb-badge { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px 6px 8px; border-radius: 999px; font: 600 12.5px/1.2 var(--sans); color: #fff;
+  border: 1px solid rgba(255, 255, 255, .18); border: 1px solid color-mix(in srgb, var(--pc) 55%, transparent);
+  background: rgba(255, 255, 255, .05); background: color-mix(in srgb, var(--pc) 16%, rgba(8, 10, 14, .6)); }
+.s-amb-mark { display: inline-flex; color: var(--pc); }
+.s-amb-logo { width: 18px; height: 18px; padding: 1px; border-radius: 4px; object-fit: contain; background: #fff; }
+.s-amb-roles { display: grid; gap: 16px; margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--border); }
+.s-amb-role-h { display: block; margin-bottom: 10px; font: 500 11.5px/1.35 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--pc); }
+.s-amb-role ul { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.s-amb-role li { display: flex; align-items: flex-start; gap: 10px; font-size: 15px; line-height: 1.5; color: var(--text-2); }
+.s-amb-role li svg { flex: none; margin-top: 4px; color: var(--pc); }
+.s-amb-role .s-link { margin-top: 10px; font-size: 14px; }
+.s-section.s-team-join { padding-top: 84px; }
+.s-team-join .s-callout { margin-top: 0; }
+@media (max-width: 860px) { .s-ambs { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 480px) {
+  .s-amb { padding: 20px; }
+  .s-amb-top { gap: 16px; }
+  .s-amb-photo { width: 92px; height: 110px; }
+  .s-amb-who h3 { font-size: 20px; }
+}

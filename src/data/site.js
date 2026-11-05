@@ -197,6 +197,45 @@ export const TEAM = [
     socials: { linkedin: 'https://www.linkedin.com/in/rautpranav13?utm_source=share_via&utm_content=profile&utm_medium=member_android' } },
 ];
 
+/* ---------------- campus ambassadors (team page) ----------------
+   PROGRAMS: the ambassador programs and what an ambassador does in each.
+   ✏️ logo: to show a program's official badge, put the image in src/assets/programs/,
+      import it at the top of this file (e.g. import gsaLogo from '../assets/programs/gsa.png';)
+      and set  logo: gsaLogo.  Leave null to show the coloured name badge instead.
+   ✏️ link: official program page ('' for none). */
+export const PROGRAMS = {
+  gsa: {
+    name: 'Google Student Ambassador', org: 'Google', color: '#4285f4', logo: null, link: '',
+    duties: ['Represents Google Gemini on campus', 'Runs hands-on AI sessions for students', 'Builds a student community around Google AI'],
+  },
+  hrcc: {
+    name: 'HackerRank Campus Crew', org: 'HackerRank', color: '#2ec866', logo: null, link: '',
+    duties: ['Represents HackerRank on campus', 'Organises workshops, hackathons and tech sessions', 'Helps students practise coding and prepare for technical interviews'],
+  },
+  msa: {
+    name: 'Microsoft Student Ambassador', org: 'Microsoft', color: '#00a4ef', logo: null,
+    link: 'https://learn.microsoft.com/training/student-hub/become-a-student-ambassador',
+    duties: ['Hosts learning sessions on Microsoft technology', 'Shares Microsoft Learn resources and learning paths', 'Builds a community of learners on campus'],
+  },
+  unstop: {
+    name: 'Unstop Campus Champion', org: 'Unstop', color: '#7c6cff', logo: null, link: '',
+    duties: ['The face and voice of Unstop on campus', 'Conducts competitions, hackathons and events', 'Connects college clubs with Unstop opportunities'],
+  },
+  gfg: {
+    name: 'GeeksforGeeks Campus Mantri', org: 'GeeksforGeeks', color: '#2f8d46', logo: null,
+    link: 'https://www.geeksforgeeks.org/campus-ambassador-know-more/',
+    duties: ['Represents GeeksforGeeks on campus', 'Organises coding events and sessions', 'Brings GfG learning resources to students'],
+  },
+};
+
+/* the members, and which programs they are part of (keys from PROGRAMS above) */
+export const AMBASSADORS = [
+  { name: 'Vrushabh Shelokar', role: 'President · 3rd CSE', img: vrushabh, programs: ['gsa', 'hrcc'] },
+  { name: 'Atharva Khule', role: 'Executive Member · 2nd CSE', img: atharva, programs: ['msa'] },
+  { name: 'Ashay Deshpande', role: 'Executive Member · 2nd IT', img: ashay, programs: ['unstop'] },
+  { name: 'Chitra Bankar', role: 'Student Advisor · 3rd CSE', img: chitra, programs: ['gfg'] },
+];
+
 /* ---------------- what we do (home page cards) ---------------- */
 export const TRACKS = [
   { id: 'web', icon: 'Globe', color: '#4c8dff', title: 'Web Development', desc: 'From your first HTML page to full-stack React apps, deployed live.' },

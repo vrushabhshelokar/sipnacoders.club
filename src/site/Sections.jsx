@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon } from './Icons';
 import { Reveal, SectionHead } from './ui';
-import { TOOLS, FAQ, VOICES, WINS, LINKS } from '../data/site';
+import { TOOLS, FAQ, VOICES, WINS, LINKS, PROGRAMS, AMBASSADORS } from '../data/site';
 
 const DOTS = ['#4285f4', '#34a853', '#fbbc05', '#ea4335'];
 
@@ -92,6 +92,66 @@ export function Voices() {
                   {v.img ? <img src={v.img} alt="" loading="lazy" decoding="async" /> : <span className="s-voice-ini">{initials}</span>}
                   <span><b>{v.name}</b>{v.role && <small>{v.role}</small>}</span>
                 </figcaption>
+              </Reveal>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- campus ambassadors (team page) ---------- */
+const Badge = ({ size = 16 }) => svg(size, <><path d="M12 2l2.4 1.8 3-.2.9 2.9 2.5 1.7-1 2.8 1 2.8-2.5 1.7-.9 2.9-3-.2L12 22l-2.4-1.8-3 .2-.9-2.9-2.5-1.7 1-2.8-1-2.8 2.5-1.7.9-2.9 3 .2L12 2Z" /><path d="m8.5 12 2.4 2.4 4.6-4.8" /></>);
+const Tick = () => svg(14, <path d="m5 12.5 4.2 4.2L19 7" />);
+
+function ProgramMark({ p }) {
+  return p.logo
+    ? <img className="s-amb-logo" src={p.logo} alt={`${p.org} logo`} loading="lazy" decoding="async" />
+    : <span className="s-amb-mark"><Badge size={15} /></span>;
+}
+
+export function Ambassadors() {
+  if (!AMBASSADORS.length) return null;
+  return (
+    <section id="ambassadors" className="s-section s-section-tint">
+      <div className="s-container">
+        <SectionHead
+          eyebrow="Campus ambassadors"
+          title="Meet our ambassadors"
+          sub="Club members who represent global tech programs at Sipna, and bring their events, resources and opportunities to every coder here."
+        />
+        <div className="s-ambs">
+          {AMBASSADORS.map((a, i) => {
+            const progs = a.programs.map((k) => PROGRAMS[k]).filter(Boolean);
+            const c1 = progs[0] ? progs[0].color : '#4c8dff', c2 = progs[1] ? progs[1].color : c1;
+            return (
+              <Reveal as="article" key={a.name} className="s-amb" delay={(i % 2) * 90} style={{ '--c1': c1, '--c2': c2 }}>
+                <div className="s-amb-top">
+                  <div className="s-amb-photo"><img src={a.img} alt={a.name} loading="lazy" decoding="async" /></div>
+                  <div className="s-amb-who">
+                    <h3>{a.name}</h3>
+                    <p>{a.role}</p>
+                    <div className="s-amb-badges">
+                      {progs.map((p) => (
+                        <span key={p.name} className="s-amb-badge" style={{ '--pc': p.color }}><ProgramMark p={p} />{p.name}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className="s-amb-roles">
+                  {progs.map((p) => (
+                    <div key={p.name} className="s-amb-role" style={{ '--pc': p.color }}>
+                      <span className="s-amb-role-h">What they do as {p.name}</span>
+                      <ul>{p.duties.map((d) => <li key={d}><Tick />{d}</li>)}</ul>
+                      {p.link && (
+                        <a className="s-link" href={p.link} target="_blank" rel="noopener noreferrer">
+                          About the {p.org} program <Icon.ArrowUpRight size={14} />
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </Reveal>
             );
           })}

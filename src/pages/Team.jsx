@@ -1,5 +1,6 @@
 import { Icon } from '../site/Icons';
 import { PageHead, Reveal } from '../site/ui';
+import { Ambassadors } from '../site/Sections';
 import { LINKS, TEAM, groupPhoto } from '../data/site';
 
 export default function Team() {
@@ -34,6 +35,13 @@ export default function Team() {
           <div className="s-team">
             {TEAM.map((m, i) => <Member key={m.name} m={m} i={i} />)}
           </div>
+        </div>
+      </section>
+
+      <Ambassadors />
+
+      <section className="s-section s-team-join">
+        <div className="s-container">
           <Reveal className="s-callout">
             <h3>Want to be part of the team?</h3>
             <p>Join the community, come to events and grow with us.</p>
