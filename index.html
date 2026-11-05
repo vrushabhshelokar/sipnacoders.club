@@ -2,13 +2,76 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/coders_club_logo.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>coders_club_website</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- Title + description: what Google and browser tabs show.
+         If you connect your own domain, replace https://sipnacoders-club.vercel.app everywhere in this file
+         (and in public/robots.txt + public/sitemap.xml). -->
+    <title>Sipna Coders Club | Coding club of Sipna COET, Amravati</title>
+    <meta name="description" content="Sipna Coders Club is the coding community of Sipna College of Engineering &amp; Technology, Amravati. Workshops, hackathons, seminars and build nights in web development, DSA, AI, cloud and app development." />
+    <link rel="canonical" href="https://sipnacoders-club.vercel.app/" />
+    <meta name="theme-color" content="#06070a" />
+
+    <!-- Icons + "Add to Home Screen" -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="apple-mobile-web-app-title" content="Coders Club" />
+
+    <!-- Link previews on WhatsApp, LinkedIn, Instagram, Facebook, X ... -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Sipna Coders Club" />
+    <meta property="og:title" content="Sipna Coders Club | Compile your future" />
+    <meta property="og:description" content="The coding community of Sipna College of Engineering &amp; Technology, Amravati. Workshops, hackathons, seminars and build nights." />
+    <meta property="og:url" content="https://sipnacoders-club.vercel.app/" />
+    <meta property="og:image" content="https://sipnacoders-club.vercel.app/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Sipna Coders Club: Compile your future" />
+    <meta property="og:locale" content="en_IN" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sipna Coders Club | Compile your future" />
+    <meta name="twitter:description" content="The coding community of Sipna College of Engineering &amp; Technology, Amravati." />
+    <meta name="twitter:image" content="https://sipnacoders-club.vercel.app/og-image.jpg" />
+
+    <!-- Tells Google who we are (can show the logo and social links in search results) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Sipna Coders Club",
+        "url": "https://sipnacoders-club.vercel.app/",
+        "logo": "https://sipnacoders-club.vercel.app/icons/icon-512.png",
+        "email": "team@sipnacoders.club",
+        "sameAs": [
+          "https://www.instagram.com/sipnacoders.club/",
+          "https://www.linkedin.com/company/sipna-coders-club/"
+        ],
+        "parentOrganization": {
+          "@type": "CollegeOrUniversity",
+          "name": "Sipna College of Engineering & Technology",
+          "address": { "@type": "PostalAddress", "addressLocality": "Amravati", "addressRegion": "Maharashtra", "addressCountry": "IN" }
+        }
+      }
+    </script>
   </head>
   <body>
+    <noscript>Sipna Coders Club: please turn on JavaScript to view this website.</noscript>
     <div id="root"></div>
     <script src="/intro/intro.js"></script>
     <script type="module" src="/src/main.jsx"></script>
+
+    <!-- Visitor stats (Vercel Web Analytics). Turn it on once in the Vercel dashboard:
+         your project > Analytics > Enable. Skipped on localhost so testing doesn't count. -->
+    <script>
+      if (!/^(localhost|127\.|192\.168\.|10\.|\[::1\])/.test(location.hostname)) {
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+        var va = document.createElement('script');
+        va.defer = true;
+        va.src = '/_vercel/insights/script.js';
+        document.head.appendChild(va);
+      }
+    </script>
   </body>
 </html>

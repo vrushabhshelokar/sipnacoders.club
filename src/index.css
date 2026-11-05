@@ -12,10 +12,6 @@
       margin: 0;
       padding: 0;
   }
-
-  a {
-    @apply text-primary hover:text-secondary;
-  }
 }
 
 /* ✅ Custom Animation for Fade-Up Reveal */

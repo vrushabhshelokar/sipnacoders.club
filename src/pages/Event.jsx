@@ -1,30 +1,27 @@
-import React from "react";
-import EventSection1 from "../components/common/EventsSection1";
-import EventPipeLine from "../components/common/EventPipeLine";
-import NavBar from "../components/navbars/NavBar";
-import Footer from '../components/footer/Footer';
+import { PageHead, SectionHead } from '../site/ui';
+import { UpcomingBlock } from '../site/events';
+import Timeline from '../site/Timeline';
 
-const Event = () => {
+export default function Event() {
   return (
-    <><NavBar />
-      {/* Global Background */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent" />
-      </div>
-
-      {/* Page Content */}
-      <section className="relative w-full z-10">
-
-        <EventSection1 />
+    <>
+      <PageHead
+        eyebrow="Events"
+        title="Events"
+        sub="Workshops, hackathons, seminars and build nights. Here's what's coming up and everything we've done so far."
+      />
+      <section id="upcoming" className="s-section s-section-first">
+        <div className="s-container">
+          <SectionHead eyebrow="Upcoming" title="Coming up" />
+          <UpcomingBlock />
+        </div>
       </section>
-
-      {/* <section className="relative w-full z-10">
-        <EventPipeLine />
-      </section> */}
-      <Footer />
+      <section id="past" className="s-section s-section-tint">
+        <div className="s-container">
+          <SectionHead eyebrow="Past events" title="What we've done" sub="Our story so far, event by event. Tap any event to open its photos." />
+          <Timeline />
+        </div>
+      </section>
     </>
   );
-};
-
-export default Event;
+}

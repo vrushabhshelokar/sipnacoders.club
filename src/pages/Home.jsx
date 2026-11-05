@@ -1,268 +1,168 @@
-import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Icon } from '../site/Icons';
+import { Odometer, Reveal, SectionHead, useInView, useIntroDone } from '../site/ui';
+import HeroArt from '../site/HeroArt';
+import { UpcomingBlock, PastBento } from '../site/events';
+import { ToolStrip, Wins, Voices, Faq } from '../site/Sections';
+import { LINKS, STATS, TRACKS, JOIN_STEPS, membershipPoster, groupPhoto } from '../data/site';
 
-import { useNavigate } from "react-router-dom";
+export default function Home() {
+  return (
+    <>
+      <Hero />
+      <Stats />
+      <ToolStrip />
 
-import { Terminal, Cpu, Globe, Code2, ArrowRight, ChevronRight, Layers, Zap } from 'lucide-react';
+      <section id="upcoming" className="s-section">
+        <div className="s-container">
+          <SectionHead eyebrow="Upcoming events" title="What's next" sub="Workshops, hackathons and contests. Here's what the club is planning next." />
+          <UpcomingBlock />
+          <div className="s-more"><Link to="/events" className="s-link">See all events <Icon.ArrowRight size={16} /></Link></div>
+        </div>
+      </section>
 
-import NavBar from '../components/navbars/NavBar';
+      <section id="what-we-do" className="s-section s-section-tint">
+        <div className="s-container">
+          <SectionHead eyebrow="What we do" title="Learn by building" sub="Pick a track, learn with friends and ship something real." />
+          <div className="s-tracks">
+            {TRACKS.map((t, i) => {
+              const IconC = Icon[t.icon] || Icon.Code;
+              return (
+                <Reveal key={t.id} className="s-track" delay={i * 80} style={{ '--c': t.color }}>
+                  <span className="s-track-ic"><IconC size={22} /></span>
+                  <h3>{t.title}</h3>
+                  <p>{t.desc}</p>
+                </Reveal>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
+      <Wins />
 
-import Membership from '../components/upcomingEvent/Membership';
+      <section id="join" className="s-section">
+        <div className="s-container">
+          <Reveal className="s-join">
+            <div className="s-join-poster">
+              <img src={membershipPoster} alt="Coders Club membership poster" loading="lazy" decoding="async" />
+            </div>
+            <div className="s-join-body">
+              <span className="s-eyebrow">Membership</span>
+              <h2 className="s-h2">Join Coders Community</h2>
+              <p className="s-sub">Registrations are open. Three simple steps and you&apos;re in.</p>
+              <ol className="s-steps">
+                {JOIN_STEPS.map((s, i) => (
+                  <li key={s.title}>
+                    <span className="s-step-n">{i + 1}</span>
+                    <div><b>{s.title}</b><p>{s.desc}</p></div>
+                  </li>
+                ))}
+              </ol>
+              <div className="s-actions">
+                <a className="s-btn s-btn-light" href={LINKS.membershipForm} target="_blank" rel="noopener noreferrer">
+                  Become a member <Icon.ArrowUpRight size={16} />
+                </a>
+                <a className="s-btn s-btn-ghost" href={LINKS.instagram} target="_blank" rel="noopener noreferrer">
+                  <Icon.Instagram size={16} /> Follow us
+                </a>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
 
-import LogoNav from '../components/navbars/LogoNav';
+      <section id="recent" className="s-section s-section-tint">
+        <div className="s-container">
+          <SectionHead eyebrow="Past events" title="What we've done" sub="Workshops, hackathons and seminars. Tap any event to see the photos." />
+          <PastBento />
+        </div>
+      </section>
 
-import Border from '../components/common/Border';
+      <Voices />
+      <Faq />
 
-import Section3GroupPhoto from '../components/common/Section3GroupPhoto';
+      <section className="s-section">
+        <div className="s-container">
+          <Reveal className="s-banner">
+            <img src={groupPhoto} alt="The members who started Sipna Coders Club" loading="lazy" decoding="async" />
+            <div className="s-banner-body">
+              <span className="s-eyebrow">Where it started</span>
+              <h2 className="s-h2">The founding crew</h2>
+              <p>The members who started Sipna Coders Club and built the community we have today.</p>
+              <Link to="/team" className="s-btn s-btn-light">Meet the current team <Icon.ArrowRight size={16} /></Link>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+    </>
+  );
+}
 
-import Footer from '../components/footer/Footer';
-
-import SplashCursor from '../blocks/Splash/SplashCursor';
-
-/* DESIGN SYSTEM CONFIGURATION
-  - Background: #050505 (Void)
-  - Primary Accent: Emerald-500 (Success/Compile)
-  - Secondary Accent: Cyan-400 (Runtime)
-  - Surface: White/5 (Glass)
-*/
-
-const HomePage = () => {
-  const [scrolled, setScrolled] = useState(false);
-  const navigate = useNavigate();
-
-  // Handle scroll for navbar glass effect
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+function Hero() {
+  const live = useIntroDone();
+  const move = (e) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty('--x', `${e.clientX - r.left}px`);
+    e.currentTarget.style.setProperty('--y', `${e.clientY - r.top}px`);
+    e.currentTarget.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 2 - 1).toFixed(3));
+    e.currentTarget.style.setProperty('--my', ((e.clientY - r.top) / r.height * 2 - 1).toFixed(3));
+  };
+  const toUpcoming = (e) => {
+    e.preventDefault();
+    const el = document.getElementById('upcoming');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-neutral-200 font-sans selection:bg-emerald-500/30 selection:text-emerald-200 overflow-x-hidden">
-      <LogoNav />
-      <SplashCursor />
-      {/* --- GLOBAL BACKGROUND GRID --- */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent"></div>
+    <section className={`s-hero ${live ? 'is-live' : ''}`} onPointerMove={move}>
+      <div className="s-hero-bg" aria-hidden="true">
+        <i className="o1" /><i className="o2" /><i className="o3" />
+        <div className="s-hero-spot" />
       </div>
-
-
-      {/* --- NAVIGATION: The Floating Console --- */}
-      <NavBar />
-      {/* <nav className={`fixed top-0 w-full z-50 transition-all duration-300 border-b ${scrolled ? 'bg-[#050505]/80 backdrop-blur-md border-white/5 py-4' : 'bg-transparent border-transparent py-6'}`}>
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          <div className="flex items-center gap-2 font-mono font-bold text-xl tracking-tighter">
-            <span className="text-emerald-500">./</span>CODERS<span className="text-neutral-500">_CLUB</span>
-          </div>
-          <div className="hidden md:flex items-center gap-8 font-mono text-sm text-neutral-400">
-            {['Events', 'Tracks', 'Projects', 'Leaderboard'].map((item) => (
-              <a key={item} href={`#${item.toLowerCase()}`} className="hover:text-emerald-400 transition-colors">
-                {item}
-              </a>
-            ))}
-          </div>
-          <button className="hidden md:flex items-center gap-2 px-5 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full font-mono text-xs transition-all group">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            JOIN_SERVER
-            <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-          </button>
-        </div>
-      </nav> */}
-
-      {/* --- HERO SECTION: The Compiler --- */}
-      <section className="relative z-10 pt-40 pb-32 px-6 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-        <div className="space-y-8 pt-0 pb-0 px-0 sm:pt-40 sm:pb-24 sm:px-6 max-w-7xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono text-xs">
-            <Terminal className="w-3 h-3" />
-            <span>v2.0 System Online</span>
-          </div>
-
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.1]">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-neutral-500">
-              Compile Your
-            </span>
-            <br />
-            <span className="font-mono text-emerald-400">Future_</span>
+      <div className="s-container s-hero-in">
+        <div className="s-hero-copy">
+          <span className="s-pill"><i /> Sipna College of Engineering &amp; Technology</span>
+          <h1 className="s-hero-title">
+            <span>Compile your</span>
+            <span><span className="s-grad">future</span><span className="s-caret">_</span></span>
           </h1>
-
-          <p className="text-lg text-neutral-400 max-w-lg leading-relaxed">
-            Not just a club. A runtime environment for the next generation of software engineers. Build, break, and ship code that matters.
+          <p className="s-hero-sub">
+            Not just a club. A runtime environment for the next generation of software engineers.
+            Build, break, and ship code that matters.
           </p>
-
-          <div className="flex flex-wrap gap-4">
-            <button
-              onClick={() =>
-  window.open(
-    "https://forms.gle/5a85cYhy9zy8Jw5s9",
-    "_blank",
-    "noopener,noreferrer"
-  )
+          <div className="s-actions">
+            <a className="s-btn s-btn-light s-btn-lg" href={LINKS.joinForm} target="_blank" rel="noopener noreferrer">
+              Join Coders Community <Icon.ArrowUpRight size={17} />
+            </a>
+            <a className="s-btn s-btn-ghost s-btn-lg" href="#upcoming" onClick={toUpcoming}>
+              Upcoming events
+            </a>
+          </div>
+        </div>
+        <div className="s-hero-visual">
+          <HeroArt />
+        </div>
+      </div>
+    </section>
+  );
 }
-              className="px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-lg transition-all flex items-center gap-2 group">
-              Join Coders Community
-              <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button
-              onClick={() => {
-                document
-                  .getElementById("section2")
-                  ?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className="px-8 py-4 bg-transparent border border-white/10 hover:border-white/30 text-white rounded-lg transition-all font-mono"
-            >
-              View_Documentation
-            </button>
+
+const STAT_COLORS = ['#4285f4', '#34a853', '#fbbc05', '#ea4335'];
+
+function Stats() {
+  const [ref, inView] = useInView(0.3);
+  return (
+    <div className="s-container">
+      <div className="s-stats" ref={ref}>
+        {STATS.map((s, i) => (
+          <div key={s.label} className={`s-stat rv ${inView ? 'in' : ''}`} style={{ '--d': `${i * 110}ms`, '--c': STAT_COLORS[i % 4], '--k': i }}>
+            <b><Odometer value={s.value} play={inView} suffix={s.suffix} /></b>
+            <span>{s.label}</span>
+            <i className="s-stat-shine" aria-hidden="true" />
           </div>
-        </div>
-
-        {/* Hero Visual: The "Glass Terminal" Card */}
-        <div className="relative group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-          <div className="relative bg-[#0A0A0B] border border-white/10 rounded-xl overflow-hidden shadow-2xl">
-            {/* Terminal Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 bg-white/5">
-              <div className="flex gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50"></div>
-                <div className="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50"></div>
-                <div className="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50"></div>
-              </div>
-              <div className="text-xs font-mono text-neutral-500">main.tsx — bash</div>
-            </div>
-            {/* Terminal Body */}
-            <div className="p-6 font-mono text-sm space-y-4 text-neutral-300">
-              <div className="flex">
-                <span className="text-emerald-500 mr-2">➜</span>
-                <span className="text-cyan-400">~</span>
-                <span className="ml-2">init coders_club</span>
-              </div>
-              <div className="text-neutral-500">
-                Loaded modules:<br />
-                - Creative_Computing<br />
-                - Data_Structures<br />
-                - System_Design
-              </div>
-              <div className="flex">
-                <span className="text-emerald-500 mr-2">➜</span>
-                <span className="text-cyan-400">~</span>
-                <span className="ml-2 animate-pulse">_</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <Border />
-      </section>
-
-
-
-      {/* --- BENTO GRID: Tracks & Focus --- */}
-      <section id="section2"
-        className="
-            relative
-            w-full
-            overflow-visible
-        "
-      >
-        
-      </section>
-
-      <section id="section2"
-        className="
-            relative
-            w-full
-            overflow-visible
-        "
-      >
-        <Membership />
-      </section>
-
-      <section
-        className="
-            relative
-            w-full
-            overflow-visible
-        "
-      >
-        <Section3GroupPhoto />
-      </section>
-
-      {/* <section className="relative z-10 py-24 px-6 max-w-7xl mx-auto">
-        <div className="mb-12 flex items-end justify-between">
-          <div>
-            <h2 className="text-3xl font-bold mb-4">Core_Modules</h2>
-            <p className="text-neutral-400 max-w-md">Select a specialization track to begin your journey.</p>
-          </div>
-          <div className="hidden md:block font-mono text-xs text-neutral-600">
-            // INDEX: 01-04
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 grid-rows-2 gap-4 h-auto md:h-[600px]">
-          
-          Main Large Card 
-          <div className="md:col-span-2 md:row-span-2 p-8 rounded-2xl bg-neutral-900/40 border border-white/5 hover:border-emerald-500/30 transition-all duration-300 group relative overflow-hidden flex flex-col justify-end">
-             <div className="absolute top-0 right-0 p-32 bg-emerald-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-             <div className="relative z-10">
-                <div className="bg-emerald-500/10 w-12 h-12 rounded-lg flex items-center justify-center mb-6 border border-emerald-500/20 text-emerald-400">
-                  <Globe className="w-6 h-6" />
-                </div>
-                <h3 className="text-2xl font-bold mb-2 group-hover:text-emerald-400 transition-colors">Full Stack Engineering</h3>
-                <p className="text-neutral-400 mb-6">Master the modern web. From React & Tailwind to Node & Postgres. Build scalable applications from scratch.</p>
-                <div className="flex gap-2">
-                   {['React', 'Next.js', 'PostgreSQL'].map(tag => (
-                     <span key={tag} className="text-xs font-mono px-2 py-1 rounded bg-white/5 border border-white/10 text-neutral-300">{tag}</span>
-                   ))}
-                </div>
-             </div>
-          </div>
-
-          Secondary Card 1 
-          <div className="p-6 rounded-2xl bg-neutral-900/40 border border-white/5 hover:border-cyan-500/30 transition-all duration-300 group flex flex-col justify-between">
-            <div className="bg-cyan-500/10 w-10 h-10 rounded-lg flex items-center justify-center border border-cyan-500/20 text-cyan-400">
-              <Cpu className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold mt-4 mb-1 group-hover:text-cyan-400 transition-colors">Systems & Cloud</h3>
-              <p className="text-sm text-neutral-500">Docker, Kubernetes, and low-level architecture.</p>
-            </div>
-          </div>
-
-          Secondary Card 2 
-          <div className="p-6 rounded-2xl bg-neutral-900/40 border border-white/5 hover:border-purple-500/30 transition-all duration-300 group flex flex-col justify-between">
-             <div className="bg-purple-500/10 w-10 h-10 rounded-lg flex items-center justify-center border border-purple-500/20 text-purple-400">
-              <Code2 className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold mt-4 mb-1 group-hover:text-purple-400 transition-colors">DSA & Competitive</h3>
-              <p className="text-sm text-neutral-500">Ace the interview. Master algorithms and optimization.</p>
-            </div>
-          </div>
-
-        </div>
-      </section> */}
-
-      {/* --- STATS TICKER: Minimalist --- */}
-      <section className="border-y border-white/5 bg-white/[0.02]">
-        <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-2 md:grid-cols-4 gap-8">
-          {[
-            { label: 'Participants', value: '600+' },
-            { label: 'Event_Conducted', value: '9+' },
-            { label: 'Lines_Of_Code', value: '' },
-            { label: 'Workshops', value: '4' }
-          ].map((stat, i) => (
-            <div key={i} className="text-center md:text-left">
-              <div className="text-3xl font-mono font-bold text-white mb-1">{stat.value}</div>
-              <div className="text-xs font-mono text-neutral-500 uppercase tracking-widest">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* --- FOOTER: Simple Command Line --- */}
-      <Footer />
-
+        ))}
+      </div>
     </div>
   );
-};
-
-export default HomePage;
+}

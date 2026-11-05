@@ -1,25 +1,26 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import Layout from './site/Layout';
 import Home from './pages/Home';
-import Event from "./pages/Event"
+import Event from './pages/Event';
 import Team from './pages/Team';
 import Connect from './pages/Connect';
-import RegistrationForm from './components/RegistrationForm';
+import Register from './pages/Register';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/register" element={<RegistrationForm />} />
           <Route path="/events" element={<Event />} />
           <Route path="/team" element={<Team />} />
           <Route path="/connect" element={<Connect />} />
-
+          <Route path="/register" element={<Register />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
-      </Router>
-    </AuthProvider>
+      </Layout>
+    </Router>
   );
 }
 
