@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { Icon } from './Icons';
 import { Reveal, SectionHead } from './ui';
 import { TOOLS, FAQ, VOICES, WINS, LINKS, PROGRAMS, AMBASSADORS } from '../data/site';
+import './Ambassadors.css';
 
 const DOTS = ['#4285f4', '#34a853', '#fbbc05', '#ea4335'];
 
@@ -102,13 +103,33 @@ export function Voices() {
 }
 
 /* ---------- campus ambassadors (team page) ---------- */
-const Badge = ({ size = 16 }) => svg(size, <><path d="M12 2l2.4 1.8 3-.2.9 2.9 2.5 1.7-1 2.8 1 2.8-2.5 1.7-.9 2.9-3-.2L12 22l-2.4-1.8-3 .2-.9-2.9-2.5-1.7 1-2.8-1-2.8 2.5-1.7.9-2.9 3 .2L12 2Z" /><path d="m8.5 12 2.4 2.4 4.6-4.8" /></>);
 const Tick = () => svg(14, <path d="m5 12.5 4.2 4.2L19 7" />);
 
-function ProgramMark({ p }) {
-  return p.logo
-    ? <img className="s-amb-logo" src={p.logo} alt={`${p.org} logo`} loading="lazy" decoding="async" />
-    : <span className="s-amb-mark"><Badge size={15} /></span>;
+/* Program logos. Drop the official logo files into src/assets/programs/ and name each one after the company,
+   in lower case: google.png, hackerrank.png, microsoft.png, unstop.png, geeksforgeeks.png (.png, .svg, .webp or .jpg).
+   They show up by themselves, no code change. A program with no file shows its letters on a brand-colour tile.
+   (A `logo:` set in data/site.js still wins over the file.) */
+const LOGO_FILES = import.meta.glob('../assets/programs/*.{png,jpg,jpeg,webp,svg}', { eager: true, import: 'default' });
+const LOGOS = Object.fromEntries(
+  Object.entries(LOGO_FILES).map(([path, url]) => [path.split('/').pop().replace(/\.[^.]+$/, '').toLowerCase().replace(/[^a-z0-9]/g, ''), url]),
+);
+const logoOf = (p) => p.logo || LOGOS[String(p.org).toLowerCase().replace(/[^a-z0-9]/g, '')] || null;
+
+/* letters shown on a program's tile while it has no logo file */
+const MONO = { Google: 'G', HackerRank: 'HR', Microsoft: 'M', Unstop: 'U', GeeksforGeeks: 'GfG' };
+const monoOf = (p) => MONO[p.org] || String(p.org || p.name).slice(0, 2);
+// "Google Student Ambassador" -> "Student Ambassador"
+const roleOf = (p) => (p.name.startsWith(p.org) ? p.name.slice(p.org.length).trim() : p.name) || p.name;
+
+function ProgramMark({ p, big }) {
+  const logo = logoOf(p);
+  return logo ? (
+    <span className={`s-amb-tile has-img ${big ? 'is-big' : ''}`}>
+      <img src={logo} alt={`${p.org} logo`} loading="lazy" decoding="async" />
+    </span>
+  ) : (
+    <span className={`s-amb-tile ${big ? 'is-big' : ''}`} role="img" aria-label={`${p.org} logo`}>{monoOf(p)}</span>
+  );
 }
 
 export function Ambassadors() {
@@ -134,7 +155,10 @@ export function Ambassadors() {
                     <p>{a.role}</p>
                     <div className="s-amb-badges">
                       {progs.map((p) => (
-                        <span key={p.name} className="s-amb-badge" style={{ '--pc': p.color }}><ProgramMark p={p} />{p.name}</span>
+                        <span key={p.name} className="s-amb-badge" style={{ '--pc': p.color }}>
+                          <ProgramMark p={p} />
+                          <span className="s-amb-bn"><b>{p.org}</b><small>{roleOf(p)}</small></span>
+                        </span>
                       ))}
                     </div>
                   </div>
@@ -142,7 +166,10 @@ export function Ambassadors() {
                 <div className="s-amb-roles">
                   {progs.map((p) => (
                     <div key={p.name} className="s-amb-role" style={{ '--pc': p.color }}>
-                      <span className="s-amb-role-h">What they do as {p.name}</span>
+                      <div className="s-amb-role-top">
+                        <ProgramMark p={p} big />
+                        <span className="s-amb-role-h">What they do as {p.name}</span>
+                      </div>
                       <ul>{p.duties.map((d) => <li key={d}><Tick />{d}</li>)}</ul>
                       {p.link && (
                         <a className="s-link" href={p.link} target="_blank" rel="noopener noreferrer">

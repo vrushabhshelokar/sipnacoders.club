@@ -4,6 +4,7 @@ import { Odometer, Reveal, SectionHead, useInView, useIntroDone } from '../site/
 import HeroArt from '../site/HeroArt';
 import { UpcomingBlock, PastBento } from '../site/events';
 import { ToolStrip, Wins, Voices, Faq } from '../site/Sections';
+import { CountBubble, FoundMessage, useUpcomingCount } from '../site/UpcomingFound';
 import { LINKS, STATS, TRACKS, JOIN_STEPS, membershipPoster, groupPhoto } from '../data/site';
 
 export default function Home() {
@@ -101,6 +102,7 @@ export default function Home() {
 
 function Hero() {
   const live = useIntroDone();
+  const found = useUpcomingCount();
   const move = (e) => {
     const r = e.currentTarget.getBoundingClientRect();
     e.currentTarget.style.setProperty('--x', `${e.clientX - r.left}px`);
@@ -135,10 +137,11 @@ function Hero() {
             <a className="s-btn s-btn-light s-btn-lg" href={LINKS.joinForm} target="_blank" rel="noopener noreferrer">
               Join Coders Community <Icon.ArrowUpRight size={17} />
             </a>
-            <a className="s-btn s-btn-ghost s-btn-lg" href="#upcoming" onClick={toUpcoming}>
-              Upcoming events
+            <a className={`s-btn s-btn-ghost s-btn-lg ${found ? 'has-found' : ''}`} href="#upcoming" onClick={toUpcoming}>
+              Upcoming events <CountBubble n={found} />
             </a>
           </div>
+          <FoundMessage n={found} onGo={toUpcoming} />
         </div>
         <div className="s-hero-visual">
           <HeroArt />

@@ -1,0 +1,61 @@
+/* Highlighted program (brand) tiles in the Campus ambassadors section.
+   These rules load before styles/site.css, so every selector starts with .s-ambs to win over the old ones. */
+
+/* the brand tile: official logo on white, or the program's letters on its brand colour */
+.s-ambs .s-amb-tile {
+  position: relative; flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 13px; overflow: hidden;
+  font: 700 15px/1 var(--display, 'Space Grotesk', sans-serif); letter-spacing: -.02em; color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, .35);
+  background: var(--pc); background: linear-gradient(145deg, var(--pc), color-mix(in srgb, var(--pc) 58%, #000));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .24), 0 8px 22px -6px var(--pc), 0 0 20px -4px var(--pc);
+  transition: transform .25s var(--ease, ease), box-shadow .25s;
+}
+.s-ambs .s-amb-tile::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; transform: translateX(-130%);
+  background: linear-gradient(115deg, transparent 36%, rgba(255, 255, 255, .5) 50%, transparent 64%);
+}
+/* logo files are square, tile-ready pictures, so they fill the whole tile */
+.s-ambs .s-amb-tile.has-img { padding: 0; background: #0b0d12; text-shadow: none; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16), 0 8px 22px -6px var(--pc), 0 0 22px -3px var(--pc); }
+.s-ambs .s-amb-tile img { display: block; width: 100%; height: 100%; object-fit: cover; background: none; border-radius: 0; padding: 0; }
+.s-ambs .s-amb-tile.is-big { width: 54px; height: 54px; border-radius: 16px; font-size: 18px; }
+.s-ambs .s-amb:hover .s-amb-tile { transform: translateY(-2px) scale(1.04); }
+.s-ambs .s-amb:hover .s-amb-tile::after { transform: translateX(130%); transition: transform .8s ease; }
+
+/* the chip under the member's name */
+.s-ambs .s-amb-badge {
+  gap: 11px; padding: 6px 16px 6px 6px; border-radius: 16px; max-width: 100%;
+  border: 1px solid rgba(255, 255, 255, .22); border: 1px solid color-mix(in srgb, var(--pc) 62%, transparent);
+  background: rgba(255, 255, 255, .06); background: linear-gradient(135deg, color-mix(in srgb, var(--pc) 26%, #0a0c11), color-mix(in srgb, var(--pc) 8%, #0a0c11));
+  box-shadow: 0 14px 30px -18px var(--pc), inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+.s-ambs .s-amb-bn { display: block; min-width: 0; line-height: 1.15; overflow-wrap: anywhere; }
+.s-ambs .s-amb-bn b { display: block; font: 700 15px/1.15 var(--display, 'Space Grotesk', sans-serif); letter-spacing: -.01em; color: #fff; }
+.s-ambs .s-amb-bn small { display: block; margin-top: 3px; font: 500 11.5px/1.2 var(--sans, system-ui, sans-serif); color: var(--text-2, #a3acba); }
+
+/* "What they do as ..." panel, tinted with the program's colour */
+.s-ambs .s-amb-roles { gap: 14px; }
+.s-ambs .s-amb-role {
+  position: relative; padding: 16px 18px 16px; border-radius: 18px; overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .1); border: 1px solid color-mix(in srgb, var(--pc) 32%, transparent);
+  background: rgba(255, 255, 255, .03); background: linear-gradient(135deg, color-mix(in srgb, var(--pc) 13%, transparent), transparent 70%);
+}
+.s-ambs .s-amb-role::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--pc); box-shadow: 0 0 16px var(--pc); }
+.s-ambs .s-amb-role-top { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.s-ambs .s-amb-role .s-amb-role-h { margin: 0; min-width: 0; }
+
+/* whole card lights up in the program colour on hover */
+.s-ambs .s-amb { transition: border-color .3s, box-shadow .3s; }
+.s-ambs .s-amb:hover { border-color: rgba(255, 255, 255, .2); border-color: color-mix(in srgb, var(--c1) 50%, transparent); box-shadow: 0 30px 70px -40px var(--c1); }
+
+@media (max-width: 380px) {
+  /* very narrow phones: the photo goes above the name so the brand chips have the full width */
+  .s-ambs .s-amb-top { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 480px) {
+  .s-ambs .s-amb-badge { padding-right: 14px; }
+  .s-ambs .s-amb-role { padding: 14px 14px 14px 16px; }
+  .s-ambs .s-amb-tile.is-big { width: 46px; height: 46px; border-radius: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .s-ambs .s-amb-tile, .s-ambs .s-amb-tile::after, .s-ambs .s-amb { transition: none !important; }
+  .s-ambs .s-amb:hover .s-amb-tile { transform: none; }
+}

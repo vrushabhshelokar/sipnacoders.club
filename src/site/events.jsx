@@ -8,6 +8,7 @@ import { LINKS, upcomingEvents, pastEvents } from '../data/site';
 import {
   getUpcoming, getPast, useCountdown, fmtDay, fmtMon, fmtFull, fmtTime, durLabel, relative, gcalLink, normCat, catColor,
 } from './time';
+import HackathonTeaser, { isTeaserLive } from './HackathonTeaser';
 
 export function useUpcoming() {
   const [now] = useState(() => Date.now());
@@ -124,6 +125,7 @@ function EventCard({ ev, i }) {
 /* featured + the rest, or a friendly empty state */
 export function UpcomingBlock() {
   const list = useUpcoming();
+  if (!list.length && isTeaserLive()) return <HackathonTeaser />;
   if (!list.length) {
     return (
       <Reveal className="s-soon">
@@ -144,6 +146,7 @@ export function UpcomingBlock() {
   const [first, ...rest] = list;
   return (
     <div className="s-upcoming">
+      <HackathonTeaser />
       <Reveal><FeaturedEvent ev={first} /></Reveal>
       {rest.length > 0 && (
         <div className="s-ev-grid">

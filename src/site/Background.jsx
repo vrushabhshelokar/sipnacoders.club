@@ -9,6 +9,7 @@ import { useEffect, useRef } from 'react';
 const PAL = [[66, 133, 244], [52, 168, 83], [251, 188, 5], [234, 67, 53]]; // blue, green, yellow, red
 const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 const PARALLAX = 0.25; // how fast the board moves compared with the page
+const BRIGHTNESS = 0.55; // ✏️ how strong the background is: 1 = original, 0.55 = softer, 0.3 = very faint
 const GLOW_BG = 'radial-gradient(70% 60% at 85% 8%, rgba(66,133,244,.14), transparent 70%),'
   + 'radial-gradient(60% 55% at 5% 95%, rgba(52,168,83,.09), transparent 70%)';
 
@@ -117,7 +118,7 @@ export default function Background() {
       shift = window.scrollY * PARALLAX;
 
       // fade a little as the visitor scrolls down
-      const op = Math.max(small ? 0.6 : 0.45, 1 - window.scrollY / (H * 1.2));
+      const op = Math.max(small ? 0.6 : 0.45, 1 - window.scrollY / (H * 1.2)) * BRIGHTNESS;
       if (Math.abs(op - lastOpacity) > 0.01) { c.style.opacity = op.toFixed(2); lastOpacity = op; }
 
       g.globalCompositeOperation = 'source-over';

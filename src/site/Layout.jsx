@@ -5,6 +5,7 @@ import { Icon } from './Icons';
 import Background from './Background';
 import Dock from './Dock';
 import { MatrixEgg, ScrollProgress } from './Extras';
+import AnnouncePopup from './AnnouncePopup';
 import { LINKS, logo } from '../data/site';
 
 const NAV = [
@@ -107,6 +108,7 @@ export default function Layout({ children }) {
 
       <Dock />
       <MatrixEgg />
+      <AnnouncePopup />
     </>
   );
 }
