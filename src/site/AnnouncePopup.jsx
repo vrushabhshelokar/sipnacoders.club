@@ -1,5 +1,6 @@
-// Announcement popup: tells visitors about the hackathon and takes them straight to "Upcoming events".
-// Shows once per visit (after the opening animation) and only while the hackathon teaser is live.
+// Announcement popup: only hints that something big is coming and takes visitors straight to "Upcoming events".
+// All the information stays on the Upcoming events card. Shows once per visit (after the opening animation),
+// and only while the Upcoming events teaser card is live.
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Icon } from './Icons';
@@ -120,22 +121,10 @@ export default function AnnouncePopup() {
 
         <div className="s-ann-body">
           <span className="s-ann-flag"><i /> New signal detected</span>
-          <h2 id="s-ann-t" className="s-ann-title">A <span>hackathon</span> is coming</h2>
+          <h2 id="s-ann-t" className="s-ann-title"><span>Something big</span> is coming</h2>
           <p id="s-ann-d" className="s-ann-desc">
-            Sipna Coders Club is organising one. The name, theme and prizes are classified, for now.
+            Tap below to see what&apos;s next at Sipna Coders Club.
           </p>
-
-          <ul className="s-ann-chips">
-            <li>18 hours</li>
-            <li>2 rounds</li>
-            <li>Online + on campus</li>
-          </ul>
-
-          <div className="s-ann-red" aria-hidden="true">
-            <span>Name</span><i />
-            <span>Theme</span><i />
-            <span>Prizes</span><i />
-          </div>
 
           <div className="s-ann-actions">
             <button ref={cta} type="button" className="s-btn s-btn-light s-ann-go" onClick={go}>

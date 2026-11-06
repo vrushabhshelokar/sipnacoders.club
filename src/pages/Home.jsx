@@ -3,7 +3,7 @@ import { Icon } from '../site/Icons';
 import { Odometer, Reveal, SectionHead, useInView, useIntroDone } from '../site/ui';
 import HeroArt from '../site/HeroArt';
 import { UpcomingBlock, PastBento } from '../site/events';
-import { ToolStrip, Wins, Voices, Faq } from '../site/Sections';
+import { ToolStrip, Wins, Voices, Faq, Ambassadors } from '../site/Sections';
 import { CountBubble, FoundMessage, useUpcomingCount } from '../site/UpcomingFound';
 import { LINKS, STATS, TRACKS, JOIN_STEPS, membershipPoster, groupPhoto } from '../data/site';
 
@@ -11,8 +11,6 @@ export default function Home() {
   return (
     <>
       <Hero />
-      <Stats />
-      <ToolStrip />
 
       <section id="upcoming" className="s-section">
         <div className="s-container">
@@ -22,25 +20,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="what-we-do" className="s-section s-section-tint">
-        <div className="s-container">
-          <SectionHead eyebrow="What we do" title="Learn by building" sub="Pick a track, learn with friends and ship something real." />
-          <div className="s-tracks">
-            {TRACKS.map((t, i) => {
-              const IconC = Icon[t.icon] || Icon.Code;
-              return (
-                <Reveal key={t.id} className="s-track" delay={i * 80} style={{ '--c': t.color }}>
-                  <span className="s-track-ic"><IconC size={22} /></span>
-                  <h3>{t.title}</h3>
-                  <p>{t.desc}</p>
-                </Reveal>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      <Wins />
+      <Ambassadors />
 
       <section id="join" className="s-section">
         <div className="s-container">
@@ -80,7 +60,32 @@ export default function Home() {
         </div>
       </section>
 
+      <section id="what-we-do" className="s-section">
+        <div className="s-container">
+          <SectionHead eyebrow="What we do" title="Learn by building" sub="Pick a track, learn with friends and ship something real." />
+          <div className="s-tracks">
+            {TRACKS.map((t, i) => {
+              const IconC = Icon[t.icon] || Icon.Code;
+              return (
+                <Reveal key={t.id} className="s-track" delay={i * 80} style={{ '--c': t.color }}>
+                  <span className="s-track-ic"><IconC size={22} /></span>
+                  <h3>{t.title}</h3>
+                  <p>{t.desc}</p>
+                </Reveal>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <Stats />
+
+      <ToolStrip />
+
+      <Wins />
+
       <Voices />
+
       <Faq />
 
       <section className="s-section">

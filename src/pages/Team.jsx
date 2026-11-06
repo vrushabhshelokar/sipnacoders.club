@@ -1,6 +1,5 @@
 import { Icon } from '../site/Icons';
 import { PageHead, Reveal } from '../site/ui';
-import { Ambassadors } from '../site/Sections';
 import { LINKS, TEAM, groupPhoto } from '../data/site';
 
 export default function Team() {
@@ -37,8 +36,6 @@ export default function Team() {
           </div>
         </div>
       </section>
-
-      <Ambassadors />
 
       <section className="s-section s-team-join">
         <div className="s-container">

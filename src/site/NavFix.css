@@ -1,0 +1,9 @@
+/* One navigation at a time (same 860px switch the rest of the site uses):
+   laptop = the top bar only, phone and tablet = the bottom bar only. */
+@media (min-width: 861px) {
+  .s-dock, .s-dock.show { display: none !important; }
+}
+@media (max-width: 860px) {
+  .s-nav .s-nav-cta { display: none; }   /* "Join us" now lives in the bottom bar */
+  .s-dock .s-dock-join { display: flex; } /* show "Join us" in the bottom bar too */
+}
