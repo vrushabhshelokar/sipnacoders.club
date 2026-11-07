@@ -1,5 +1,5 @@
-// Announcement popup: only hints that something big is coming and takes visitors straight to "Upcoming events".
-// All the information stays on the Upcoming events card. Shows once per visit (after the opening animation),
+// Announcement popup: only hints that something big is coming and takes visitors straight to the Upcoming events page.
+// All the information stays on that page. Shows once per visit (after the opening animation),
 // and only while the Upcoming events teaser card is live.
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -12,7 +12,7 @@ import './AnnouncePopup.css';
 const SHOW_POPUP = true;        // set to false to turn the popup off completely
 const SEEN_KEY = 'scc-hack-popup-1'; // change the number (…-2) to show it again to people who already closed it
 const DELAY = 600;              // milliseconds to wait after the opening animation
-const SKIP_ON = ['/register'];  // pages where the popup never appears
+const SKIP_ON = ['/register', '/upcoming'];  // pages where the popup never appears
 /* ------------------------------------------------------------------------- */
 
 let handled = false; // also remembers "already shown" when the browser blocks sessionStorage
@@ -24,7 +24,6 @@ const markSeen = () => {
   handled = true;
   try { window.sessionStorage.setItem(SEEN_KEY, '1'); } catch { /* storage blocked: the variable above is enough */ }
 };
-const reduced = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
 export default function AnnouncePopup() {
   const introDone = useIntroDone();
@@ -85,15 +84,10 @@ export default function AnnouncePopup() {
     };
   }, [open, close]);
 
-  // "See what's coming": go to Upcoming events (this page, or the home page if we are somewhere else)
+  // "See what's coming": open the Upcoming events page
   const go = () => {
     from.current = null;
-    if (pathname === '/' || pathname === '/events') {
-      const el = document.getElementById('upcoming');
-      if (el) el.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth' });
-    } else {
-      navigate('/#upcoming');
-    }
+    navigate('/upcoming');
     close();
   };
 

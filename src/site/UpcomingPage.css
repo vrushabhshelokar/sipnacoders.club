@@ -1,0 +1,34 @@
+/* Upcoming events: the Instagram "coming soon" panel + the small count badge on the nav buttons.
+   This file loads before styles/site.css, so selectors that must win start with a parent class. */
+
+/* ---- coming soon panel ---- */
+.s-soon.s-soon-ig .s-soon-works {
+  list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 0 auto; padding: 0; max-width: 560px;
+}
+.s-soon.s-soon-ig .s-soon-works li {
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px;
+  font: 500 13.5px/1 var(--sans, system-ui, sans-serif); color: var(--text-2, #aeb6c4);
+  background: rgba(255, 255, 255, .04); border: 1px solid var(--border-2, rgba(255, 255, 255, .14));
+}
+.s-soon.s-soon-ig .s-soon-works svg { color: var(--blue, #4c8dff); }
+.s-soon.s-soon-ig .s-soon-actions { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; margin-top: 30px; }
+.s-soon.s-soon-ig p.s-soon-note {
+  display: flex; align-items: center; justify-content: center; gap: 8px; margin: 22px auto 0; font-size: 13.5px; color: var(--muted, #7d8696);
+}
+.s-soon.s-soon-ig p.s-soon-note svg { flex: none; }
+@media (max-width: 480px) {
+  .s-soon.s-soon-ig .s-soon-actions .s-btn { width: 100%; justify-content: center; }
+}
+
+/* ---- count badge on the "Upcoming events" nav button (top bar) and bottom bar icon ---- */
+.s-nav .s-nav-cta { gap: 8px; }
+.s-nav .s-nav-cta .s-uf-count { min-width: 20px; height: 20px; padding: 0 6px; font-size: 11.5px; }
+.s-dock .s-dock-join .s-dock-ic { position: relative; overflow: visible; }
+.s-dock .s-dock-join .s-uf-count {
+  position: absolute; top: -7px; right: 4px; min-width: 18px; height: 18px; padding: 0 5px; font-size: 11px;
+  border: 2px solid rgba(9, 11, 15, .95);
+}
+.s-dock .s-dock-join .s-uf-count::after { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .s-nav .s-nav-cta .s-uf-count::after { animation: none !important; }
+}

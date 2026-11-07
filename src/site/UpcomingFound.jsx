@@ -1,6 +1,7 @@
 // "1 upcoming event found" message and count bubble for the Upcoming events button on the home page.
 // The number comes from the real events list plus the hackathon teaser, so it updates by itself.
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Icon } from './Icons';
 import { useIntroDone } from './ui';
 import { useUpcoming } from './events';
@@ -22,7 +23,7 @@ export function CountBubble({ n }) {
 }
 
 /* the line under the hero buttons: "scanning…" first, then "1 upcoming event found" */
-export function FoundMessage({ n, onGo }) {
+export function FoundMessage({ n }) {
   const live = useIntroDone();
   const [found, setFound] = useState(() => reduced());
 
@@ -41,7 +42,7 @@ export function FoundMessage({ n, onGo }) {
       {found ? (
         <>
           <span className="s-uf-t" key="found">{text}</span>{' '}
-          <a className="s-uf-go" href="#upcoming" onClick={onGo}>View <Icon.ArrowRight size={14} /></a>
+          <Link className="s-uf-go" to="/upcoming">View <Icon.ArrowRight size={14} /></Link>
         </>
       ) : (
         <span className="s-uf-t s-uf-scan" aria-hidden="true">scanning for events<i>.</i><i>.</i><i>.</i></span>

@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Icon } from './Icons';
-import { LINKS } from '../data/site';
+import { CountBubble, useUpcomingCount } from './UpcomingFound';
 
 const ITEMS = [
   { to: '/', label: 'Home', icon: 'Home' },
@@ -17,6 +17,7 @@ export default function Dock() {
   const { pathname } = useLocation();
   const [show, setShow] = useState(false);
   const ref = useRef(null);
+  const upcoming = useUpcomingCount();
 
   useEffect(() => {
     const on = () => setShow(window.scrollY > 260);
@@ -49,10 +50,10 @@ export default function Dock() {
         );
       })}
       <span className="s-dock-sep" aria-hidden="true" />
-      <a className="s-dock-item s-dock-join" href={LINKS.joinForm} target="_blank" rel="noopener noreferrer">
-        <span className="s-dock-ic"><Icon.Sparkles size={20} /></span>
-        <span className="s-dock-lbl">Join us</span>
-      </a>
+      <Link to="/upcoming" className={`s-dock-item s-dock-join ${pathname === '/upcoming' ? 'on' : ''}`} aria-current={pathname === '/upcoming' ? 'page' : undefined}>
+        <span className="s-dock-ic"><Icon.Sparkles size={20} /><CountBubble n={upcoming} /></span>
+        <span className="s-dock-lbl">Upcoming</span>
+      </Link>
     </nav>
   );
 }

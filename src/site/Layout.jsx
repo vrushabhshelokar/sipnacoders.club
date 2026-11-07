@@ -6,7 +6,9 @@ import Background from './Background';
 import Dock from './Dock';
 import { MatrixEgg, ScrollProgress } from './Extras';
 import AnnouncePopup from './AnnouncePopup';
+import { CountBubble, useUpcomingCount } from './UpcomingFound';
 import './NavFix.css';
+import './UpcomingPage.css';
 import { LINKS, logo } from '../data/site';
 
 const NAV = [
@@ -15,7 +17,8 @@ const NAV = [
   { to: '/team', label: 'Team' },
   { to: '/connect', label: 'Connect' },
 ];
-const TITLES = { '/': 'Home', '/events': 'Events', '/team': 'Team', '/connect': 'Connect', '/register': 'Register' };
+const TITLES = { '/': 'Home', '/upcoming': 'Upcoming events', '/events': 'Events', '/team': 'Team', '/connect': 'Connect', '/register': 'Register' };
+const FOOTER_LINKS = [...NAV, { to: '/upcoming', label: 'Upcoming' }];
 
 // load the fonts once
 if (typeof document !== 'undefined' && !document.getElementById('s-fonts')) {
@@ -30,6 +33,7 @@ export default function Layout({ children }) {
   const { pathname, hash } = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const taps = useRef([]);
+  const upcoming = useUpcomingCount();
 
   useEffect(() => {
     const on = () => setScrolled(window.scrollY > 16);
@@ -73,9 +77,9 @@ export default function Layout({ children }) {
               <Link key={n.to} to={n.to} className={pathname === n.to ? 'on' : ''}>{n.label}</Link>
             ))}
           </nav>
-          <a className="s-btn s-btn-light s-btn-sm s-nav-cta" href={LINKS.joinForm} target="_blank" rel="noopener noreferrer">
-            Join us <Icon.ArrowUpRight size={15} />
-          </a>
+          <Link className="s-btn s-btn-light s-btn-sm s-nav-cta" to="/upcoming">
+            Upcoming events <CountBubble n={upcoming} /> <Icon.ArrowRight size={15} />
+          </Link>
         </div>
       </header>
 
@@ -92,7 +96,7 @@ export default function Layout({ children }) {
               </div>
             </div>
             <nav className="s-footer-links" aria-label="Footer">
-              {NAV.map((n) => <Link key={n.to} to={n.to}>{n.label}</Link>)}
+              {FOOTER_LINKS.map((n) => <Link key={n.to} to={n.to}>{n.label}</Link>)}
             </nav>
             <div className="s-footer-social">
               <a href={LINKS.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram"><Icon.Instagram size={18} /></a>

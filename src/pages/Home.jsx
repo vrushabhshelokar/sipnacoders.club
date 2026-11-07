@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Icon } from '../site/Icons';
 import { Odometer, Reveal, SectionHead, useInView, useIntroDone } from '../site/ui';
 import HeroArt from '../site/HeroArt';
-import { UpcomingBlock, PastBento } from '../site/events';
+import { PastBento } from '../site/events';
 import { ToolStrip, Wins, Voices, Faq, Ambassadors } from '../site/Sections';
 import { CountBubble, FoundMessage, useUpcomingCount } from '../site/UpcomingFound';
 import { LINKS, STATS, TRACKS, JOIN_STEPS, membershipPoster, groupPhoto } from '../data/site';
@@ -11,14 +11,6 @@ export default function Home() {
   return (
     <>
       <Hero />
-
-      <section id="upcoming" className="s-section">
-        <div className="s-container">
-          <SectionHead eyebrow="Upcoming events" title="What's next" sub="Workshops, hackathons and contests. Here's what the club is planning next." />
-          <UpcomingBlock />
-          <div className="s-more"><Link to="/events" className="s-link">See all events <Icon.ArrowRight size={16} /></Link></div>
-        </div>
-      </section>
 
       <Ambassadors />
 
@@ -115,11 +107,6 @@ function Hero() {
     e.currentTarget.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 2 - 1).toFixed(3));
     e.currentTarget.style.setProperty('--my', ((e.clientY - r.top) / r.height * 2 - 1).toFixed(3));
   };
-  const toUpcoming = (e) => {
-    e.preventDefault();
-    const el = document.getElementById('upcoming');
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  };
 
   return (
     <section className={`s-hero ${live ? 'is-live' : ''}`} onPointerMove={move}>
@@ -142,11 +129,11 @@ function Hero() {
             <a className="s-btn s-btn-light s-btn-lg" href={LINKS.joinForm} target="_blank" rel="noopener noreferrer">
               Join Coders Community <Icon.ArrowUpRight size={17} />
             </a>
-            <a className={`s-btn s-btn-ghost s-btn-lg ${found ? 'has-found' : ''}`} href="#upcoming" onClick={toUpcoming}>
+            <Link className={`s-btn s-btn-ghost s-btn-lg ${found ? 'has-found' : ''}`} to="/upcoming">
               Upcoming events <CountBubble n={found} />
-            </a>
+            </Link>
           </div>
-          <FoundMessage n={found} onGo={toUpcoming} />
+          <FoundMessage n={found} />
         </div>
         <div className="s-hero-visual">
           <HeroArt />
