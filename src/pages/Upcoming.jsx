@@ -1,7 +1,7 @@
 // Upcoming events page.
 // - Real events from `upcomingEvents` (data/site.js) show as cards, with the mystery card on top while it is live.
-// - Nothing announced + SHOW_TEASER = true  (site/HackathonTeaser.jsx, line 14) -> the "Signal detected" mystery card.
-// - Nothing announced + SHOW_TEASER = false                                   -> a "coming soon" panel with an Instagram button.
+// - Nothing announced + SHOW_UPCOMING = true  (site/upcomingConfig.js) -> the mystery card (hackathon / workshop / online, 5 looks).
+// - Nothing announced + SHOW_UPCOMING = false                          -> a "coming soon" panel with Instagram + "See past events" buttons.
 import { Link } from 'react-router-dom';
 import { Icon } from '../site/Icons';
 import { PageHead } from '../site/ui';
@@ -23,9 +23,11 @@ export default function Upcoming() {
       <section id="upcoming" className="s-section s-section-first">
         <div className="s-container">
           {quiet ? <UpcomingSoon /> : <UpcomingBlock />}
-          <div className="s-more">
-            <Link to="/events#past" className="s-link">See what we&apos;ve done so far <Icon.ArrowRight size={16} /></Link>
-          </div>
+          {!quiet && (
+            <div className="s-more">
+              <Link to="/events#past" className="s-link">See what we&apos;ve done so far <Icon.ArrowRight size={16} /></Link>
+            </div>
+          )}
         </div>
       </section>
     </>
