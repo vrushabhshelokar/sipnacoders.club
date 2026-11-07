@@ -251,7 +251,7 @@
   .pp-glitch .pp-vis { height: 84px; }
   .pp-ticket .pp-bars { height: 24px; }
   .pp-ticket .pp-tk-rows { gap: 6px; margin-top: 12px; }
-  .pp-ticket .pp-desc { display: none; }
+  .pp-ticket .pp-tk-rows { display: none; }   /* the description stays: it can carry the "press Try to decrypt" message */
   .pp-git .pp-log li { min-height: 34px; }
   .pp-neon .pp-nx-ring { width: 56px; height: 56px; margin-bottom: 0; }
   .pp-neon .pp-nx-ring b { font-size: 32px; }

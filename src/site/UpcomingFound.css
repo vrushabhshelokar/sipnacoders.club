@@ -13,6 +13,9 @@
   font: 700 13px/1 var(--mono, ui-monospace, monospace); color: #1b0a29; background: #d9aef5; box-shadow: 0 0 14px rgba(199, 146, 234, .85);
 }
 .s-uf-count::after { content: ''; position: absolute; inset: -4px; border-radius: inherit; border: 2px solid rgba(217, 174, 245, .7); animation: s-uf-ring 1.9s ease-out infinite; }
+.s-uf-count.is-new { color: #052b12; background: #7ee787; box-shadow: 0 0 14px rgba(126, 231, 135, .9); }
+.s-uf-count.is-new::after { border-color: rgba(126, 231, 135, .8); }
+.s-uf-new { display: inline-block; margin-left: -2px; padding: 4px 7px 3px; border-radius: 999px; font: 800 10px/1 var(--mono, ui-monospace, monospace); letter-spacing: .1em; text-transform: uppercase; color: #052b12; background: #7ee787; box-shadow: 0 0 12px rgba(126, 231, 135, .8); animation: s-uf-newglow 1.6s ease-in-out infinite; }
 
 /* the message line */
 .s-uf {
@@ -35,6 +38,7 @@
 .s-uf-go:focus-visible { outline: 2px solid #c792ea; outline-offset: 2px; }
 
 @keyframes s-uf-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(199, 146, 234, 0), 0 10px 32px -14px rgba(199, 146, 234, .6); } 50% { box-shadow: 0 0 0 5px rgba(199, 146, 234, .12), 0 10px 36px -12px rgba(199, 146, 234, .9); } }
+@keyframes s-uf-newglow { 0%, 100% { box-shadow: 0 0 0 0 rgba(126, 231, 135, 0), 0 0 8px rgba(126, 231, 135, .6); } 50% { box-shadow: 0 0 0 4px rgba(126, 231, 135, .25), 0 0 16px rgba(126, 231, 135, .95); } }
 @keyframes s-uf-ring { 0% { transform: scale(.8); opacity: .9; } 100% { transform: scale(1.7); opacity: 0; } }
 @keyframes s-uf-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .45; transform: scale(.7); } }
 @keyframes s-uf-dots { 0% { opacity: .15; } 33%, 100% { opacity: 1; } }
@@ -44,6 +48,6 @@
   .s-uf { font-size: 12.5px; padding: 8px 12px 8px 11px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .s-hero .s-btn.has-found, .s-uf-count::after, .s-uf-dot, .s-uf-scan i, .s-uf.is-found .s-uf-t, .s-uf-go { animation: none !important; }
+  .s-hero .s-btn.has-found, .s-uf-count::after, .s-uf-new, .s-uf-dot, .s-uf-scan i, .s-uf.is-found .s-uf-t, .s-uf-go { animation: none !important; }
   .s-uf-count::after { display: none; }
 }

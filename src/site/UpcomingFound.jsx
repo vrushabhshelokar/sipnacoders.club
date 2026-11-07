@@ -6,6 +6,7 @@ import { Icon } from './Icons';
 import { useIntroDone } from './ui';
 import { useUpcoming } from './events';
 import { isTeaserLive } from './HackathonTeaser';
+import { HAS_DETAILS } from './teaserCore';
 import './UpcomingFound.css';
 
 const reduced = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -16,10 +17,19 @@ export function useUpcomingCount() {
   return list.length + (isTeaserLive() ? 1 : 0);
 }
 
-/* small glowing number that sits inside the button */
+/* true while the mystery card is on AND you have filled in some details (site/upcomingConfig.js -> DETAILS) */
+const hasFresh = () => HAS_DETAILS && isTeaserLive();
+
+/* small glowing number that sits inside the button (turns green while there are new details to unlock) */
 export function CountBubble({ n }) {
   if (!n) return null;
-  return <span className="s-uf-count" aria-hidden="true">{n}</span>;
+  return <span className={`s-uf-count ${hasFresh() ? 'is-new' : ''}`} aria-hidden="true">{n}</span>;
+}
+
+/* green "NEW" tag next to the number in the top menu, shown while there are new details to unlock */
+export function NewTag() {
+  if (!hasFresh()) return null;
+  return <span className="s-uf-new" aria-hidden="true">New</span>;
 }
 
 /* the line under the hero buttons: "scanning…" first, then "1 upcoming event found" */
@@ -34,7 +44,7 @@ export function FoundMessage({ n }) {
   }, [live, found]);
 
   if (!n) return null;
-  const text = `${n} upcoming event${n === 1 ? '' : 's'} found`;
+  const text = `${n} upcoming event${n === 1 ? '' : 's'} found${hasFresh() ? ' · new details unlocked' : ''}`;
 
   return (
     <div className={`s-uf ${found ? 'is-found' : 'is-scan'}`} aria-live="polite">

@@ -10,6 +10,8 @@ import * as C from './upcomingConfig';
 export const TYPES = ['hackathon', 'workshop', 'online'];
 export const TYPE = TYPES.includes(C.EVENT_TYPE) ? C.EVENT_TYPE : 'hackathon';
 export const EVENT_NAME = String(C.EVENT_NAME || '').trim();
+// has any detail been filled in for this kind of event? (then the card tells visitors to press "Try to decrypt")
+export const HAS_DETAILS = Object.values((C.DETAILS && C.DETAILS[TYPE]) || {}).some((v) => String(v || '').trim());
 
 const T = { from: toDate(C.TEASER_FROM), start: toDate(C.EVENT_START), end: toDate(C.HIDE_AFTER) };
 // when the card and the popup go away by themselves: HIDE_AFTER, else 2 days after EVENT_START, else never (the switch decides)
@@ -108,6 +110,7 @@ export function FieldValue({ f }) {
   }
   if (f.state === 'work') return <Cipher len={f.len} speed={45} />;
   if (f.state === 'denied') return 'ACCESS DENIED';
+  if (f.state === 'ready') return 'Ready to decrypt';
   return 'Will be revealed soon';
 }
 
@@ -116,7 +119,7 @@ export function useTeaser() {
   const now = useNow();
   const copy = COPY[TYPE];
   const details = (C.DETAILS && C.DETAILS[TYPE]) || {};
-  const detailOf = (k) => String(details[k] || '');
+  const detailOf = (k) => String(details[k] || '').trim();
   const hasDetails = copy.boxes.some(([k]) => detailOf(k));
 
   const [phase, setPhase] = useState('idle'); // idle -> work -> denied -> idle   (or work -> typing -> done when details are set)
@@ -183,34 +186,56 @@ export function useTeaser() {
     const typing = phase === 'typing';
     return {
       k, len, text,
-      state: isOpen ? 'open' : phase === 'work' ? 'work' : phase === 'denied' ? 'denied' : 'idle',
+      state: isOpen ? 'open' : phase === 'work' ? 'work' : phase === 'denied' ? 'denied' : text ? 'ready' : 'idle',
       typing: isOpen && typing,
       shownText: isOpen && typing ? text.slice(0, counts[i]) : text,
       showCursor: isOpen && typing && counts[i] < text.length,
     };
   });
 
+  const readyCount = fields.filter((f) => f.text).length;
+  const ready = hasDetails && phase === 'idle';   // details are waiting: tell visitors to press the button
+
   return {
+    ready, readyCount, total: fields.length,
     visible, type: TYPE, copy, name: EVENT_NAME, title: EVENT_NAME || copy.title,
     phase, decrypt, open, shown, status, btn, fields, cells, counting, waiting, live, c, hex: HEX,
     label: `Something big is coming. Every detail will be revealed soon.`,
   };
 }
 
-/* the buttons under every card: Get notified, Try to decrypt, Instagram */
+/* the buttons under every card: Get notified, Try to decrypt, Instagram.
+   When you have filled in details, a hint appears and "Try to decrypt" glows until the visitor presses it. */
 export function Actions({ t, className = '' }) {
   return (
-    <div className={`s-actions ${className}`}>
-      <a className="s-btn s-btn-light" href={LINKS.joinForm} target="_blank" rel="noopener noreferrer">
-        <Icon.Bell size={16} /> Get notified
-      </a>
-      <button type="button" className="s-btn s-btn-ghost s-mys-dec" onClick={t.decrypt} disabled={t.phase !== 'idle'}>
-        <Icon.Terminal size={16} /> {t.btn}
-      </button>
-      <a className="s-link" href={LINKS.instagram} target="_blank" rel="noopener noreferrer">
-        <Icon.Instagram size={16} /> Get updates on Instagram
-      </a>
-    </div>
+    <>
+      {t.ready && (
+        <p className="s-hint" role="status">
+          <i aria-hidden="true"><Icon.ArrowRight size={17} /></i>
+          <span>
+            <b>New details unlocked.</b> {t.readyCount} of {t.total} {t.readyCount === 1 ? 'is' : 'are'} ready. Press <b>Try to decrypt</b> to see {t.readyCount === 1 ? 'it' : 'them'}.
+          </span>
+        </p>
+      )}
+      <div className={`s-actions ${className}`}>
+        <a className="s-btn s-btn-light" href={LINKS.joinForm} target="_blank" rel="noopener noreferrer">
+          <Icon.Bell size={16} /> Get notified
+        </a>
+        <button
+          type="button"
+          className={`s-btn s-btn-ghost s-mys-dec ${t.ready ? 'is-ready' : ''}`}
+          data-new={t.ready ? t.readyCount : undefined}
+          aria-label={t.ready ? `${t.btn}, ${t.readyCount} new ${t.readyCount === 1 ? 'detail' : 'details'} ready` : undefined}
+          onClick={t.decrypt}
+          disabled={t.phase !== 'idle'}
+        >
+          {t.ready ? <Icon.Sparkles size={16} /> : <Icon.Terminal size={16} />} {t.btn}
+        </button>
+        <a className="s-link" href={LINKS.instagram} target="_blank" rel="noopener noreferrer">
+          <Icon.Instagram size={16} /> Get updates on Instagram
+        </a>
+      </div>
+    </>
   );
 }
 

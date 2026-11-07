@@ -59,9 +59,9 @@ function Signal({ t }) {
 
         <div className="s-mys-grid">
           {t.fields.map((f) => (
-            <div key={f.k} className={`s-mys-cell ${f.state === 'open' ? 'is-open' : 'is-lock'} ${f.state === 'denied' ? 'is-denied' : ''}`}>
+            <div key={f.k} className={`s-mys-cell ${f.state === 'open' ? 'is-open' : 'is-lock'} ${f.state === 'denied' ? 'is-denied' : ''} ${f.state === 'ready' ? 'is-ready' : ''}`}>
               <span className="s-mys-k">{f.k}</span>
-              <b className={`s-mys-v ${f.state === 'open' ? 's-mys-real' : f.state === 'idle' ? 's-mys-soon' : 's-mys-code'}`}>
+              <b className={`s-mys-v ${f.state === 'open' ? 's-mys-real' : f.state === 'idle' ? 's-mys-soon' : f.state === 'ready' ? 's-mys-ready' : 's-mys-code'}`}>
                 <FieldValue f={f} />
               </b>
             </div>

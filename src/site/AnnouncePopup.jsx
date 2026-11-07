@@ -10,7 +10,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useIntroDone } from './ui';
 import { useUpcoming } from './events';
-import { EVENT_NAME, getDesign, isTeaserLive } from './teaserCore';
+import { EVENT_NAME, HAS_DETAILS, getDesign, isTeaserLive } from './teaserCore';
 import {
   SHOW_UPCOMING, SHOW_POPUP, POPUP_TEXT, POPUP_SHOW_NAME, POPUP_DELAY, POPUP_SEEN_KEY, POPUP_SKIP_ON,
 } from './upcomingConfig';
@@ -118,9 +118,11 @@ export default function AnnouncePopup() {
 
   // once the event name is announced the popup can say it (turn it off with POPUP_SHOW_NAME = false)
   const named = POPUP_SHOW_NAME && !!EVENT_NAME;
+  // once you fill in details the popup says so too, so people know there is something new to unlock
+  const news = HAS_DETAILS ? 'New details are unlocked. Tap below, then press Try to decrypt.' : null;
   const text = named
-    ? { ...POPUP_TEXT, title: `${EVENT_NAME} is coming`, desc: "Tap below to see all the details on the Upcoming events page.", flag: 'Now announced' }
-    : { ...POPUP_TEXT, flag: 'New signal detected' };
+    ? { ...POPUP_TEXT, title: `${EVENT_NAME} is coming`, desc: news || 'Tap below to see all the details on the Upcoming events page.', flag: 'Now announced' }
+    : { ...POPUP_TEXT, desc: news || POPUP_TEXT.desc, flag: HAS_DETAILS ? 'New details unlocked' : 'New signal detected' };
   const { Design } = view;
 
   return (

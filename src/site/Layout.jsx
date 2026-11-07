@@ -6,7 +6,7 @@ import Background from './Background';
 import Dock from './Dock';
 import { MatrixEgg, ScrollProgress } from './Extras';
 import AnnouncePopup from './AnnouncePopup';
-import { CountBubble, useUpcomingCount } from './UpcomingFound';
+import { CountBubble, NewTag, useUpcomingCount } from './UpcomingFound';
 import './NavFix.css';
 import './UpcomingPage.css';
 import { LINKS, logo } from '../data/site';
@@ -78,7 +78,7 @@ export default function Layout({ children }) {
             ))}
           </nav>
           <Link className="s-btn s-btn-light s-btn-sm s-nav-cta" to="/upcoming">
-            Upcoming events <CountBubble n={upcoming} /> <Icon.ArrowRight size={15} />
+            Upcoming events <CountBubble n={upcoming} /><NewTag /> <Icon.ArrowRight size={15} />
           </Link>
         </div>
       </header>
