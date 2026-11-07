@@ -6,7 +6,7 @@ import { Icon } from './Icons';
 import { Reveal } from './ui';
 import { LINKS, upcomingEvents, pastEvents } from '../data/site';
 import {
-  getUpcoming, getPast, useCountdown, fmtDay, fmtMon, fmtFull, fmtTime, durLabel, relative, gcalLink, normCat, catColor,
+  getUpcoming, getPast, useCountdown, fmtDay, fmtMon, fmtFull, fmtTime, durLabel, relative, gcalLink, normCat, catColor, hasPhotos,
 } from './time';
 import HackathonTeaser, { isTeaserLive } from './HackathonTeaser';
 
@@ -183,7 +183,8 @@ export function PastCard({ ev, i, onOpen }) {
 
 /* past events with optional filter buttons */
 export function PastEvents({ limit, filters = true }) {
-  const all = usePast();
+  const everything = usePast();
+  const all = useMemo(() => everything.filter(hasPhotos), [everything]);
   const cats = useMemo(() => ['All', ...Array.from(new Set(all.map((e) => normCat(e.category))))], [all]);
   const [cat, setCat] = useState('All');
   const [open, setOpen] = useState(null);
@@ -289,7 +290,8 @@ function BentoMore({ rest, total }) {
 }
 
 export function PastBento() {
-  const all = usePast();
+  const everything = usePast();
+  const all = useMemo(() => everything.filter(hasPhotos), [everything]);   // events without photos only show on the Events timeline
   const [open, setOpen] = useState(null);
   if (!all.length) return null;
   const top = all.slice(0, 3);

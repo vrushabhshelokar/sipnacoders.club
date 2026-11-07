@@ -92,6 +92,14 @@ export const upcomingEvents = [];
    ===================================================================== */
 export const pastEvents = [
   {
+    id: 'next-event',
+    title: '',       
+    category: '',    
+    date: '',         
+    description: '',
+    images: [],       
+  },
+  {
     id: 'gemini-build-night',
     title: 'Fund My Crazy – Build Night with Gemini',
     category: 'Online Build Night',

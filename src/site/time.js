@@ -21,14 +21,28 @@ export function getUpcoming(list, now = Date.now()) {
     .sort((a, b) => (a.at ? a.at.getTime() : Infinity) - (b.at ? b.at.getTime() : Infinity));
 }
 
-// Past = dated today or earlier, newest first
+// '26 DEC 2026' -> '2026-12-26' ('' when the text has no full date)
+const MONTHS = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12 };
+export function dateFromText(s = '') {
+  const m = /(\d{1,2})\s+([A-Za-z]{3})[A-Za-z]*\.?,?\s+(\d{4})/.exec(s);
+  const mo = m && MONTHS[m[2].toLowerCase()];
+  return mo ? `${m[3]}-${String(mo).padStart(2, '0')}-${m[1].padStart(2, '0')}` : '';
+}
+
+// does this past event have photos yet?
+export const hasPhotos = (e) => !!(e.images && e.images.length);
+
+// Past = has photos and is dated today or earlier, newest first.
+// An entry with no photos yet is skipped (the permanent "coming soon" box in the timeline covers it).
 export function getPast(list, now = Date.now()) {
-  return [...list]
+  const day = (e) => e.sortDate || dateFromText(e.date);
+  return list
     .filter((e) => {
-      const d = toDate(e.sortDate);
+      if (!hasPhotos(e)) return false;
+      const d = toDate(day(e));
       return !d || d.getTime() <= now;
     })
-    .sort((a, b) => (b.sortDate || '').localeCompare(a.sortDate || ''));
+    .sort((a, b) => (day(b) || '9999').localeCompare(day(a) || '9999'));
 }
 
 const fmt = (d, o) => d.toLocaleString('en-IN', { timeZone: TZ, ...o });
