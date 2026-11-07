@@ -106,7 +106,7 @@ export default function Layout({ children }) {
           </div>
           <div className="s-footer-bottom">
             <span>&copy; {new Date().getFullYear()} Sipna Coders Club &middot; Sipna COET</span>
-            <span>Dev: <b>vrushabh shelokar</b></span>
+            <span>Dev: <b>Vrushabh Shelokar</b>, <b>Ashay Deshpande</b></span>
           </div>
         </div>
       </footer>
