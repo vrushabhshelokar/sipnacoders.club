@@ -238,10 +238,10 @@ export const PROGRAMS = {
 
 /* the members, and which programs they are part of (keys from PROGRAMS above) */
 export const AMBASSADORS = [
-  { name: 'Vrushabh Shelokar', role: 'President · 3rd CSE', img: vrushabh, programs: ['gsa', 'hrcc'] },
-  { name: 'Atharva Khule', role: 'Executive Member · 2nd CSE', img: atharva, programs: ['msa'] },
-  { name: 'Ashay Deshpande', role: 'Executive Member · 2nd IT', img: ashay, programs: ['unstop'] },
-  { name: 'Chitra Bankar', role: 'Student Advisor · 3rd CSE', img: chitra, programs: ['gfg'] },
+  { name: 'Vrushabh Shelokar', role: 'President · 3rd CSE', img: vrushabh, programs: ['gsa', 'hrcc'], status: 'present' },
+  { name: 'Atharva Khule', role: 'Executive Member · 2nd CSE', img: atharva, programs: ['msa'], status: 'present' },
+  { name: 'Ashay Deshpande', role: 'Executive Member · 2nd IT', img: ashay, programs: ['unstop'], status: 'present' },
+  { name: 'Chitra Bankar', role: 'Student Advisor · 3rd CSE', img: chitra, programs: ['gfg'], status: 'present' },
 ];
 
 /* ---------------- what we do (home page cards) ---------------- */

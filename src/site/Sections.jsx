@@ -1,6 +1,6 @@
 // Extra home-page sections: tools strip, wins & projects, member voices and FAQ.
 // All content comes from src/data/site.js. Voices and wins stay hidden until real entries are added there.
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon } from './Icons';
 import { Reveal, SectionHead } from './ui';
@@ -132,8 +132,26 @@ function ProgramMark({ p, big }) {
   );
 }
 
+/* Present or past?  In data/site.js every ambassador has  status: 'present'  or  status: 'past'.
+   Present ones always come first, past ones go below by themselves (inside each group the order stays as written).
+   No status = present. A word that is not recognised also counts as present, and a note appears in the browser console. */
+const PAST_WORDS = ['past', 'former', 'alumni'];
+const PRESENT_WORDS = ['present', 'current', 'active', 'now'];
+const isPast = (a) => {
+  const s = String(a.status || '').trim().toLowerCase();
+  if (s && !PAST_WORDS.includes(s) && !PRESENT_WORDS.includes(s)) {
+    console.warn(`[ambassadors] ${a.name}: status "${a.status}" is not "present" or "past", so it is shown as present.`);
+  }
+  return PAST_WORDS.includes(s);
+};
+const SORTED = (() => {
+  const all = AMBASSADORS.map((a) => ({ a, past: isPast(a) }));
+  return [...all.filter((x) => !x.past), ...all.filter((x) => x.past)];
+})();
+
 export function Ambassadors() {
   if (!AMBASSADORS.length) return null;
+  const both = SORTED.some((x) => x.past) && SORTED.some((x) => !x.past);   // the two group titles show only when both groups exist
   return (
     <section id="ambassadors" className="s-section s-section-tint">
       <div className="s-container">
@@ -143,14 +161,20 @@ export function Ambassadors() {
           sub="Club members who represent global tech programs at Sipna, and bring their events, resources and opportunities to every coder here."
         />
         <div className="s-ambs">
-          {AMBASSADORS.map((a, i) => {
+          {SORTED.map(({ a, past }, i) => {
             const progs = a.programs.map((k) => PROGRAMS[k]).filter(Boolean);
             const c1 = progs[0] ? progs[0].color : '#4c8dff', c2 = progs[1] ? progs[1].color : c1;
+            const firstOfGroup = both && (i === 0 || SORTED[i - 1].past !== past);
             return (
-              <Reveal as="article" key={a.name} className="s-amb" delay={(i % 2) * 90} style={{ '--c1': c1, '--c2': c2 }}>
+              <Fragment key={a.name}>
+              {firstOfGroup && <p className="s-ambs-group" aria-hidden="true">{past ? 'Past ambassadors' : 'Present ambassadors'}</p>}
+              <Reveal as="article" className={`s-amb ${past ? 'is-past' : 'is-present'}`} delay={(i % 2) * 90} style={{ '--c1': c1, '--c2': c2 }}>
                 <div className="s-amb-top">
                   <div className="s-amb-photo"><img src={a.img} alt={a.name} loading="lazy" decoding="async" /></div>
                   <div className="s-amb-who">
+                    <span className={`s-amb-st ${past ? 'is-past' : 'is-present'}`}>
+                      <i aria-hidden="true" />{past ? 'Past' : 'Present'}{a.years ? <small>{a.years}</small> : null}
+                    </span>
                     <h3>{a.name}</h3>
                     <p>{a.role}</p>
                     <div className="s-amb-badges">
@@ -180,6 +204,7 @@ export function Ambassadors() {
                   ))}
                 </div>
               </Reveal>
+              </Fragment>
             );
           })}
         </div>

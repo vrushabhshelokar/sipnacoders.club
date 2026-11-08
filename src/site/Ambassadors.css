@@ -44,7 +44,7 @@
 
 /* the program's logo as a big, soft picture behind the text of the panel (only when the program has a logo file)
    ✏️ --logo-show: how strong the logo is (0 = hidden, .3 = strong). --logo-size: how big it is. */
-.s-ambs .s-amb-role.has-logo { --logo-show: .2; --logo-size: 250px; }
+.s-ambs .s-amb-role.has-logo { --logo-show: .17; --logo-size: 240px; }
 .s-ambs .s-amb-role.has-logo > * { position: relative; z-index: 1; }
 .s-ambs .s-amb-role.has-logo::after {
   content: ''; position: absolute; z-index: 0; right: -46px; bottom: -52px; width: var(--logo-size); height: var(--logo-size); pointer-events: none;
@@ -53,6 +53,28 @@
   transform: rotate(-10deg); transition: opacity .35s ease, transform .6s var(--ease, ease);
 }
 .s-ambs .s-amb:hover .s-amb-role.has-logo::after { opacity: calc(var(--logo-show) + .08); transform: rotate(-4deg) scale(1.05); }
+
+/* Present / Past label on every card (set with  status: 'present' or 'past'  in data/site.js),
+   and the two small titles that split the section when both kinds exist */
+.s-ambs .s-ambs-group {
+  grid-column: 1 / -1; display: flex; align-items: center; gap: 14px; margin: 14px 0 -4px;
+  font: 600 15px/1.2 var(--display, 'Space Grotesk', sans-serif); letter-spacing: -.01em; color: var(--text-2, #a3acba);
+}
+.s-ambs .s-ambs-group:first-child { margin-top: 0; }
+.s-ambs .s-ambs-group::after { content: ''; flex: 1; height: 1px; background: var(--border, rgba(255, 255, 255, .12)); }
+.s-ambs .s-amb-st {
+  display: inline-flex; align-items: center; gap: 7px; margin-bottom: 10px; padding: 4px 12px 4px 10px; border-radius: 999px;
+  font: 600 12px/1.2 var(--sans, system-ui, sans-serif); border: 1px solid transparent;
+}
+.s-ambs .s-amb-st i { flex: none; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.s-ambs .s-amb-st small { font: 500 11.5px/1.2 var(--sans, system-ui, sans-serif); padding-left: 8px; border-left: 1px solid currentColor; opacity: .8; }
+.s-ambs .s-amb-st.is-present { color: #5fe3a1; border-color: rgba(95, 227, 161, .4); background: rgba(95, 227, 161, .1); }
+.s-ambs .s-amb-st.is-present i { box-shadow: 0 0 8px 1px currentColor; animation: s-amb-live 2.4s ease-in-out infinite; }
+.s-ambs .s-amb-st.is-past { color: #aeb6c4; border-color: rgba(174, 182, 196, .32); background: rgba(174, 182, 196, .08); }
+@keyframes s-amb-live { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+/* a past ambassador's photo is a little greyed, and gets its colour back on hover */
+.s-ambs .s-amb.is-past .s-amb-photo img { filter: grayscale(.7); transition: filter .35s; }
+.s-ambs .s-amb.is-past:hover .s-amb-photo img { filter: none; }
 
 /* whole card lights up in the program colour on hover */
 .s-ambs .s-amb { transition: border-color .3s, box-shadow .3s; }
@@ -69,5 +91,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .s-ambs .s-amb-tile, .s-ambs .s-amb-tile::after, .s-ambs .s-amb { transition: none !important; }
+  .s-ambs .s-amb-st.is-present i, .s-ambs .s-amb.is-past .s-amb-photo img { animation: none; transition: none; }
   .s-ambs .s-amb:hover .s-amb-tile { transform: none; }
+  .s-ambs .s-amb-role.has-logo::after, .s-ambs .s-amb:hover .s-amb-role.has-logo::after { transition: none; transform: rotate(-10deg); }
 }
