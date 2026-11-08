@@ -1,9 +1,11 @@
 // =====================================================================================
 //  UPCOMING EVENT CONTROL PANEL  -  the only file you edit for the popup and the Upcoming events card.
 //
-//  EVERY DAY YOU ONLY NEED THESE TWO LINES:
+//  EVERY DAY YOU ONLY NEED THESE THREE LINES:
 //    1) SHOW_UPCOMING   true  = popup + Upcoming card are ON        false = both are OFF (no event right now)
 //    2) EVENT_TYPE      'hackathon'  or  'workshop'  or  'online'
+//    3) SHOW_POPUP      true  = the popup shows                     false = no popup (the Upcoming events button,
+//                                                                          "1 upcoming event found" and the card all stay)
 //
 //  The popup design and the matching card design pick themselves. Every new event gets the NEXT design
 //  (1, 2, 3 ... 10, then it starts again from 1), so two events in a row never look the same.
@@ -13,6 +15,7 @@
 
 export const SHOW_UPCOMING = true;
 export const EVENT_TYPE = 'hackathon';   // 'hackathon' | 'workshop' | 'online'
+export const SHOW_POPUP = false;          // true = show the popup   false = no popup (everything else stays)
 
 
 /* -------------------------------------------------------------------------------------
@@ -58,7 +61,6 @@ export const FORCE_DESIGN = 0;
 // Preview any design on your computer: add ?design=4 to the address (example: localhost:5173/?design=4).
 // Only the popup: ?popup=glitch   Names: radar terminal glitch launch matrix ticket neon arcade git confetti
 
-export const SHOW_POPUP = true;     // false = hide only the popup (the card stays)
 export const COMPILING = 35;        // the "compiling" bar percentage while no date is announced
 export const TEASER_FROM = '';      // optional: with EVENT_START set, the bar fills from this moment up to EVENT_START
 export const POPUP_TEXT = {
