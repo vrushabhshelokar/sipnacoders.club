@@ -121,7 +121,7 @@ export default function AnnouncePopup() {
   // once you fill in details the popup says so too, so people know there is something new to unlock
   const news = HAS_DETAILS ? 'New details are unlocked. Tap below, then press Try to decrypt.' : null;
   const text = named
-    ? { ...POPUP_TEXT, title: `${EVENT_NAME} is coming`, desc: news || 'Tap below to see all the details on the Upcoming events page.', flag: 'Now announced' }
+    ? { ...POPUP_TEXT, title: `${EVENT_NAME} is coming`, name: EVENT_NAME, rest: 'is coming', desc: news || 'Tap below to see all the details on the Upcoming events page.', flag: 'Now announced' }
     : { ...POPUP_TEXT, desc: news || POPUP_TEXT.desc, flag: HAS_DETAILS ? 'New details unlocked' : 'New signal detected' };
   const { Design } = view;
 

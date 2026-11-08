@@ -1,0 +1,282 @@
+/* The event name: letters come in one by one, each gives a sparkle, then the whole word shines now and then.
+   Ten effects, one per design (see NameReveal.jsx). */
+
+.nr-h .nr-name { display: inline; }
+.nr-h .nr-w { display: inline-block; max-width: 100%; white-space: nowrap; }
+.nr-h .nr-w.is-long { white-space: normal; overflow-wrap: anywhere; }
+.nr-h .nr-w.nr-rest { display: inline; white-space: normal; }
+.nr-h .nr-c { position: relative; display: inline-block; }
+.nr-h .nr-rest .nr-c { display: inline; }
+
+/* before it starts the letters wait invisible (they keep their room, so nothing jumps) */
+.nr-h:not(.is-on) .nr-c[data-i] { opacity: 0; }
+.nr-h:not(.is-on) .nr-rest { opacity: 0; }
+.nr-h.is-on .nr-rest { animation: nr-fade .8s ease calc(var(--T) * .75) both; }
+@keyframes nr-fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* the sparkle every letter gives */
+.nr-h .nr-c[data-i]::after {
+  content: ''; position: absolute; top: -.1em; right: -.16em; width: .34em; height: .34em; pointer-events: none;
+  background: var(--nr-sp, #fff); opacity: 0;
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+}
+.nr-h.is-on:not(.is-done) .nr-c[data-i]::after { animation: nr-spark .8s ease-out calc(var(--i) * var(--d) + var(--ts, 320ms)) both; }
+@keyframes nr-spark {
+  0%   { opacity: 0; transform: scale(0) rotate(0); }
+  35%  { opacity: 1; transform: scale(1.3) rotate(45deg); }
+  100% { opacity: 0; transform: scale(.2) rotate(110deg); }
+}
+/* once the name is in: a shine wave runs through the letters every few seconds, with a few sparkles */
+.nr-h.is-done .nr-c[data-i]::after { animation: nr-spark-loop 7s linear calc(var(--i) * 55ms) infinite; }
+@keyframes nr-spark-loop {
+  0%   { opacity: 0; transform: scale(0) rotate(0); }
+  5%   { opacity: 1; transform: scale(1.25) rotate(45deg); }
+  12%  { opacity: 0; transform: scale(.2) rotate(110deg); }
+  100% { opacity: 0; transform: scale(.2) rotate(110deg); }
+}
+.nr-h.is-paused .nr-c, .nr-h.is-paused .nr-c::before, .nr-h.is-paused .nr-c::after { animation-play-state: paused; }
+
+/* ---------- 1. radar: blurred letters scan in, then sharpen ---------- */
+.nr-radar { --nr-sp: #fff; }
+.s-ann-title.nr-radar .nr-w:not(.nr-rest) .nr-c {
+  background: linear-gradient(100deg, #e1b8ff, #c792ea 45%, #8ab4ff);
+  background-size: calc(var(--n) * 100%) 100%; background-position: var(--g) 0;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+}
+.nr-radar.is-on:not(.is-done) .nr-c[data-i] { animation: nr-radar-in .9s cubic-bezier(.2, .8, .2, 1) calc(var(--i) * var(--d)) both; }
+@keyframes nr-radar-in {
+  0%   { opacity: 0; filter: blur(10px); transform: translateY(-.18em) scale(1.7); }
+  55%  { opacity: 1; filter: blur(2px) brightness(1.7); transform: scale(1.08); }
+  100% { opacity: 1; filter: none; transform: none; }
+}
+.nr-radar.is-done .nr-c[data-i] { animation: nr-radar-shine 7s linear calc(var(--i) * 55ms) infinite; }
+@keyframes nr-radar-shine {
+  0%, 16%, 100% { filter: none; }
+  7% { filter: brightness(2.1) drop-shadow(0 0 .22em rgba(199, 146, 234, .95)); }
+}
+
+/* ---------- 2. terminal: typed one letter at a time with a block cursor ---------- */
+.nr-terminal { --nr-sp: var(--nr-a, #2dff8a); }
+.nr-terminal.is-on:not(.is-done) .nr-c[data-i] { animation: nr-type .2s linear calc(var(--i) * var(--d)) both; }
+@keyframes nr-type { 0% { opacity: 0; } 1%, 100% { opacity: 1; } }   /* (not a 10ms jump: a very short animation can be skipped by the browser) */
+.nr-terminal .nr-c[data-i]::before {
+  content: ''; position: absolute; left: 100%; top: .1em; width: .55em; height: .86em; margin-left: .03em; pointer-events: none;
+  background: var(--nr-a, #2dff8a); opacity: 0;
+}
+.nr-terminal.is-on:not(.is-done) .nr-c[data-i]::before { animation: nr-cur calc(var(--d) + 20ms) steps(1) calc(var(--i) * var(--d)) forwards; }
+@keyframes nr-cur { 0%, 99% { opacity: 1; } 100% { opacity: 0; } }
+.nr-terminal.is-done .nr-c[data-last]::before { animation: nr-blink 1s steps(1) 5 forwards; }
+@keyframes nr-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+.nr-terminal.is-done .nr-c[data-i] { animation: nr-term-shine 7s linear calc(var(--i) * 55ms) infinite; }
+@keyframes nr-term-shine {
+  0%, 16%, 100% { filter: none; }
+  7% { filter: brightness(1.7) drop-shadow(0 0 .3em var(--nr-a, #2dff8a)); }
+}
+
+/* ---------- 3. ticket: every letter is stamped down, then a gold foil glint runs along it ---------- */
+.nr-ticket { --nr-sp: #ff8a2f; --nr-ink: #17130d; }
+.tc-doss .nr-ticket { --nr-ink: var(--ink, #1b1710); }
+.nr-ticket.is-on:not(.is-done) .nr-c[data-i] { animation: nr-stamp .6s cubic-bezier(.2, .9, .3, 1) calc(var(--i) * var(--d)) both; }
+@keyframes nr-stamp {
+  0%   { opacity: 0; transform: translateY(-.9em) scale(2.3) rotate(-8deg); filter: blur(3px); }
+  55%  { opacity: 1; transform: translateY(.04em) scale(.92) rotate(1deg); filter: none; }
+  78%  { transform: scale(1.04); }
+  100% { opacity: 1; transform: none; filter: none; }
+}
+.nr-ticket.is-done .nr-c[data-i] {
+  background: linear-gradient(100deg, var(--nr-ink) 0 38%, #ff9a3d 45%, #ffe9a8 50%, #ff9a3d 55%, var(--nr-ink) 62% 100%);
+  background-size: 300% 100%; background-position: 100% 0;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  animation: nr-foil 7s linear calc(var(--i) * 55ms) infinite;
+}
+@keyframes nr-foil { 0% { background-position: 0% 0; } 16%, 100% { background-position: 100% 0; } }
+
+/* ---------- 4. launch: letters lift off from below with a flame under each ---------- */
+.nr-launch { --nr-sp: #ffb347; }
+.nr-launch.is-on:not(.is-done) .nr-c[data-i] { animation: nr-rise .9s cubic-bezier(.2, .9, .25, 1.1) calc(var(--i) * var(--d)) both; }
+@keyframes nr-rise {
+  0%   { opacity: 0; transform: translateY(1.2em) scale(.8, 1.6); filter: blur(3px); }
+  60%  { opacity: 1; transform: translateY(-.1em) scaleY(1.05); filter: none; }
+  80%  { transform: translateY(.03em); }
+  100% { opacity: 1; transform: none; filter: none; }
+}
+.nr-launch .nr-c[data-i]::before {
+  content: ''; position: absolute; left: 26%; right: 26%; top: 92%; height: .7em; pointer-events: none; opacity: 0;
+  background: linear-gradient(#ffd27a, #ff8a2a 38%, rgba(255, 90, 20, 0)); border-radius: 0 0 60% 60%; transform-origin: 50% 0; filter: blur(.03em);
+}
+.nr-launch.is-on:not(.is-done) .nr-c[data-i]::before { animation: nr-flame .9s ease-out calc(var(--i) * var(--d)) both; }
+@keyframes nr-flame {
+  0%   { opacity: 0; transform: scaleY(0); }
+  25%  { opacity: .85; transform: scaleY(1.2); }
+  70%  { opacity: .5; transform: scaleY(.45); }
+  100% { opacity: 0; transform: scaleY(0); }
+}
+.nr-launch.is-done .nr-c[data-i] { animation: nr-launch-shine 7s linear calc(var(--i) * 55ms) infinite; }
+@keyframes nr-launch-shine {
+  0%, 16%, 100% { filter: none; transform: none; }
+  7% { filter: brightness(1.55) drop-shadow(0 0 .25em #ff9a3d); transform: translateY(-.05em); }
+}
+
+/* ---------- 5. neon: the sign flickers on letter by letter ---------- */
+.nr-neon { --nr-sp: #fff; }
+.nr-neon .nr-w.t1 { color: #ffe3f8; text-shadow: 0 0 6px #ff4fd8, 0 0 18px #ff4fd8, 0 0 42px #ff4fd8; }
+.nr-neon .nr-w.t2 { color: #e0ffff; text-shadow: 0 0 6px #4ff0ff, 0 0 18px #4ff0ff, 0 0 42px #4ff0ff; }
+.nr-neon.is-on:not(.is-done) .nr-c[data-i] { animation: nr-neon-on .8s steps(1) calc(var(--i) * var(--d)) both; }
+@keyframes nr-neon-on {
+  0%   { opacity: .06; }
+  10%  { opacity: 1; }
+  18%  { opacity: .12; }
+  30%  { opacity: 1; }
+  38%  { opacity: .3; }
+  50%  { opacity: .08; }
+  64%  { opacity: 1; }
+  100% { opacity: 1; }
+}
+.nr-neon.is-done .nr-c[data-i] { animation: nr-neon-shine 7s linear calc(var(--i) * 55ms) infinite; }
+@keyframes nr-neon-shine {
+  0%, 16%, 100% { filter: none; }
+  7% { filter: brightness(1.6) drop-shadow(0 0 .3em currentColor); }
+}
+
+/* ---------- 6. glitch: random signs, then each letter locks in with a colour split ---------- */
+.nr-glitch { --nr-sp: #00e5ff; }
+.nr-glitch .nr-c[data-i]:nth-child(2n)::after { background: #ff2e63; }
+/* the old "copies behind the title" would wrap differently from the letters, so with the animated name they are off (the letters do the colour split themselves) */
+.nr-glitch.nr-h::before, .nr-glitch.nr-h::after { display: none; }
+.nr-glitch.is-on .nr-c[data-i] { opacity: 0; }
+.nr-glitch.is-on .nr-c[data-i][data-s] { opacity: 1; color: transparent; text-shadow: none; }
+.nr-glitch .nr-c[data-s]::before {
+  content: attr(data-s); position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none;
+  color: #fff; text-shadow: -2px 0 #00e5ff, 2px 0 #ff2e63;
+}
+.nr-glitch.is-on:not(.is-done) .nr-c[data-i].is-lock { opacity: 1; animation: nr-glitch-lock .5s steps(1) both; }
+.nr-glitch.is-on:not(.is-done) .nr-c[data-i].is-lock::after { animation: nr-spark .8s ease-out both; }
+@keyframes nr-glitch-lock {
+  0%   { transform: translate(-.06em, .04em) skewX(-12deg); text-shadow: -.06em 0 #00e5ff, .06em 0 #ff2e63; }
+  20%  { transform: translate(.05em, -.03em) skewX(8deg); }
+  40%  { transform: translate(-.03em, 0) skewX(-4deg); text-shadow: .05em 0 #00e5ff, -.05em 0 #ff2e63; }
+  60%  { transform: none; text-shadow: -.035em 0 #00e5ff, .035em 0 #ff2e63; }
+  100% { transform: none; text-shadow: none; }
+}
+.nr-glitch.is-done .nr-c[data-i] { opacity: 1; animation: nr-glitch-shine 7s steps(1) calc(var(--i) * 55ms) infinite; }
+@keyframes nr-glitch-shine {
+  0%, 12%, 100% { filter: none; transform: none; }
+  3% { filter: drop-shadow(-.05em 0 #00e5ff) drop-shadow(.05em 0 #ff2e63); transform: translateX(.02em); }
+  6% { filter: drop-shadow(.05em 0 #00e5ff) drop-shadow(-.05em 0 #ff2e63); transform: translateX(-.02em) skewX(-6deg); }
+  9% { filter: drop-shadow(-.03em 0 #00e5ff) drop-shadow(.03em 0 #ff2e63); }
+}
+
+/* ---------- 7. matrix: falling code decodes into the name ---------- */
+.nr-matrix { --nr-sp: var(--nr-a, #2dff8a); }
+.nr-matrix.is-on .nr-c[data-i] { opacity: 0; }
+.nr-matrix.is-on .nr-c[data-i][data-s] { opacity: 1; color: transparent; text-shadow: none; }
+.nr-matrix .nr-c[data-s]::before {
+  content: attr(data-s); position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none;
+  color: var(--nr-a, #2dff8a); opacity: .85; text-shadow: 0 0 .4em var(--nr-a, #2dff8a);
+}
+.nr-matrix.is-on:not(.is-done) .nr-c[data-i].is-lock { opacity: 1; animation: nr-matrix-lock .7s ease-out both; }
+.nr-matrix.is-on:not(.is-done) .nr-c[data-i].is-lock::after { animation: nr-spark .8s ease-out both; }
+@keyframes nr-matrix-lock {
+  0%   { color: #fff; text-shadow: 0 0 .5em #fff, 0 0 1em var(--nr-a, #2dff8a); transform: scale(1.3); }
+  100% { transform: none; }
+}
+.nr-matrix.is-done .nr-c[data-i] { opacity: 1; animation: nr-matrix-shine 7s linear calc(var(--i) * 55ms) infinite; }
+@keyframes nr-matrix-shine {
+  0%, 16%, 100% { filter: none; }
+  7% { filter: brightness(1.8) drop-shadow(0 0 .3em var(--nr-a, #2dff8a)); }
+}
+
+/* ---------- 8. confetti: letters drop in with a bounce, coloured like Google, and fade to white ---------- */
+.nr-confetti { --c0: #4285f4; --c1: #ea4335; --c2: #fbbc05; --c3: #34a853; }
+.nr-confetti .nr-c[data-k="0"] { --cc: var(--c0); }
+.nr-confetti .nr-c[data-k="1"] { --cc: var(--c1); }
+.nr-confetti .nr-c[data-k="2"] { --cc: var(--c2); }
+.nr-confetti .nr-c[data-k="3"] { --cc: var(--c3); }
+.nr-confetti .nr-c[data-i]::after { background: var(--cc); }
+.nr-confetti.is-on:not(.is-done) .nr-c[data-i] { animation: nr-pop .9s cubic-bezier(.3, 1.2, .4, 1) calc(var(--i) * var(--d)) both; }
+@keyframes nr-pop {
+  0%   { opacity: 0; transform: translateY(-1.5em) rotate(-25deg) scale(.3); color: var(--cc); }
+  50%  { opacity: 1; transform: translateY(.12em) rotate(6deg) scale(1.15); color: var(--cc); }
+  72%  { transform: translateY(-.1em) rotate(-3deg) scale(.97); }
+  100% { opacity: 1; transform: none; }
+}
+.nr-confetti.is-done .nr-c[data-i] { animation: nr-conf-shine 7s linear calc(var(--i) * 55ms) infinite; }
+@keyframes nr-conf-shine {
+  0%, 16%, 100% { filter: none; transform: none; }
+  7% { filter: drop-shadow(0 .05em 0 var(--cc)) brightness(1.25); transform: translateY(-.14em) scale(1.12); }
+}
+
+/* ---------- 9. git: a green "diff" highlight wipes over each letter, with a + that floats up ---------- */
+.nr-git { --nr-sp: #3fb950; }
+.nr-git.is-on:not(.is-done) .nr-c[data-i] { animation: nr-type .2s linear calc(var(--i) * var(--d)) both; }
+.nr-git .nr-c[data-i]::before {
+  content: ''; position: absolute; inset: .06em -.03em .02em -.03em; border-radius: 3px; pointer-events: none;
+  background: rgba(63, 185, 80, .34); transform-origin: left; opacity: 0;
+}
+.nr-git.is-on:not(.is-done) .nr-c[data-i]::before { animation: nr-diff .9s ease calc(var(--i) * var(--d)) both; }
+@keyframes nr-diff {
+  0%   { opacity: 0; transform: scaleX(0); }
+  25%  { opacity: 1; transform: scaleX(1); }
+  70%  { opacity: .9; transform: scaleX(1); }
+  100% { opacity: 0; transform: scaleX(1); }
+}
+.nr-git .nr-c[data-i]::after {
+  content: '+'; width: auto; height: auto; clip-path: none; background: none; top: -.28em; right: -.08em;
+  font: 700 .42em/1 var(--mono, ui-monospace, Menlo, Consolas, monospace); color: #3fb950;
+}
+.nr-git.is-on:not(.is-done) .nr-c[data-i]::after { animation: nr-plus .9s ease-out calc(var(--i) * var(--d) + 120ms) both; }
+@keyframes nr-plus {
+  0%   { opacity: 0; transform: translateY(.3em); }
+  30%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-.55em); }
+}
+.nr-git.is-done .nr-c[data-i]::before { animation: nr-diff-loop 7s linear calc(var(--i) * 55ms) infinite; }
+.nr-git.is-done .nr-c[data-i]::after { animation: nr-plus-loop 7s linear calc(var(--i) * 55ms) infinite; }
+@keyframes nr-diff-loop {
+  0%   { opacity: 0; transform: scaleX(0); }
+  5%   { opacity: .8; transform: scaleX(1); }
+  14%  { opacity: 0; transform: scaleX(1); }
+  100% { opacity: 0; transform: scaleX(1); }
+}
+@keyframes nr-plus-loop {
+  0%   { opacity: 0; transform: translateY(.3em); }
+  5%   { opacity: 1; }
+  14%  { opacity: 0; transform: translateY(-.55em); }
+  100% { opacity: 0; transform: translateY(-.55em); }
+}
+
+/* ---------- 10. arcade: letters blink on in steps, then a rainbow shimmer ---------- */
+.nr-arcade { --nr-sp: #7cf4ff; }
+.nr-arcade .nr-c[data-i]::after {
+  clip-path: polygon(40% 0, 60% 0, 60% 40%, 100% 40%, 100% 60%, 60% 60%, 60% 100%, 40% 100%, 40% 60%, 0 60%, 0 40%, 40% 40%);
+}
+.nr-arcade .nr-c[data-i]:nth-child(2n)::after { background: #ff4fd8; }
+.nr-arcade.is-on:not(.is-done) .nr-c[data-i]::after { animation-timing-function: steps(4, end); }
+.nr-arcade.is-on:not(.is-done) .nr-c[data-i] { animation: nr-blink-in .7s steps(1) calc(var(--i) * var(--d)) both; }
+@keyframes nr-blink-in {
+  0%   { opacity: 0; transform: translateY(-.25em); }
+  15%  { opacity: 1; }
+  30%  { opacity: 0; }
+  45%  { opacity: 1; transform: translateY(.08em); }
+  60%  { opacity: 0; }
+  75%  { opacity: 1; transform: none; }
+  100% { opacity: 1; transform: none; }
+}
+.nr-arcade.is-done .nr-c[data-i] { animation: nr-arc-shine 7s steps(1) calc(var(--i) * 55ms) infinite; }
+@keyframes nr-arc-shine {
+  0%, 20%, 100% { filter: none; }
+  3%  { filter: hue-rotate(80deg) brightness(1.3); }
+  7%  { filter: hue-rotate(170deg) brightness(1.4); }
+  11% { filter: hue-rotate(260deg) brightness(1.3); }
+  15% { filter: brightness(1.6) drop-shadow(0 0 .2em #7cf4ff); }
+}
+
+/* ---------- on the Upcoming cards the glow follows the event colour ---------- */
+.tc .nr-h, .s-mys .nr-h { --nr-a: var(--a); }
+
+/* ---------- reduced motion: the name is simply there ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .nr-h .nr-c, .nr-h .nr-c::before, .nr-h .nr-c::after, .nr-h .nr-rest { animation: none !important; }
+  .nr-h .nr-c[data-i], .nr-h .nr-rest { opacity: 1 !important; transform: none !important; }
+  .nr-h .nr-c[data-i]::before, .nr-h .nr-c[data-i]::after { display: none !important; }
+}

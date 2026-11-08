@@ -4,13 +4,18 @@
 // Names: radar, terminal, glitch, launch, matrix, ticket, neon, arcade, git, confetti
 import { useEffect, useRef } from 'react';
 import { Icon } from './Icons';
+import PosterStage from './PosterStage';
+import NameReveal from './NameReveal';
 import './PopupStyles.css';
 
 /* ---------- small shared pieces ---------- */
 const Close = ({ onClose }) => (
   <button type="button" className="pp-x" onClick={onClose} aria-label="Close"><Icon.X size={18} /></button>
 );
-const Title = ({ text, extra }) => <h2 id="s-ann-t" className="pp-title" {...extra}>{text.title}</h2>;
+// once the event name is written (text.name) the heading is the animated NameReveal, with this design's own effect (fx)
+const Title = ({ text, extra, fx }) => (text.name
+  ? <NameReveal as="h2" id="s-ann-t" className="pp-title" text={text.name} rest={text.rest} effect={fx} {...extra} />
+  : <h2 id="s-ann-t" className="pp-title" {...extra}>{text.title}</h2>);
 const Desc = ({ text }) => <p id="s-ann-d" className="pp-desc">{text.desc}</p>;
 const Actions = ({ text, p }) => (
   <div className="pp-actions">
@@ -37,17 +42,21 @@ function Radar({ text, ...p }) {
   return (
     <div ref={p.cardRef} className="s-ann-card" role="dialog" aria-modal="true" aria-labelledby="s-ann-t" aria-describedby="s-ann-d">
       <button type="button" className="s-ann-x" onClick={p.onClose} aria-label="Close"><Icon.X size={18} /></button>
-      <div className="s-ann-vis" aria-hidden="true">
-        <div className="s-ann-radar">
-          <i /><i /><i />
-          <b className="s-ann-sweep" />
-          <em className="b1" /><em className="b2" /><em className="b3" />
+      <PosterStage kind="popup">
+        <div className="s-ann-vis" aria-hidden="true">
+          <div className="s-ann-radar">
+            <i /><i /><i />
+            <b className="s-ann-sweep" />
+            <em className="b1" /><em className="b2" /><em className="b3" />
+          </div>
+          <span className="s-ann-q">?</span>
         </div>
-        <span className="s-ann-q">?</span>
-      </div>
+      </PosterStage>
       <div className="s-ann-body">
         <span className="s-ann-flag"><i /> {text.flag || 'New signal detected'}</span>
-        <h2 id="s-ann-t" className="s-ann-title">{m ? <><span>{m[1]}</span>{m[2]}</> : <span>{text.title}</span>}</h2>
+        {text.name
+          ? <NameReveal as="h2" id="s-ann-t" className="s-ann-title" text={text.name} rest={text.rest} effect="radar" />
+          : <h2 id="s-ann-t" className="s-ann-title">{m ? <><span>{m[1]}</span>{m[2]}</> : <span>{text.title}</span>}</h2>}
         <p id="s-ann-d" className="s-ann-desc">{text.desc}</p>
         <div className="s-ann-actions">
           <button ref={p.ctaRef} type="button" className="s-btn s-btn-light s-ann-go" onClick={p.onGo}>
@@ -72,14 +81,16 @@ function Terminal({ text, ...p }) {
   return (
     <Shell name="terminal" p={p}>
       <div className="pp-bar" aria-hidden="true"><i /><i /><i /><span>sipna@coders: ~</span></div>
-      <div className="pp-vis" aria-hidden="true">
-        {T_LINES.map((l) => (
-          <span key={l.t} className={`pp-t-line ${l.err ? 'err' : ''}`} style={{ '--n': l.n, '--d': `${l.d}s` }}>{l.t}</span>
-        ))}
-        <span className="pp-t-cur">$ <i /></span>
-      </div>
+      <PosterStage kind="popup">
+        <div className="pp-vis" aria-hidden="true">
+          {T_LINES.map((l) => (
+            <span key={l.t} className={`pp-t-line ${l.err ? 'err' : ''}`} style={{ '--n': l.n, '--d': `${l.d}s` }}>{l.t}</span>
+          ))}
+          <span className="pp-t-cur">$ <i /></span>
+        </div>
+      </PosterStage>
       <div className="pp-body">
-        <Title text={text} />
+        <Title fx="terminal" text={text} />
         <Desc text={text} />
         <Actions text={text} p={p} />
       </div>
@@ -91,12 +102,14 @@ function Terminal({ text, ...p }) {
 function Glitch({ text, ...p }) {
   return (
     <Shell name="glitch" p={p}>
-      <div className="pp-vis" aria-hidden="true">
-        <div className="pp-stripes" />
-        <div className="pp-gl-tag"><i /> ALERT <b>//</b> SIGNAL INTERCEPTED</div>
-      </div>
+      <PosterStage kind="popup">
+        <div className="pp-vis" aria-hidden="true">
+          <div className="pp-stripes" />
+          <div className="pp-gl-tag"><i /> ALERT <b>//</b> SIGNAL INTERCEPTED</div>
+        </div>
+      </PosterStage>
       <div className="pp-body">
-        <Title text={text} extra={{ 'data-text': text.title }} />
+        <Title fx="glitch" text={text} extra={{ 'data-text': text.title }} />
         <Desc text={text} />
         <Actions text={text} p={p} />
       </div>
@@ -108,26 +121,28 @@ function Glitch({ text, ...p }) {
 function Launch({ text, ...p }) {
   return (
     <Shell name="launch" p={p}>
-      <div className="pp-vis" aria-hidden="true">
-        <div className="pp-stars" />
-        <svg className="pp-rocket" viewBox="0 0 60 104" width="58" height="100">
-          <defs>
-            <linearGradient id="pp-fl" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#fff3b0" /><stop offset=".45" stopColor="#ff9a3d" /><stop offset="1" stopColor="#ff4b2b" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          <path className="pp-flame" d="M23 64 Q30 104 37 64Z" fill="url(#pp-fl)" />
-          <path d="M18 52 L5 76 L19 69Z" fill="#ff8a3d" />
-          <path d="M42 52 L55 76 L41 69Z" fill="#ff8a3d" />
-          <path d="M30 3 C43 18 45 42 43 66 L17 66 C15 42 17 18 30 3Z" fill="#eef2ff" />
-          <path d="M30 3 C36 9 39 15 40.5 23 L19.5 23 C21 15 24 9 30 3Z" fill="#ff5b5b" />
-          <circle cx="30" cy="42" r="7" fill="#4c8dff" stroke="#fff" strokeWidth="2.5" />
-        </svg>
-        <div className="pp-cd">T<b>-</b> <em>--</em><u>:</u><em>--</em><u>:</u><em>--</em></div>
-      </div>
+      <PosterStage kind="popup">
+        <div className="pp-vis" aria-hidden="true">
+          <div className="pp-stars" />
+          <svg className="pp-rocket" viewBox="0 0 60 104" width="58" height="100">
+            <defs>
+              <linearGradient id="pp-fl" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stopColor="#fff3b0" /><stop offset=".45" stopColor="#ff9a3d" /><stop offset="1" stopColor="#ff4b2b" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <path className="pp-flame" d="M23 64 Q30 104 37 64Z" fill="url(#pp-fl)" />
+            <path d="M18 52 L5 76 L19 69Z" fill="#ff8a3d" />
+            <path d="M42 52 L55 76 L41 69Z" fill="#ff8a3d" />
+            <path d="M30 3 C43 18 45 42 43 66 L17 66 C15 42 17 18 30 3Z" fill="#eef2ff" />
+            <path d="M30 3 C36 9 39 15 40.5 23 L19.5 23 C21 15 24 9 30 3Z" fill="#ff5b5b" />
+            <circle cx="30" cy="42" r="7" fill="#4c8dff" stroke="#fff" strokeWidth="2.5" />
+          </svg>
+          <div className="pp-cd">T<b>-</b> <em>--</em><u>:</u><em>--</em><u>:</u><em>--</em></div>
+        </div>
+      </PosterStage>
       <div className="pp-body">
         <span className="pp-flag"><i /> Launch window: classified</span>
-        <Title text={text} />
+        <Title fx="launch" text={text} />
         <Desc text={text} />
         <Actions text={text} p={p} />
       </div>
@@ -180,11 +195,13 @@ function Matrix({ text, ...p }) {
   return (
     <Shell name="matrix" p={p}>
       <Rain />
-      <div className="pp-vis" aria-hidden="true">
-        <span className="pp-mx-tag">&gt; the network is hiding something<i>_</i></span>
-      </div>
+      <PosterStage kind="popup">
+        <div className="pp-vis" aria-hidden="true">
+          <span className="pp-mx-tag">&gt; the network is hiding something<i>_</i></span>
+        </div>
+      </PosterStage>
       <div className="pp-body">
-        <Title text={text} />
+        <Title fx="matrix" text={text} />
         <Desc text={text} />
         <Actions text={text} p={p} />
       </div>
@@ -202,13 +219,15 @@ function Ticket({ text, ...p }) {
         <span className="pp-tk-admit">Admit one</span>
       </div>
       <div className="pp-tk-main">
-        <Title text={text} />
-        <dl className="pp-tk-rows" aria-hidden="true">
-          <div><dt>Event</dt><dd><s /></dd></div>
-          <div><dt>Date</dt><dd><s className="sm" /></dd></div>
-          <div><dt>Venue</dt><dd><s /></dd></div>
-          <div><dt>Seat</dt><dd>???</dd></div>
-        </dl>
+        <Title fx="ticket" text={text} />
+        <PosterStage kind="popup">
+          <dl className="pp-tk-rows" aria-hidden="true">
+            <div><dt>Event</dt><dd><s /></dd></div>
+            <div><dt>Date</dt><dd><s className="sm" /></dd></div>
+            <div><dt>Venue</dt><dd><s /></dd></div>
+            <div><dt>Seat</dt><dd>???</dd></div>
+          </dl>
+        </PosterStage>
         <Desc text={text} />
       </div>
       <div className="pp-perf" aria-hidden="true" />
@@ -227,11 +246,17 @@ function Neon({ text, ...p }) {
   return (
     <Shell name="neon" p={p}>
       <div className="pp-body">
-        <span className="pp-nx-ring" aria-hidden="true"><b>?</b></span>
-        <h2 id="s-ann-t" className="pp-title">
-          <span className="pp-n1">{words.slice(0, half).join(' ')}</span>{' '}
-          <span className="pp-n2">{words.slice(half).join(' ')}</span>
-        </h2>
+        <PosterStage kind="popup">
+          <span className="pp-nx-ring" aria-hidden="true"><b>?</b></span>
+        </PosterStage>
+        {text.name
+          ? <NameReveal as="h2" id="s-ann-t" className="pp-title" text={text.name} rest={text.rest} effect="neon" all />
+          : (
+            <h2 id="s-ann-t" className="pp-title">
+              <span className="pp-n1">{words.slice(0, half).join(' ')}</span>{' '}
+              <span className="pp-n2">{words.slice(half).join(' ')}</span>
+            </h2>
+          )}
         <span className="pp-nx-sub" aria-hidden="true">coming soon</span>
         <Desc text={text} />
         <Actions text={text} p={p} />
@@ -246,11 +271,13 @@ function Arcade({ text, ...p }) {
     <Shell name="arcade" p={p}>
       <div className="pp-hud" aria-hidden="true"><span>1UP</span><span>HI-SCORE ??????</span></div>
       <div className="pp-body">
-        <Title text={text} />
-        <div className="pp-lv" aria-hidden="true">
-          <span>LEVEL ??</span>
-          <div className="pp-seg">{Array.from({ length: 16 }, (_, i) => <i key={i} className={i < 6 ? 'on' : ''} />)}</div>
-        </div>
+        <Title fx="arcade" text={text} />
+        <PosterStage kind="popup">
+          <div className="pp-lv" aria-hidden="true">
+            <span>LEVEL ??</span>
+            <div className="pp-seg">{Array.from({ length: 16 }, (_, i) => <i key={i} className={i < 6 ? 'on' : ''} />)}</div>
+          </div>
+        </PosterStage>
         <Desc text={text} />
         <span className="pp-coin" aria-hidden="true">INSERT COIN</span>
         <Actions text={text} p={p} />
@@ -270,22 +297,24 @@ function Git({ text, ...p }) {
   return (
     <Shell name="git" p={p}>
       <div className="pp-gh" aria-hidden="true"><code>$ git log --graph</code></div>
-      <ul className="pp-log" aria-hidden="true">
-        {COMMITS.map((c, i) => (
-          <li key={c.h} className={c.head ? 'head' : ''}>
-            <svg width="26" height="44" viewBox="0 0 26 44">
-              {i > 0 && <line x1="13" y1="0" x2="13" y2="22" />}
-              {i < COMMITS.length - 1 && <line x1="13" y1="22" x2="13" y2="44" />}
-              <circle cx="13" cy="22" r={c.head ? 6 : 5} />
-            </svg>
-            <code className="h">{c.h}</code>
-            <code className="m">{c.m}</code>
-            {c.head && <code className="b">HEAD → next-event</code>}
-          </li>
-        ))}
-      </ul>
+      <PosterStage kind="popup">
+        <ul className="pp-log" aria-hidden="true">
+          {COMMITS.map((c, i) => (
+            <li key={c.h} className={c.head ? 'head' : ''}>
+              <svg width="26" height="44" viewBox="0 0 26 44">
+                {i > 0 && <line x1="13" y1="0" x2="13" y2="22" />}
+                {i < COMMITS.length - 1 && <line x1="13" y1="22" x2="13" y2="44" />}
+                <circle cx="13" cy="22" r={c.head ? 6 : 5} />
+              </svg>
+              <code className="h">{c.h}</code>
+              <code className="m">{c.m}</code>
+              {c.head && <code className="b">HEAD → next-event</code>}
+            </li>
+          ))}
+        </ul>
+      </PosterStage>
       <div className="pp-body">
-        <Title text={text} />
+        <Title fx="git" text={text} />
         <Desc text={text} />
         <Actions text={text} p={p} />
       </div>
@@ -301,22 +330,24 @@ const PIECES = Array.from({ length: 26 }, (_, i) => ({
 function Confetti({ text, ...p }) {
   return (
     <Shell name="confetti" p={p}>
-      <div className="pp-vis" aria-hidden="true">
-        {PIECES.map((c, i) => (
-          <i key={i} className="pp-cf" style={{ left: `${c.l}%`, width: `${c.w}px`, height: `${c.w * 1.6}px`, background: c.c, animationDelay: `${c.d}s`, animationDuration: `${c.t}s`, '--r': `${c.r}deg` }} />
-        ))}
-        <svg className="pp-gift" viewBox="0 0 96 96" width="92" height="92">
-          <rect x="14" y="44" width="68" height="40" rx="5" fill="#4285f4" />
-          <rect x="10" y="34" width="76" height="16" rx="5" fill="#5b9bff" />
-          <rect x="43" y="34" width="10" height="50" fill="#fbbc05" />
-          <path d="M48 34 C38 12 20 18 28 30 C32 35 44 34 48 34Z" fill="#ea4335" />
-          <path d="M48 34 C58 12 76 18 68 30 C64 35 52 34 48 34Z" fill="#ea4335" />
-          <circle cx="48" cy="34" r="5" fill="#fbbc05" />
-        </svg>
-        <span className="pp-gq">?</span>
-      </div>
+      <PosterStage kind="popup">
+        <div className="pp-vis" aria-hidden="true">
+          {PIECES.map((c, i) => (
+            <i key={i} className="pp-cf" style={{ left: `${c.l}%`, width: `${c.w}px`, height: `${c.w * 1.6}px`, background: c.c, animationDelay: `${c.d}s`, animationDuration: `${c.t}s`, '--r': `${c.r}deg` }} />
+          ))}
+          <svg className="pp-gift" viewBox="0 0 96 96" width="92" height="92">
+            <rect x="14" y="44" width="68" height="40" rx="5" fill="#4285f4" />
+            <rect x="10" y="34" width="76" height="16" rx="5" fill="#5b9bff" />
+            <rect x="43" y="34" width="10" height="50" fill="#fbbc05" />
+            <path d="M48 34 C38 12 20 18 28 30 C32 35 44 34 48 34Z" fill="#ea4335" />
+            <path d="M48 34 C58 12 76 18 68 30 C64 35 52 34 48 34Z" fill="#ea4335" />
+            <circle cx="48" cy="34" r="5" fill="#fbbc05" />
+          </svg>
+          <span className="pp-gq">?</span>
+        </div>
+      </PosterStage>
       <div className="pp-body">
-        <Title text={text} />
+        <Title fx="confetti" text={text} />
         <Desc text={text} />
         <Actions text={text} p={p} />
       </div>

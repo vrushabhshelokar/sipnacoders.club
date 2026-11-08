@@ -70,7 +70,7 @@
 }
 .s-ann-flag i { width: 7px; height: 7px; border-radius: 50%; background: var(--ann-a); box-shadow: 0 0 10px var(--ann-a); animation: s-ann-pulse 1.6s ease-in-out infinite; }
 .s-ann-title { margin: 14px 0 0; font: 700 clamp(28px, 6.4vw, 34px)/1.1 var(--display, 'Space Grotesk', sans-serif); letter-spacing: -.025em; color: #fff; }
-.s-ann-title span { background: linear-gradient(100deg, #e1b8ff, #c792ea 45%, #8ab4ff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: var(--ann-a); }
+.s-ann-title > span:not(.nr-name) { background: linear-gradient(100deg, #e1b8ff, #c792ea 45%, #8ab4ff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: var(--ann-a); }
 .s-ann-desc { margin: 12px 0 0; font-size: 15px; line-height: 1.6; color: var(--text-2, #a3acba); }
 
 .s-ann-actions { display: flex; align-items: center; gap: 14px; margin-top: 24px; }

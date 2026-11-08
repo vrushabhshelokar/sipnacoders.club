@@ -4,6 +4,8 @@
 //   look 1 = Signal (this file) , looks 2-5 = Terminal / Dossier / Blueprint / Vault (site/TeaserCards.jsx)
 import { Suspense, lazy } from 'react';
 import { Reveal } from './ui';
+import PosterStage from './PosterStage';
+import { CardTitle } from './NameReveal';
 import { Actions, FieldValue, Guard, getDesign, isTeaserLive, useTeaser } from './teaserCore';
 import './HackathonTeaser.css';
 
@@ -16,6 +18,7 @@ function Signal({ t }) {
   const { copy } = t;
   return (
     <article className={`s-mys t-${t.type} is-${t.phase}`} aria-label={t.label}>
+      <PosterStage kind="card">
       <div className="s-mys-vis" aria-hidden="true">
         <div className="s-mys-radar">
           <i /><i /><i />
@@ -26,6 +29,7 @@ function Signal({ t }) {
         <div className="s-mys-hex"><span>{t.hex}  {t.hex}  </span></div>
         <span className="s-mys-tag">{copy.tag}</span>
       </div>
+      </PosterStage>
 
       <div className="s-mys-body">
         <div className="s-row">
@@ -33,7 +37,7 @@ function Signal({ t }) {
           <span className="s-mys-file">{copy.file}</span>
         </div>
 
-        <h3 className="s-mys-title">{t.title}</h3>
+        <CardTitle t={t} className="s-mys-title" />
         <p className="s-mys-lede">{copy.lede}</p>
         <p className="s-mys-desc">{copy.desc}</p>
 
