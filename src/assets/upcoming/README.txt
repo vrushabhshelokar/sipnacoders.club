@@ -18,12 +18,15 @@ Put the poster of the next event in THIS folder and name the file after the even
 * No poster in this folder = the mystery picture ("?", radar, ...) stays like before.
 
 HOW IT LOOKS ON THE SITE
-After the poster is added, the mystery picture of the popup and of the Upcoming card glitches
-(it jumps up big for a second) and the poster appears in its place and stays.
+After the poster is added, the mystery picture of the popup and of the Upcoming card stays for 2 seconds.
+Then a crazy reveal plays (about 1.5 seconds) and the poster appears in its place and stays.
 It does not need "Try to decrypt".
+There are 10 reveals: slam, curtain, flip, iris, assemble, spotlight, scroll, zap, burst and warp.
+Every design has its own one and the site picks it by itself (the list is in src/site/designs.js, the 3rd word of every line).
+To try one on your computer add  ?fx=warp  to the address (for example localhost:5173/?popup=quest&fx=warp).
 
 The poster has the same look as the membership poster on the home page: round corners, a soft glow and a small tilt.
-It drops into its tilt right after the glitch, gives a small shake every 3 seconds, and when the mouse is on it
+After the reveal it gives a small shake every 3 seconds, and when the mouse is on it
 the poster comes straight. (People who switched off animations on their phone / computer see it still, only tilted.)
 To change this look, open src/site/PosterStage.css and find ".ps { --ps-tilt: ... }":
     --ps-tilt: -2deg    <- 0deg = straight poster   --ps-radius: 12px = corner roundness
@@ -31,8 +34,7 @@ To stop the 3-second shake, delete the line "animation: ps-shake 3s ease-in-out 
 
 THE EVENT NAME
 When you write EVENT_NAME in src/site/upcomingConfig.js, the name appears letter by letter with a sparkle on every letter,
-and then the whole word shines now and then. Every design has its own effect (radar, terminal, ticket, launch, neon,
-glitch, matrix, confetti, git, arcade) and the Upcoming card uses the effect of its popup. Nothing to set up.
+and then the whole word shines now and then. Every design has its own effect and the Upcoming card uses the effect of its popup. Nothing to set up.
 
 After adding or removing a poster: git add src/assets/upcoming, commit and push (the site rebuilds by itself).
 When the event is over, delete the poster files (or leave them: they only show while SHOW_UPCOMING is true).

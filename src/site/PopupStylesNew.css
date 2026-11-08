@@ -13,7 +13,7 @@
 .pp-slot .pq-lamps { display: flex; justify-content: space-between; padding: 13px 58px 2px 18px; }
 .pp-slot .pq-lamps i { width: 9px; height: 9px; border-radius: 50%; background: #ffd966; box-shadow: 0 0 8px 2px rgba(255, 200, 61, .85); animation: pq-lamp 1.2s steps(1) infinite; }
 .pp-slot .pq-lamps i:nth-child(even) { animation-delay: .6s; }
-.pp-slot .ps.is-glitch, .pp-slot .ps.is-poster { margin: 6px 0 0; border-block: 2px solid #ffc83d; }
+.pp-slot .ps.is-reveal, .pp-slot .ps.is-poster { margin: 6px 0 0; border-block: 2px solid #ffc83d; }
 .pp-slot .pp-body { padding-top: 14px; }
 .pp-slot .pp-title { margin-top: 0; font: 900 clamp(26px, 6.6vw, 33px)/1.1 Georgia, 'Times New Roman', serif; letter-spacing: 0; color: #ffd76a; text-shadow: 0 2px 0 #7a1020, 0 0 24px rgba(255, 200, 61, .45); }
 .s-ann .pp-slot .pp-go { background: linear-gradient(180deg, #ff5a6e, #c4122a); color: #fff; border: 2px solid #ffc83d; border-radius: 999px; font-family: Georgia, 'Times New Roman', serif; font-weight: 700; box-shadow: 0 5px 0 #7a0c1b, 0 14px 30px -10px rgba(255, 59, 78, .8); }

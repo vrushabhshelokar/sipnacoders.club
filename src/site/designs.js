@@ -1,7 +1,11 @@
-// The designs, in the order the events use them: [popup name, card look].
+// The designs, in the order the events use them: [popup name, card look, poster reveal].
 // The site picks the next one by itself for every new event (the first event uses the first line, the second event the
 // second line ...). After the last line it starts again from the first one.
 // Old and new designs are mixed on purpose, so two events in a row never look alike.
+//
+// Poster reveal (the 3rd word of every line): what happens when the poster you uploaded replaces the "?" picture, 2 seconds after it appears.
+//   slam curtain flip iris assemble spotlight scroll zap burst warp      (each one is used by two designs)
+// To try one on your computer: add ?fx=warp to the address (any name from the list).
 //
 // Popups (the "Something big is coming" window):
 //   radar terminal ticket launch neon glitch matrix confetti git arcade                (the first 10)
@@ -14,28 +18,29 @@
 // You do not need to edit this file. To lock one design use FORCE_DESIGN in upcomingConfig.js (a line number from this list, 1 to 20).
 // To look at one on your computer add ?design=7 to the address.
 export const DESIGNS = [
-  ['radar', 1],
-  ['comic', 9],
-  ['terminal', 2],
-  ['slot', 6],
-  ['ticket', 3],
-  ['bsod', 11],
-  ['neon', 5],
-  ['chat', 8],
-  ['launch', 4],
-  ['clapper', 12],
-  ['glitch', 1],
-  ['scratch', 7],
-  ['git', 4],
-  ['synth', 13],
-  ['confetti', 3],
-  ['news', 10],
-  ['matrix', 2],
-  ['quest', 15],
-  ['arcade', 5],
-  ['spy', 14],
+  ['radar', 1, 'iris'],
+  ['comic', 9, 'slam'],
+  ['terminal', 2, 'assemble'],
+  ['slot', 6, 'burst'],
+  ['ticket', 3, 'scroll'],
+  ['bsod', 11, 'zap'],
+  ['neon', 5, 'spotlight'],
+  ['chat', 8, 'flip'],
+  ['launch', 4, 'warp'],
+  ['clapper', 12, 'curtain'],
+  ['glitch', 1, 'zap'],
+  ['scratch', 7, 'iris'],
+  ['git', 4, 'assemble'],
+  ['synth', 13, 'warp'],
+  ['confetti', 3, 'burst'],
+  ['news', 10, 'slam'],
+  ['matrix', 2, 'flip'],
+  ['quest', 15, 'scroll'],
+  ['arcade', 5, 'curtain'],
+  ['spy', 14, 'spotlight'],
 ];
 
+export const POSTER_EFFECTS = ['slam', 'curtain', 'flip', 'iris', 'assemble', 'spotlight', 'scroll', 'zap', 'burst', 'warp'];
 export const OLD_POPUPS = ['radar', 'terminal', 'glitch', 'launch', 'matrix', 'ticket', 'neon', 'arcade', 'git', 'confetti'];
 export const NEW_POPUPS = ['slot', 'scratch', 'chat', 'comic', 'news', 'bsod', 'clapper', 'synth', 'spy', 'quest'];
 export const POPUP_NAMES = [...OLD_POPUPS, ...NEW_POPUPS];

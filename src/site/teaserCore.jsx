@@ -5,7 +5,7 @@ import { Icon } from './Icons';
 import { LINKS, pastEvents } from '../data/site';
 import { dateFromText, getPast, toDate } from './time';
 import * as C from './upcomingConfig';
-import { CARD_LOOKS, DESIGNS as DESIGN_LIST } from './designs';
+import { CARD_LOOKS, DESIGNS as DESIGN_LIST, POSTER_EFFECTS } from './designs';
 
 /* ---------- settings (read from upcomingConfig.js, with safe fallbacks) ---------- */
 export const TYPES = ['hackathon', 'workshop', 'online'];
@@ -40,6 +40,16 @@ export function getDesign() {
   else i = finishedSince() % LIST.length;                         // automatic: the next design for every new event
   const [popup, card] = LIST[i];
   return { n: i + 1, popup, card: Math.min(CARD_LOOKS, Math.max(1, Math.round(Number(card)) || 1)), preview: q >= 1 && q <= LIST.length ? Math.round(q) : 0 };
+}
+
+/* which reveal the poster uses (the 3rd word of the line in designs.js). ?fx=warp in the address tries one. */
+export function getFx() {
+  let q = '', pn = '';
+  try { const sp = new URLSearchParams(window.location.search); q = sp.get('fx') || ''; pn = sp.get('popup') || ''; } catch { /* no address bar: ignore */ }
+  if (POSTER_EFFECTS.includes(q)) return q;
+  const byName = pn ? LIST.find((d) => d[0] === pn) : null;   // ?popup=quest preview: the effect of that popup
+  const line = byName || LIST[getDesign().n - 1] || LIST[0];
+  return POSTER_EFFECTS.includes(line[2]) ? line[2] : POSTER_EFFECTS[(getDesign().n - 1) % POSTER_EFFECTS.length];
 }
 
 /* ---------- words for each kind of event ---------- */
