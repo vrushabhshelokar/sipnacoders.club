@@ -42,6 +42,18 @@
 .s-ambs .s-amb-role-top { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
 .s-ambs .s-amb-role .s-amb-role-h { margin: 0; min-width: 0; }
 
+/* the program's logo as a big, soft picture behind the text of the panel (only when the program has a logo file)
+   ✏️ --logo-show: how strong the logo is (0 = hidden, .3 = strong). --logo-size: how big it is. */
+.s-ambs .s-amb-role.has-logo { --logo-show: .2; --logo-size: 250px; }
+.s-ambs .s-amb-role.has-logo > * { position: relative; z-index: 1; }
+.s-ambs .s-amb-role.has-logo::after {
+  content: ''; position: absolute; z-index: 0; right: -46px; bottom: -52px; width: var(--logo-size); height: var(--logo-size); pointer-events: none;
+  background: var(--logo) center / contain no-repeat; opacity: var(--logo-show); mix-blend-mode: screen;
+  -webkit-mask-image: radial-gradient(closest-side, #000 52%, transparent 100%); mask-image: radial-gradient(closest-side, #000 52%, transparent 100%);
+  transform: rotate(-10deg); transition: opacity .35s ease, transform .6s var(--ease, ease);
+}
+.s-ambs .s-amb:hover .s-amb-role.has-logo::after { opacity: calc(var(--logo-show) + .08); transform: rotate(-4deg) scale(1.05); }
+
 /* whole card lights up in the program colour on hover */
 .s-ambs .s-amb { transition: border-color .3s, box-shadow .3s; }
 .s-ambs .s-amb:hover { border-color: rgba(255, 255, 255, .2); border-color: color-mix(in srgb, var(--c1) 50%, transparent); box-shadow: 0 30px 70px -40px var(--c1); }

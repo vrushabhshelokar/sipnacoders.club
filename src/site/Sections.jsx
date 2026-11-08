@@ -165,7 +165,7 @@ export function Ambassadors() {
                 </div>
                 <div className="s-amb-roles">
                   {progs.map((p) => (
-                    <div key={p.name} className="s-amb-role" style={{ '--pc': p.color }}>
+                    <div key={p.name} className={`s-amb-role ${logoOf(p) ? 'has-logo' : ''}`} style={{ '--pc': p.color, '--logo': logoOf(p) ? `url("${logoOf(p)}")` : 'none' }}>
                       <div className="s-amb-role-top">
                         <ProgramMark p={p} big />
                         <span className="s-amb-role-h">What they do as {p.name}</span>
