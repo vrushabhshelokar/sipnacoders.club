@@ -1,0 +1,175 @@
+/* The event name effects of the newer designs (see NameReveal.jsx and NameReveal.css for the rules every effect shares).
+   slot, scratch, chat, comic, news, bsod, clapper, synth, spy, quest */
+
+/* ---------- slot: the letters spin like reels, then lock in with a gold flash ---------- */
+.nr-slot { --nr-sp: #fff3b0; }
+.nr-slot.is-on .nr-c[data-i] { opacity: 0; }
+.nr-slot.is-on .nr-c[data-i][data-s] { opacity: 1; color: transparent; text-shadow: none; }
+.nr-slot .nr-c[data-s]::before {
+  content: attr(data-s); position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none;
+  color: #fff3b0; text-shadow: 0 0 .3em rgba(255, 200, 61, .9); animation: nr-slot-roll .12s linear infinite;
+}
+@keyframes nr-slot-roll { 0% { transform: translateY(-.32em); filter: blur(.5px); } 100% { transform: translateY(.32em); filter: blur(.5px); } }
+.nr-slot.is-on:not(.is-done) .nr-c[data-i].is-lock { opacity: 1; animation: nr-slot-lock .6s cubic-bezier(.3, 1.6, .5, 1) both; }
+.nr-slot.is-on:not(.is-done) .nr-c[data-i].is-lock::after { animation: nr-spark .8s ease-out both; }
+@keyframes nr-slot-lock {
+  0%   { transform: translateY(-.5em); filter: brightness(2.2); }
+  55%  { transform: translateY(.08em); filter: brightness(1.5) drop-shadow(0 0 .25em #ffc83d); }
+  100% { transform: none; filter: none; }
+}
+.nr-slot.is-done .nr-c[data-i] { opacity: 1; animation: nr-slot-shine 7s linear calc(var(--i) * 55ms) infinite; }
+@keyframes nr-slot-shine {
+  0%, 16%, 100% { filter: none; transform: none; }
+  7% { filter: brightness(1.7) drop-shadow(0 0 .28em #ffc83d); transform: translateY(-.05em); }
+}
+
+/* ---------- scratch: a silver foil covers each letter and is scratched off ---------- */
+.nr-scratch { --nr-sp: #fff; }
+.nr-scratch .nr-c[data-i]::before {
+  content: ''; position: absolute; inset: -.04em -.06em; border-radius: .08em; pointer-events: none; transform-origin: right center;
+  background: linear-gradient(115deg, #cfd4dc, #f6f8fb 40%, #98a1ae 60%, #e3e7ee);
+}
+.nr-scratch.is-on:not(.is-done) .nr-c[data-i]::before { animation: nr-foil-off .55s cubic-bezier(.5, 0, .3, 1) calc(var(--i) * var(--d) + 520ms) both; }
+.nr-scratch.is-done .nr-c[data-i]::before { display: none; }
+@keyframes nr-foil-off {
+  0%   { transform: scaleX(1) skewX(0); opacity: 1; }
+  100% { transform: scaleX(0) skewX(-14deg); opacity: .6; }
+}
+.nr-scratch.is-on:not(.is-done) .nr-c[data-i]::after { animation: nr-spark .8s ease-out calc(var(--i) * var(--d) + 700ms) both; }
+.nr-scratch.is-done .nr-c[data-i] { animation: nr-scratch-shine 7s linear calc(var(--i) * 55ms) infinite; }
+@keyframes nr-scratch-shine {
+  0%, 16%, 100% { filter: none; }
+  7% { filter: brightness(1.5) drop-shadow(0 0 .22em #fff); }
+}
+
+/* ---------- chat: every letter pops in like a message bubble, then a little wave runs through ---------- */
+.nr-chat { --nr-sp: #8fb4ff; }
+.nr-chat.is-on:not(.is-done) .nr-c[data-i] { animation: nr-chat-in .55s cubic-bezier(.3, 1.6, .5, 1) calc(var(--i) * var(--d)) both; }
+@keyframes nr-chat-in {
+  0%   { opacity: 0; transform: translateY(.5em) scale(.4); }
+  60%  { opacity: 1; transform: translateY(-.12em) scale(1.12); }
+  100% { opacity: 1; transform: none; }
+}
+.nr-chat.is-done .nr-c[data-i] { animation: nr-chat-wave 7s ease-in-out calc(var(--i) * 55ms) infinite; }
+@keyframes nr-chat-wave {
+  0%, 14%, 100% { transform: none; }
+  4% { transform: translateY(-.16em); }
+  8% { transform: translateY(.04em); }
+}
+
+/* ---------- comic: letters are slammed down big, then wobble now and then ---------- */
+.nr-comic { --nr-sp: #ffe600; }
+.nr-comic.is-on:not(.is-done) .nr-c[data-i] { animation: nr-comic-slam .6s cubic-bezier(.2, 1.4, .4, 1) calc(var(--i) * var(--d)) both; }
+@keyframes nr-comic-slam {
+  0%   { opacity: 0; transform: scale(3.2) rotate(-14deg); }
+  60%  { opacity: 1; transform: scale(.9) rotate(2deg); }
+  100% { opacity: 1; transform: none; }
+}
+.nr-comic.is-done .nr-c[data-i] { animation: nr-comic-wob 7s ease-in-out calc(var(--i) * 55ms) infinite; }
+@keyframes nr-comic-wob {
+  0%, 14%, 100% { transform: none; }
+  4% { transform: rotate(-5deg) scale(1.1); }
+  8% { transform: rotate(4deg) scale(1.05); }
+}
+
+/* ---------- news: the letters slide in like a ticker, with a red line growing under them ---------- */
+.nr-news { --nr-sp: #ffd24a; }
+.nr-news.is-on:not(.is-done) .nr-c[data-i] { animation: nr-news-in .5s cubic-bezier(.2, .9, .3, 1) calc(var(--i) * var(--d)) both; }
+@keyframes nr-news-in {
+  0%   { opacity: 0; transform: translateX(1em) skewX(-14deg); }
+  100% { opacity: 1; transform: none; }
+}
+.nr-news .nr-c[data-i]::before {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -.04em; height: .07em; background: var(--nr-line, #e5192e); transform: scaleX(0); transform-origin: left; pointer-events: none;
+}
+.nr-news.is-on:not(.is-done) .nr-c[data-i]::before { animation: nr-news-line .4s ease-out calc(var(--i) * var(--d) + 200ms) both; }
+.nr-news.is-done .nr-c[data-i]::before { transform: scaleX(1); }
+@keyframes nr-news-line { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.nr-news.is-done .nr-c[data-i] { animation: nr-news-shine 7s linear calc(var(--i) * 55ms) infinite; }
+@keyframes nr-news-shine {
+  0%, 16%, 100% { filter: none; }
+  7% { filter: brightness(1.4) drop-shadow(0 0 .2em rgba(229, 25, 46, .8)); }
+}
+
+/* ---------- bsod: every letter flashes in inverse video (white block) like a crash screen, then settles ---------- */
+.nr-bsod { --nr-sp: #fff; }
+.nr-bsod.is-on:not(.is-done) .nr-c[data-i] { animation: nr-bsod-in .32s steps(1) calc(var(--i) * var(--d)) both; }
+@keyframes nr-bsod-in {
+  0%   { opacity: 0; }
+  1%   { opacity: 1; background: #fff; color: #0a6fd6; }
+  72%  { opacity: 1; background: #fff; color: #0a6fd6; }
+  100% { opacity: 1; background: transparent; color: inherit; }
+}
+.nr-bsod.is-done .nr-c[data-i] { animation: nr-bsod-blink 7s steps(1) calc(var(--i) * 55ms) infinite; }
+@keyframes nr-bsod-blink {
+  0%   { background: transparent; color: inherit; }
+  1%   { background: #fff; color: #0a6fd6; }
+  5%   { background: transparent; color: inherit; }
+  100% { background: transparent; color: inherit; }
+}
+
+/* ---------- clapper: each letter swings down on a hinge, like a clapstick, with a bright flash ---------- */
+.nr-clapper { --nr-sp: #ffe9a8; }
+.nr-clapper.is-on:not(.is-done) .nr-c[data-i] { transform-origin: 50% 0; animation: nr-clap-in .7s cubic-bezier(.3, 1.4, .5, 1) calc(var(--i) * var(--d)) both; }
+@keyframes nr-clap-in {
+  0%   { opacity: 0; transform: perspective(.9em) rotateX(-95deg); filter: brightness(2); }
+  40%  { opacity: 1; }
+  70%  { transform: perspective(.9em) rotateX(10deg); filter: brightness(1.6); }
+  100% { opacity: 1; transform: none; filter: none; }
+}
+.nr-clapper.is-done .nr-c[data-i] { animation: nr-clap-shine 7s ease-in-out calc(var(--i) * 55ms) infinite; }
+@keyframes nr-clap-shine {
+  0%, 14%, 100% { filter: none; }
+  6% { filter: brightness(1.6) drop-shadow(0 0 .2em #ffe9a8); }
+}
+
+/* ---------- synth: chrome letters rise out of the haze with a pink glow ---------- */
+.nr-synth { --nr-sp: #2de2e6; }
+.nr-synth .nr-c { background: linear-gradient(180deg, #fff 0 44%, #ffc2ea 46% 54%, #b84bff 56%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+.nr-synth.is-on:not(.is-done) .nr-c[data-i] { animation: nr-synth-in .9s cubic-bezier(.2, .8, .2, 1) calc(var(--i) * var(--d)) both; }
+@keyframes nr-synth-in {
+  0%   { opacity: 0; transform: translateY(.6em) skewX(-14deg) scaleY(.4); filter: blur(5px) drop-shadow(0 0 .3em #ff2a9d); }
+  60%  { opacity: 1; filter: blur(0) drop-shadow(0 0 .4em #ff2a9d); }
+  100% { opacity: 1; transform: none; filter: drop-shadow(0 0 .2em rgba(255, 42, 157, .6)); }
+}
+.nr-synth.is-done .nr-c[data-i] { filter: drop-shadow(0 0 .2em rgba(255, 42, 157, .6)); animation: nr-synth-shine 7s linear calc(var(--i) * 55ms) infinite; }
+@keyframes nr-synth-shine {
+  0%, 16%, 100% { filter: drop-shadow(0 0 .2em rgba(255, 42, 157, .6)); }
+  7% { filter: brightness(1.5) drop-shadow(0 0 .35em #2de2e6); }
+}
+
+/* ---------- spy: each letter flickers on in red, like a scanner locking onto it, then turns normal ---------- */
+.nr-spy { --nr-sp: #ff3030; }
+.nr-spy.is-on:not(.is-done) .nr-c[data-i] { animation: nr-spy-in .8s steps(1) calc(var(--i) * var(--d)) both; }
+@keyframes nr-spy-in {
+  0%   { opacity: 0; }
+  6%   { opacity: 1; color: #ff3030; text-shadow: 0 0 .35em #ff3030; }
+  16%  { opacity: .15; }
+  26%  { opacity: 1; color: #ff3030; text-shadow: 0 0 .3em #ff3030; }
+  40%  { opacity: .3; }
+  52%  { opacity: 1; color: #ff3030; text-shadow: 0 0 .3em #ff3030; }
+  100% { opacity: 1; color: inherit; text-shadow: none; }
+}
+.nr-spy.is-done .nr-c[data-i] { animation: nr-spy-shine 7s linear calc(var(--i) * 55ms) infinite; }
+@keyframes nr-spy-shine {
+  0%, 16%, 100% { color: inherit; text-shadow: none; }
+  7% { color: #ff3030; text-shadow: 0 0 .3em #ff3030; }
+}
+
+/* ---------- quest: letters drop and bounce in steps (like old game text), with a gold flash ---------- */
+.nr-quest { --nr-sp: #ffd23f; }
+.nr-quest.is-on:not(.is-done) .nr-c[data-i] { animation: nr-quest-in .6s steps(6) calc(var(--i) * var(--d)) both; }
+@keyframes nr-quest-in {
+  0%   { opacity: 0; transform: translateY(-.9em); color: #ffd23f; }
+  25%  { opacity: 1; transform: translateY(0); color: #ffd23f; }
+  45%  { transform: translateY(-.28em); color: #ffd23f; }
+  65%  { transform: translateY(0); }
+  80%  { transform: translateY(-.1em); }
+  100% { opacity: 1; transform: none; color: inherit; }
+}
+.nr-quest.is-done .nr-c[data-i] { animation: nr-quest-hop 7s steps(4) calc(var(--i) * 55ms) infinite; }
+@keyframes nr-quest-hop {
+  0%, 12%, 100% { transform: none; color: inherit; }
+  4% { transform: translateY(-.16em); color: #ffd23f; }
+  8% { transform: translateY(-.05em); }
+}

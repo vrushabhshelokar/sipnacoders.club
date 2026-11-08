@@ -1,39 +1,14 @@
 // The 10 looks of the "Something big is coming" popup. They all say the same thing (every detail is hidden,
 // tap to see the Upcoming events page), only the design is different.
-// You never edit this file. The design is picked by itself (see DESIGNS in site/upcomingConfig.js).
+// You never edit this file. The design is picked by itself (see site/designs.js).
 // Names: radar, terminal, glitch, launch, matrix, ticket, neon, arcade, git, confetti
+// (the newer designs live in PopupStylesNew.jsx)
 import { useEffect, useRef } from 'react';
 import { Icon } from './Icons';
 import PosterStage from './PosterStage';
 import NameReveal from './NameReveal';
+import { Actions, Desc, Shell, Title, reduced } from './popupParts';
 import './PopupStyles.css';
-
-/* ---------- small shared pieces ---------- */
-const Close = ({ onClose }) => (
-  <button type="button" className="pp-x" onClick={onClose} aria-label="Close"><Icon.X size={18} /></button>
-);
-// once the event name is written (text.name) the heading is the animated NameReveal, with this design's own effect (fx)
-const Title = ({ text, extra, fx }) => (text.name
-  ? <NameReveal as="h2" id="s-ann-t" className="pp-title" text={text.name} rest={text.rest} effect={fx} {...extra} />
-  : <h2 id="s-ann-t" className="pp-title" {...extra}>{text.title}</h2>);
-const Desc = ({ text }) => <p id="s-ann-d" className="pp-desc">{text.desc}</p>;
-const Actions = ({ text, p }) => (
-  <div className="pp-actions">
-    <button ref={p.ctaRef} type="button" className="pp-go" onClick={p.onGo}>
-      <span>{text.button}</span><Icon.ArrowRight size={17} />
-    </button>
-    <button type="button" className="pp-later" onClick={p.onClose}>{text.later}</button>
-  </div>
-);
-function Shell({ name, p, children }) {
-  return (
-    <div ref={p.cardRef} className={`pp pp-${name}`} role="dialog" aria-modal="true" aria-labelledby="s-ann-t" aria-describedby="s-ann-d">
-      <Close onClose={p.onClose} />
-      {children}
-    </div>
-  );
-}
-const reduced = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
 /* ---------- 1. radar (the original look) ---------- */
 function Radar({ text, ...p }) {

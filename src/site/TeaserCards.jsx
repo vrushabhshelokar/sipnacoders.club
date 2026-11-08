@@ -9,7 +9,7 @@ import { CardTitle } from './NameReveal';
 import './TeaserCards.css';
 
 /* a small picture that tells the kind of event: </> for hackathon, a wrench for workshop, a globe for online */
-function Motif({ type, size = 30 }) {
+export function Motif({ type, size = 30 }) {
   if (type === 'workshop') {
     return (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -20,14 +20,14 @@ function Motif({ type, size = 30 }) {
   if (type === 'online') return <Icon.Globe size={size} />;
   return <Icon.Code size={size} />;
 }
-const Lock = ({ size = 16 }) => (
+export const Lock = ({ size = 16 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
   </svg>
 );
 
 /* the countdown tiles (asleep with "--" until a start date is set) */
-function Clock({ t }) {
+export function Clock({ t }) {
   if (t.live) return <div className="s-live tc-live"><i /> It&apos;s live</div>;
   return (
     <div className="tc-clock">
@@ -49,7 +49,7 @@ function Clock({ t }) {
 }
 
 /* the progress line */
-function Prog({ t }) {
+export function Prog({ t }) {
   return (
     <div className="tc-prog" role="progressbar" aria-label="Compiling" aria-valuemin={0} aria-valuemax={100} aria-valuenow={t.shown}>
       <span>{t.status}</span>
@@ -60,7 +60,7 @@ function Prog({ t }) {
 }
 
 /* one detail box. The look decides how it is drawn, this keeps the same content in all of them. */
-const Field = ({ f, label }) => (
+export const Field = ({ f, label }) => (
   <div className={`tc-f is-${f.state}`}>
     <span className="tc-k">{label || f.k}</span>
     <b className="tc-v"><FieldValue f={f} /></b>
