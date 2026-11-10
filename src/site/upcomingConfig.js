@@ -7,6 +7,7 @@
 //    3) SHOW_POPUP      true  = the popup shows                     false = no popup (the Upcoming events button,
 //                                                                          "1 upcoming event found" and the card all stay)
 //
+//  The "Two-Round Event Flow" section under the card is controlled further down (SHOW_FLOW, FLOW).
 //  The popup design and the matching card design pick themselves. Every new event gets the NEXT design
 //  (1, 2, 3 ... 10, then it starts again from 1), so two events in a row never look the same.
 //  The club decides it by counting your finished events: when you add a finished event (with photos) to
@@ -15,7 +16,7 @@
 
 export const SHOW_UPCOMING = true;
 export const EVENT_TYPE = 'hackathon';   // 'hackathon' | 'workshop' | 'online'
-export const SHOW_POPUP = false;          // true = show the popup   false = no popup (everything else stays)
+export const SHOW_POPUP = true;          // true = show the popup   false = no popup (everything else stays)
 
 
 /* -------------------------------------------------------------------------------------
@@ -23,16 +24,61 @@ export const SHOW_POPUP = false;          // true = show the popup   false = no 
    When a new event starts, clear them again.
    Dates are Indian time, written 'YYYY-MM-DDTHH:MM'  (example: '2026-12-26T10:00')
    ------------------------------------------------------------------------------------- */
-export const EVENT_NAME = '';       // the name. The card title and the popup both show it ("Vibe A Thon is coming")
+export const EVENT_NAME = 'Vibe-A-Thon';   // the name. The card title and the popup both show it ("Vibe-a-Thon is coming")
 export const EVENT_START = '';      // first day of the event. The timer starts counting down to it
 export const HIDE_AFTER = '';       // optional: the card + popup disappear after this moment.
                                     //   Empty = they hide 2 days after EVENT_START (or stay until you set SHOW_UPCOMING = false)
 // A box left '' stays "Will be revealed soon". Type a detail and "Try to decrypt" types it out in its box.
 // Only the block of your EVENT_TYPE is used. Examples: Format '18 hours', Team size '4 members', Venue 'Seminar Hall'.
 export const DETAILS = {
-  hackathon: { Format: '', Rounds: '', 'Team size': '', Theme: '', Prizes: '', Registration: '' },
+  hackathon: { Format: '18-hour build-a-thon', Rounds: '2 (online + offline)', 'Team size': '1 to 4 members', Theme: 'AI & vibe coding', Prizes: '₹40,000+ cash' },
   workshop: { Topic: '', Speaker: '', Duration: '', Venue: '', Seats: '', Registration: '' },
   online: { Platform: '', Host: '', Duration: '', 'Join link': '', Certificate: '', Registration: '' },
+};
+
+
+/* -------------------------------------------------------------------------------------
+   EVENT FLOW - the "Two-Round Event Flow" section that shows under the Upcoming card (hackathon only).
+   SHOW_FLOW = false hides it. For the next event: change the words below (or set SHOW_FLOW = false).
+   Round 2 phases: `from` and `to` are hours, and the bar on the page is drawn from them by itself.
+   `check` (optional) puts a "desk check" flag at the end of that phase.
+   ------------------------------------------------------------------------------------- */
+export const SHOW_FLOW = true;
+export const FLOW = {
+  eyebrow: 'How it works',
+  title: 'The Two-Round Event Flow',
+  sub: 'Stop making pitch decks. Start deploying.',
+  r1: {
+    tag: 'Round 1', where: 'Online',
+    name: 'The Online Vibe-Coding Qualifier',
+    intro: 'No PPT qualifier. Build one real module with AI tools, deploy it live and send it in.',
+    steps: [
+      { title: 'The 20% Challenge', desc: 'Pick 1 of the 10 released problem statements. Each one is the core 20% frontend module of a real-world system.' },
+      { title: 'Vibe-code your interface', desc: 'Build it with modern AI tools.', tools: ['Cursor', 'v0.dev', 'Bolt.new', 'Claude', 'ChatGPT'] },
+      {
+        title: 'Add an AI action trigger',
+        desc: 'Include one working AI feature: data triage, parsing, summarization or structured generation.',
+        levels: [
+          { tag: 'Level 1', note: 'Full qualification', desc: 'A realistic interactive mock: button click, loading spinner, then structured sample cards.' },
+          { tag: 'Level 2', note: 'Bonus points', desc: 'A live API integration, like Google Gemini Flash or Groq.', bonus: true },
+        ],
+      },
+      { title: 'Deploy and ship', desc: 'Host it on Vercel. Submit your public GitHub repo with a Vibe Log written in the README.md.' },
+    ],
+  },
+  link: { top: 'Top', big: '75', label: 'teams qualify' },
+  r2: {
+    tag: 'Round 2', where: 'Offline · 18 hours',
+    name: 'The 18-Hour Offline Finale',
+    venue: 'Sipna C.O.E.T., Badnera Road, Amravati',
+    intro: 'The Top 75 teams arrive with their Round 1 Vercel module and unbox the 100% full problem statement.',
+    phases: [
+      { from: 0, to: 2.5, title: 'Architecture Blueprint & Workspace Lock' },
+      { from: 2.5, to: 7.5, title: 'Full-Stack & Database Hookup', check: 'Roving Desk Check 1' },
+      { from: 7.5, to: 12.5, title: 'Functional AI Engine Activation', check: 'Roving Desk Check 2' },
+      { from: 12.5, to: 18, title: 'System Expansion, Code Freeze & Top Team Stage Walkthroughs' },
+    ],
+  },
 };
 
 

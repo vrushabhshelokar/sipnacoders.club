@@ -8,6 +8,7 @@ import { Reveal } from './ui';
 import PosterStage from './PosterStage';
 import { CardTitle } from './NameReveal';
 import { Actions, FieldValue, Guard, getDesign, isTeaserLive, useTeaser } from './teaserCore';
+import EventFlow from './EventFlow';
 import './HackathonTeaser.css';
 
 export { isTeaserLive };
@@ -91,16 +92,19 @@ export default function HackathonTeaser() {
   if (!t.visible) return null;
   const STYLE = getDesign().card;
   return (
-    <Reveal>
-      {STYLE === 1 ? (
-        <Signal t={t} />
-      ) : (
-        <Guard>
-          <Suspense fallback={<div className="tc-wait" aria-hidden="true" />}>
-            {STYLE <= 5 ? <Cards t={t} style={STYLE} /> : <NewCards t={t} style={STYLE} />}
-          </Suspense>
-        </Guard>
-      )}
-    </Reveal>
+    <>
+      <Reveal>
+        {STYLE === 1 ? (
+          <Signal t={t} />
+        ) : (
+          <Guard>
+            <Suspense fallback={<div className="tc-wait" aria-hidden="true" />}>
+              {STYLE <= 5 ? <Cards t={t} style={STYLE} /> : <NewCards t={t} style={STYLE} />}
+            </Suspense>
+          </Guard>
+        )}
+      </Reveal>
+      <EventFlow />
+    </>
   );
 }

@@ -1,0 +1,129 @@
+/* "Two-Round Event Flow" section (under the Upcoming card). Written for site/EventFlow.jsx. */
+
+.s-flow { margin-top: 72px; }
+.s-flow-head { max-width: 640px; margin-bottom: 36px; }
+.s-flow-h { font: 700 clamp(30px, 3.8vw, 44px)/1.08 var(--display, system-ui, sans-serif); letter-spacing: -.03em; color: #fff; margin: 12px 0 0; }
+.s-flow-sub { margin: 12px 0 0; font-size: 17.5px; line-height: 1.55; color: var(--text-2, #a3acba); }
+
+.s-flow-grid { display: grid; grid-template-columns: minmax(0, 1fr) 96px minmax(0, 1fr); align-items: stretch; }
+
+/* ---- the two round cards ---- */
+.s-flow .s-fl {
+  --a: #4c8dff; --a-rgb: 76, 141, 255;
+  position: relative; overflow: hidden; padding: 32px 32px 30px; border-radius: 22px;
+  background: radial-gradient(520px 260px at 0% 0%, rgba(var(--a-rgb), .14), transparent 70%), linear-gradient(180deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, .016));
+  border: 1px solid var(--border, rgba(255, 255, 255, .08));
+}
+.s-flow .s-fl-2 { --a: #3ddc84; --a-rgb: 61, 220, 132; display: flex; flex-direction: column; }
+.s-flow .s-fl::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: linear-gradient(90deg, var(--a), transparent 72%); }
+.s-flow .s-fl-ghost {
+  position: absolute; right: 24px; top: 8px; font: 700 150px/1 var(--display, system-ui, sans-serif); color: var(--a);
+  opacity: .055; pointer-events: none; user-select: none;
+}
+.s-flow .s-fl-top { position: relative; }
+.s-flow .s-fl-tag { display: inline-flex; align-items: center; gap: 10px; font: 500 12.5px var(--mono, ui-monospace, monospace); letter-spacing: .12em; text-transform: uppercase; color: var(--a); }
+.s-flow .s-fl-tag b { font-weight: 600; }
+.s-flow .s-fl-tag i { width: 1px; height: 13px; background: currentColor; opacity: .45; }
+.s-flow .s-fl-tag span { display: inline-flex; align-items: center; gap: 6px; color: var(--text-2, #a3acba); }
+.s-flow .s-fl-name { margin: 14px 0 0; font: 700 clamp(24px, 2.5vw, 30px)/1.12 var(--display, system-ui, sans-serif); letter-spacing: -.025em; color: #fff; }
+.s-flow .s-fl-intro { margin: 10px 0 0; max-width: 48ch; font-size: 15.5px; line-height: 1.55; color: var(--text-2, #a3acba); }
+.s-flow .s-fl-venue {
+  display: inline-flex; align-items: center; gap: 8px; margin: 16px 0 0; padding: 8px 14px; border-radius: 999px;
+  font: 500 14px/1.3 var(--sans, system-ui, sans-serif); color: #d7f7e5; background: rgba(61, 220, 132, .08); border: 1px solid rgba(61, 220, 132, .3);
+}
+.s-flow .s-fl-venue svg { color: var(--a); }
+
+/* ---- Round 1: steps ---- */
+.s-flow .s-fl-steps { list-style: none; margin: 28px 0 0; padding: 0; position: relative; }
+.s-flow .s-fl-steps > li { position: relative; display: flex; gap: 16px; padding-bottom: 24px; }
+.s-flow .s-fl-steps > li:last-child { padding-bottom: 0; }
+.s-flow .s-fl-steps > li:not(:last-child)::before { content: ''; position: absolute; left: 16px; top: 38px; bottom: 4px; width: 1px; background: linear-gradient(rgba(var(--a-rgb), .55), rgba(var(--a-rgb), .05)); }
+.s-flow .s-fl-n {
+  position: relative; z-index: 1; flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+  font: 600 14px var(--display, system-ui, sans-serif); color: var(--a); border: 1px solid rgba(var(--a-rgb), .5); background: #0a0d14;
+}
+.s-flow .s-fl-sb { min-width: 0; }
+.s-flow .s-fl-sb h4 { margin: 4px 0 0; font: 600 17px/1.3 var(--display, system-ui, sans-serif); color: #fff; }
+.s-flow .s-fl-sb > p { margin: 5px 0 0; color: var(--text-2, #a3acba); font-size: 15px; line-height: 1.55; }
+.s-flow .s-fl-tools { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; padding: 0; }
+.s-flow .s-fl-tools li { padding: 7px 12px; border-radius: 999px; font: 500 13px/1 var(--mono, ui-monospace, monospace); color: #dbe6ff; background: rgba(var(--a-rgb), .1); border: 1px solid rgba(var(--a-rgb), .32); }
+.s-flow .s-fl-levels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+.s-flow .s-fl-lv { padding: 14px 14px 15px; border-radius: 14px; background: rgba(255, 255, 255, .035); border: 1px solid var(--border-2, rgba(255, 255, 255, .14)); }
+.s-flow .s-fl-lv.is-bonus { background: rgba(251, 188, 5, .06); border: 1px dashed rgba(251, 188, 5, .42); }
+.s-flow .s-fl-lv-t { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font: 600 12.5px var(--mono, ui-monospace, monospace); letter-spacing: .06em; text-transform: uppercase; color: #8fe5b3; }
+.s-flow .s-fl-lv.is-bonus .s-fl-lv-t { color: #ffd866; }
+.s-flow .s-fl-lv-t em { font: 500 13px var(--sans, system-ui, sans-serif); font-style: normal; letter-spacing: .01em; text-transform: none; color: var(--text-2, #a3acba); }
+.s-flow .s-fl-lv > p { margin: 8px 0 0; font-size: 14px; line-height: 1.5; color: var(--text-2, #a3acba); }
+
+/* ---- the "Top 75 qualify" link between the cards ---- */
+.s-flow .s-fl-link { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 0 6px; }
+.s-flow .s-fl-link > i { flex: 1; width: 1px; min-height: 28px; background: linear-gradient(to bottom, transparent, #4c8dff); }
+.s-flow .s-fl-link > i:last-child { background: linear-gradient(to bottom, #3ddc84, transparent); }
+.s-flow .s-fl-badge {
+  width: 78px; height: 78px; border-radius: 50%; display: grid; place-content: center; text-align: center;
+  border: 2px solid transparent; background: linear-gradient(#0b0e15, #0b0e15) padding-box, linear-gradient(135deg, #4c8dff, #3ddc84) border-box;
+  box-shadow: 0 0 34px -8px rgba(76, 141, 255, .7);
+}
+.s-flow .s-fl-badge small { display: block; font: 600 10.5px/1 var(--mono, ui-monospace, monospace); letter-spacing: .16em; text-transform: uppercase; color: var(--text-2, #a3acba); }
+.s-flow .s-fl-badge b { display: block; margin-top: 3px; font: 700 30px/1 var(--display, system-ui, sans-serif); color: #fff; }
+.s-flow .s-fl-linklabel { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; max-width: 86px; text-align: center; font: 500 12px/1.3 var(--mono, ui-monospace, monospace); letter-spacing: .05em; text-transform: uppercase; color: var(--text-2, #a3acba); }
+.s-flow .s-fl-linklabel svg { color: #3ddc84; }
+
+/* ---- Round 2: the 18-hour bar ---- */
+.s-flow .s-fl-bar { position: relative; margin: 30px 0 0; padding-top: 24px; }
+.s-flow .s-fl-flags { position: absolute; left: 0; right: 0; top: 0; height: 24px; }
+.s-flow .s-fl-flag { position: absolute; top: 0; width: 2px; height: 24px; margin-left: -1px; background: linear-gradient(rgba(255, 255, 255, .6), rgba(255, 255, 255, .15)); }
+.s-flow .s-fl-flag i { position: absolute; left: 50%; top: -1px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 4px rgba(255, 255, 255, .14); }
+.s-flow .s-fl-track { display: flex; gap: 4px; height: 14px; }
+.s-flow .s-fl-track i { flex: 1 1 0; min-width: 0; border-radius: 999px; background: var(--c); opacity: .2; transform: scaleX(0); transform-origin: left center; }
+.s-flow .s-fl-track.in i { opacity: 1; transform: none; transition: transform .8s var(--ease, ease) calc(var(--i) * 150ms), opacity .8s var(--ease, ease) calc(var(--i) * 150ms); box-shadow: 0 0 18px -4px var(--c); }
+.s-flow .s-fl-ticks { position: relative; height: 20px; margin-top: 9px; font: 500 11.5px var(--mono, ui-monospace, monospace); color: var(--text-2, #a3acba); }
+.s-flow .s-fl-ticks span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.s-flow .s-fl-ticks span.is-first { transform: none; }
+.s-flow .s-fl-ticks span.is-last { transform: translateX(-100%); }
+
+/* ---- Round 2: the four phases ---- */
+.s-flow .s-fl-phases { list-style: none; margin: 16px 0 0; padding: 0; display: grid; grid-auto-rows: 1fr; flex: 1; gap: 10px; }
+.s-flow .s-fl-phases > li {
+  display: grid; grid-template-columns: 94px minmax(0, 1fr); gap: 14px; align-items: center; padding: 14px 16px; border-radius: 14px;
+  background: rgba(255, 255, 255, .03); border: 1px solid var(--border, rgba(255, 255, 255, .08)); border-left: 3px solid var(--c);
+}
+.s-flow .s-fl-ph { display: inline-flex; align-items: center; gap: 8px; font: 600 12px/1.5 var(--mono, ui-monospace, monospace); letter-spacing: .08em; text-transform: uppercase; color: var(--c); white-space: nowrap; }
+.s-flow .s-fl-ph i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); box-shadow: 0 0 10px var(--c); }
+.s-flow .s-fl-pb { min-width: 0; }
+.s-flow .s-fl-pb h4 { margin: 0; font: 600 16px/1.35 var(--display, system-ui, sans-serif); color: #fff; }
+.s-flow .s-fl-hrs { display: block; margin-top: 4px; font: 500 13px var(--sans, system-ui, sans-serif); color: var(--text-2, #a3acba); }
+.s-flow .s-fl-check { display: inline-flex; align-items: center; gap: 6px; margin-top: 9px; padding: 6px 11px; border-radius: 999px; font: 600 12px/1 var(--sans, system-ui, sans-serif); color: #fff; background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .24); }
+
+/* ---- small screens: the cards stack and the link turns sideways ---- */
+@media (max-width: 1020px) {
+  .s-flow-grid { grid-template-columns: minmax(0, 1fr); }
+  .s-flow .s-fl-link { flex-direction: row; padding: 18px 0; gap: 12px; }
+  .s-flow .s-fl-link > i { flex: 1; width: auto; height: 1px; min-height: 0; background: linear-gradient(to right, transparent, #4c8dff); }
+  .s-flow .s-fl-link > i:last-child { background: linear-gradient(to right, #3ddc84, transparent); }
+  .s-flow .s-fl-linklabel { flex-direction: row; max-width: none; text-align: left; }
+  .s-flow .s-fl-linklabel svg { transform: rotate(90deg); }
+}
+@media (max-width: 640px) {
+  .s-flow { margin-top: 56px; }
+  .s-flow .s-fl { padding: 24px 20px 22px; border-radius: 20px; }
+  .s-flow .s-fl-ghost { font-size: 110px; right: 16px; }
+  .s-flow .s-fl-levels { grid-template-columns: minmax(0, 1fr); }
+  .s-flow .s-fl-phases > li { grid-template-columns: minmax(0, 1fr); gap: 6px; padding: 13px 14px; }
+  .s-flow .s-fl-badge { width: 70px; height: 70px; }
+  .s-flow .s-fl-badge b { font-size: 26px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .s-flow .s-fl-track i { transform: none; opacity: 1; transition: none !important; }
+}
+
+/* ---- the Upcoming card with 5 detail boxes (no Registration box): the last box fills the gap in the 3-column / 2-column grids ---- */
+.s-mys-grid > :nth-child(5):last-child,
+.tc-vault .tc-tiles > :nth-child(5):last-child,
+.tc-scr .tc-scr-boxes > :nth-child(5):last-child,
+.tc-comic .tc-cm-d > :nth-child(5):last-child,
+.tc-sun .tc-sn-tiles > :nth-child(5):last-child { grid-column: span 2; }
+@media (max-width: 640px) {
+  .tc-comic .tc-cm-d > :nth-child(5):last-child,
+  .tc-sun .tc-sn-tiles > :nth-child(5):last-child { grid-column: auto; }
+}

@@ -59,7 +59,7 @@ export const COPY = {
     title: 'Name will be announced soon', lede: 'Something big is coming.',
     desc: 'Every detail is classified for now. The name, dates, format and prizes will all be announced soon.',
     wait: 'Timer starts when the dates are announced', status: 'Compiling the unknown',
-    boxes: [['Format', 8], ['Rounds', 9], ['Team size', 7], ['Theme', 9], ['Prizes', 8], ['Registration', 10]],
+    boxes: [['Format', 8], ['Rounds', 9], ['Team size', 7], ['Theme', 9], ['Prizes', 8]],
   },
   workshop: {
     flag: 'New session loading', file: 'Locked', tag: 'LOCKED', noun: 'workshop',
@@ -129,7 +129,10 @@ export function FieldValue({ f }) {
 /* everything a card design needs: timer, detail boxes, progress, the decrypt button */
 export function useTeaser() {
   const now = useNow();
-  const copy = COPY[TYPE];
+  // once the name is announced, the card must not say "the name will be announced soon"
+  const copy = EVENT_NAME && TYPE === 'hackathon'
+    ? { ...COPY[TYPE], desc: COPY[TYPE].desc.replace('The name, dates,', 'The dates,') }
+    : COPY[TYPE];
   const details = (C.DETAILS && C.DETAILS[TYPE]) || {};
   const detailOf = (k) => String(details[k] || '').trim();
   const hasDetails = copy.boxes.some(([k]) => detailOf(k));
