@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Icon } from './Icons';
-import { CountBubble, useUpcomingCount } from './UpcomingFound';
+import { CountBubble, upcomingLabel, useUpcomingCount } from './UpcomingFound';
 
 const ITEMS = [
   { to: '/', label: 'Home', icon: 'Home' },
@@ -52,7 +52,7 @@ export default function Dock() {
       <span className="s-dock-sep" aria-hidden="true" />
       <Link to="/upcoming" className={`s-dock-item s-dock-join ${pathname === '/upcoming' ? 'on' : ''}`} aria-current={pathname === '/upcoming' ? 'page' : undefined}>
         <span className="s-dock-ic"><Icon.Sparkles size={20} /><CountBubble n={upcoming} /></span>
-        <span className="s-dock-lbl">Upcoming</span>
+        <span className="s-dock-lbl">{upcomingLabel(upcoming, 'Upcoming')}</span>
       </Link>
     </nav>
   );

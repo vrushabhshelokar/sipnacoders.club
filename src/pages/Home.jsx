@@ -4,7 +4,7 @@ import { Odometer, Reveal, SectionHead, useInView, useIntroDone } from '../site/
 import HeroArt from '../site/HeroArt';
 import { PastBento } from '../site/events';
 import { ToolStrip, Wins, Voices, Faq, Ambassadors } from '../site/Sections';
-import { CountBubble, FoundMessage, useUpcomingCount } from '../site/UpcomingFound';
+import { CountBubble, FoundMessage, upcomingLabel, useUpcomingCount } from '../site/UpcomingFound';
 import { LINKS, STATS, TRACKS, JOIN_STEPS, membershipPoster, groupPhoto } from '../data/site';
 
 export default function Home() {
@@ -130,7 +130,7 @@ function Hero() {
               Join Coders Community <Icon.ArrowUpRight size={17} />
             </a>
             <Link className={`s-btn s-btn-ghost s-btn-lg ${found ? 'has-found' : ''}`} to="/upcoming">
-              Upcoming events <CountBubble n={found} />
+              {upcomingLabel(found)} <CountBubble n={found} />
             </Link>
           </div>
           <FoundMessage n={found} />
