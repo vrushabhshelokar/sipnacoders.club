@@ -8,6 +8,7 @@ import PosterStage from './PosterStage';
 import { CardTitle } from './NameReveal';
 import { Clock, Field, Prog } from './TeaserCards';
 import { Bomb, BsodScreen, ChatThread, Chest, Clapper, ComicPanel, Reels, ScratchPanel, Sunset, TvScreen } from './newParts';
+import { CyberCard } from './Cyber';
 import './TeaserCardsNew.css';
 
 const Fields = ({ t }) => t.fields.map((f) => <Field key={f.k} f={f} />);
@@ -244,7 +245,7 @@ function Quest({ t }) {
   );
 }
 
-const LOOKS = { 6: Jackpot, 7: ScratchCard, 8: ChatCard, 9: ComicCard, 10: Newsroom, 11: Crash, 12: Cinema, 13: SunsetCard, 14: Countdown, 15: Quest };
+const LOOKS = { 6: Jackpot, 7: ScratchCard, 8: ChatCard, 9: ComicCard, 10: Newsroom, 11: Crash, 12: Cinema, 13: SunsetCard, 14: Countdown, 15: Quest, 16: CyberCard };
 
 export default function TeaserCardsNew({ t, style }) {
   const Look = LOOKS[style] || Jackpot;

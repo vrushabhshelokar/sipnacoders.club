@@ -10,12 +10,13 @@
 // Popups (the "Something big is coming" window):
 //   radar terminal ticket launch neon glitch matrix confetti git arcade                (the first 10)
 //   slot scratch chat comic news bsod clapper synth spy quest                          (the new 10)
+//   cyber                                                                              (design 21)
 // Card looks (the card on the Upcoming events page):
 //   1 Signal   2 Terminal   3 Dossier   4 Blueprint   5 Vault                          (the first 5)
 //   6 Jackpot  7 Scratch card  8 Chat  9 Comic page  10 Newsroom                       (new)
 //   11 Crash   12 Cinema       13 Sunset  14 Countdown  15 Quest                       (new)
 //
-// You do not need to edit this file. To lock one design use FORCE_DESIGN in upcomingConfig.js (a line number from this list, 1 to 20).
+// You do not need to edit this file. To lock one design use FORCE_DESIGN in upcomingConfig.js (a line number from this list, 1 to 21).
 // To look at one on your computer add ?design=7 to the address.
 export const DESIGNS = [
   ['radar', 1, 'iris'],
@@ -38,10 +39,11 @@ export const DESIGNS = [
   ['quest', 15, 'scroll'],
   ['arcade', 5, 'curtain'],
   ['spy', 14, 'spotlight'],
+  ['cyber', 16, 'zap'],   // 21  Cyber: ash paper, black slashes, holographic panels (site/Cyber.jsx)
 ];
 
 export const POSTER_EFFECTS = ['slam', 'curtain', 'flip', 'iris', 'assemble', 'spotlight', 'scroll', 'zap', 'burst', 'warp'];
 export const OLD_POPUPS = ['radar', 'terminal', 'glitch', 'launch', 'matrix', 'ticket', 'neon', 'arcade', 'git', 'confetti'];
-export const NEW_POPUPS = ['slot', 'scratch', 'chat', 'comic', 'news', 'bsod', 'clapper', 'synth', 'spy', 'quest'];
+export const NEW_POPUPS = ['slot', 'scratch', 'chat', 'comic', 'news', 'bsod', 'clapper', 'synth', 'spy', 'quest', 'cyber'];
 export const POPUP_NAMES = [...OLD_POPUPS, ...NEW_POPUPS];
-export const CARD_LOOKS = 15;
+export const CARD_LOOKS = 16;

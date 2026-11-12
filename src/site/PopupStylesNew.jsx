@@ -1,10 +1,11 @@
 // The newer looks of the "Something big is coming" popup. They all say the same thing (every detail is hidden,
 // tap to see the Upcoming events page), only the design is different.
 // You never edit this file. The design is picked by itself (see site/designs.js).
-// Names: slot, scratch, chat, comic, news, bsod, clapper, synth, spy, quest
+// Names: slot, scratch, chat, comic, news, bsod, clapper, synth, spy, quest, cyber (cyber lives in site/Cyber.jsx)
 import PosterStage from './PosterStage';
 import { Actions, Desc, Shell, Title } from './popupParts';
 import { Bomb, BsodScreen, ChatThread, Chest, Clapper, ComicPanel, Reels, ScratchPanel, Sunset, TvScreen } from './newParts';
+import { CyberPopup } from './Cyber';
 import './PopupStyles.css';
 import './PopupStylesNew.css';
 
@@ -157,7 +158,7 @@ function Quest({ text, ...p }) {
   );
 }
 
-const DESIGNS = { slot: Slot, scratch: Scratch, chat: Chat, comic: Comic, news: News, bsod: Bsod, clapper: Clap, synth: Synth, spy: Spy, quest: Quest };
+const DESIGNS = { slot: Slot, scratch: Scratch, chat: Chat, comic: Comic, news: News, bsod: Bsod, clapper: Clap, synth: Synth, spy: Spy, quest: Quest, cyber: CyberPopup };
 
 /* picks the design by name (an unknown name falls back to the slot machine) */
 export default function PopupStyleNew({ name, ...props }) {
