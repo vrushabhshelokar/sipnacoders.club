@@ -20,22 +20,36 @@
  * Loaded by ONE line in index.html, just above the main.jsx script:
  *   <script src="/intro/intro.js"></script>
  *
- * Replay any time by adding ?intro to the URL.
+ * It plays only on a visitor's FIRST visit (remembered in the browser).
+ * Every later visit - refresh, new tab, next day - opens the website directly.
+ * Replay any time by adding ?intro to the URL (or clear the "scc-intro-seen" key in the browser).
  */
 (function () {
   'use strict';
 
   /* ---------------- settings ---------------- */
-  var ONCE_PER_SESSION = true;            // true = plays once per visit (a refresh does NOT replay it); false = plays on every load / refresh
+  var ONCE_EVER = true;                   // true = each visitor sees the intro only ONE time (first visit), after that the site opens directly; false = plays on every load / refresh
+  var SEEN_KEY = 'scc-intro-seen';        // change this name (e.g. 'scc-intro-seen-2') if you make a new intro and want everybody to see it once more
   var LOGO_SRC = '/coders_club_logo.png'; // the logo in /public
   var MAX_WAIT = 7000;                    // ms - never hide the site longer than this
 
-  /* ---------------- play once per session ---------------- */
+  /* ---------------- play only once per visitor ---------------- */
+  // The "seen" mark is saved in the visitor's browser (localStorage), so it is remembered for good:
+  // new tab, refresh, closing the browser, coming back next week - the site opens directly.
+  // If the browser blocks localStorage, it falls back to "once per visit" (sessionStorage).
+  function seenBefore() {
+    try { if (localStorage.getItem(SEEN_KEY)) return true; } catch (e) { /* storage blocked */ }
+    try { if (sessionStorage.getItem(SEEN_KEY)) return true; } catch (e) { /* storage blocked */ }
+    return false;
+  }
+  function markSeen() {
+    try { localStorage.setItem(SEEN_KEY, '1'); } catch (e) { /* storage blocked */ }
+    try { sessionStorage.setItem(SEEN_KEY, '1'); } catch (e) { /* storage blocked */ }
+  }
+
   var forced = /[?&]intro(=|&|$)/.test(location.search);
-  try {
-    if (!forced && ONCE_PER_SESSION && sessionStorage.getItem('scc-intro-seen')) return;
-    sessionStorage.setItem('scc-intro-seen', '1');
-  } catch (e) { /* storage blocked: just play */ }
+  if (!forced && ONCE_EVER && seenBefore()) return; // seen already: do nothing, the website opens directly
+  markSeen();                                       // first time: play it and remember
 
   function mq(q) { return !!(window.matchMedia && window.matchMedia(q).matches); }
   var REDUCED = mq('(prefers-reduced-motion: reduce)');
