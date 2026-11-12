@@ -56,7 +56,7 @@ export const LINKS = {
   instagram: 'https://www.instagram.com/sipnacoders.club/',
   linkedin: 'https://www.linkedin.com/company/sipna-coders-club/posts/',
   email: 'team@sipnacoders.club',
-  registerForm: 'https://tally.so/embed/J9OJGY?alignLeft=1&hideTitle=0&transparentBackground=1&dynamicHeight=1',
+  registerForm: 'https://tally.so/embed/VpQzav?hideTitle=1&transparentBackground=1&dynamicHeight=1',
 };
 
 /* ---------------- numbers on the home page ---------------- */
