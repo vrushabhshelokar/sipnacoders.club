@@ -6,7 +6,7 @@ import { Icon } from './Icons';
 import { useIntroDone } from './ui';
 import { useUpcoming } from './events';
 import { isTeaserLive } from './HackathonTeaser';
-import { HAS_DETAILS } from './teaserCore';
+import { EVENT_NAME, HAS_DETAILS } from './teaserCore';
 import './UpcomingFound.css';
 
 const reduced = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -15,6 +15,12 @@ const reduced = () => !!(window.matchMedia && window.matchMedia('(prefers-reduce
 export function useUpcomingCount() {
   const list = useUpcoming();
   return list.length + (isTeaserLive() ? 1 : 0);
+}
+
+/* the words on the Upcoming button. While the hackathon card is the ONLY upcoming event and EVENT_NAME is written
+   (site/upcomingConfig.js), the button shows the event name. Otherwise it keeps the plain words. The link stays /upcoming. */
+export function upcomingLabel(n, plain = 'Upcoming events') {
+  return EVENT_NAME && isTeaserLive() && n === 1 ? EVENT_NAME : plain;
 }
 
 /* true while the mystery card is on AND you have filled in some details (site/upcomingConfig.js -> DETAILS) */
