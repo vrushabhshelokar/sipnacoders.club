@@ -16,7 +16,11 @@ export const HAS_DETAILS = Object.values((C.DETAILS && C.DETAILS[TYPE]) || {}).s
 
 const T = { from: toDate(C.TEASER_FROM), start: toDate(C.EVENT_START), end: toDate(C.HIDE_AFTER) };
 // when the card and the popup go away by themselves: HIDE_AFTER, else 2 days after EVENT_START, else never (the switch decides)
-const END = T.end || (T.start ? new Date(T.start.getTime() + 2 * 864e5) : null);
+// two rounds: CURRENT_ROUND (1 or 2) and ROUND_END in upcomingConfig.js. The card goes 2 days after the end of Round 2.
+const ROUND = Math.round(Number(C.CURRENT_ROUND)) === 2 ? 2 : 1;
+const roundEnd = (n) => toDate((C.ROUND_END || {})[n]);
+const FINAL = roundEnd(2);
+const END = T.end || (FINAL ? new Date(FINAL.getTime() + 2 * 864e5) : T.start ? new Date(T.start.getTime() + 2 * 864e5) : null);
 const stillOn = (now) => !END || now < END.getTime();
 
 /* is the mystery card (and with it the popup) live right now? */
@@ -56,7 +60,7 @@ export function getFx() {
 export const COPY = {
   hackathon: {
     flag: 'Signal detected', file: 'Classified', tag: 'CLASSIFIED', noun: 'hackathon',
-    title: 'Name will be announced soon', lede: 'Something big is coming.',
+    title: 'Name will be announced soon', lede: 'Step Into The Coders Arena.',
     desc: 'Every detail is classified for now. The name, dates, format and prizes will all be announced soon.',
     wait: 'Timer starts when the dates are announced', status: 'Compiling the unknown',
     boxes: [['Format', 8], ['Rounds', 9], ['Team size', 7], ['Theme', 9], ['Prizes', 8]],
@@ -174,12 +178,19 @@ export function useTeaser() {
     later(() => { clearInterval(tick); if (hasDetails) reveal(); else deny(); }, 2600);
   };
 
-  // countdown: asleep until a start date is set, then it counts down, then it says "live"
-  const startMs = T.start ? T.start.getTime() : null;
+  // countdown: asleep until a date is set, then it counts down, then it says "live"
+  // Two-round mode (hackathon + the Cyber design): it counts down to the END of the current round ("Round 1 ends in")
+  const rounds = TYPE === 'hackathon' && getDesign().card === 16;
+  const goal = rounds ? roundEnd(ROUND) : T.start;
+  const startMs = goal ? goal.getTime() : null;
   const waiting = startMs === null;
   const counting = startMs !== null && now < startMs;
-  const live = startMs !== null && now >= startMs;
-  const c = counting ? parts(startMs - now) : null;
+  const over = startMs !== null && now >= startMs;
+  const live = over && !rounds;
+  const ended = over && rounds;
+  const c = counting ? parts(startMs - now) : ended ? parts(0) : null;
+  const cdLabel = rounds ? `Round ${ROUND} ends in` : 'Starts in';
+  const cdWait = rounds ? (ended ? `Round ${ROUND} has ended` : `Round ${ROUND} ends in: date to be announced`) : copy.wait;
   const cells = c
     ? [['Days', c.d], ['Hours', c.h], ['Mins', c.m], ['Secs', c.s]]
     : [['Days', '--'], ['Hours', '--'], ['Mins', '--'], ['Secs', '--']];
@@ -187,7 +198,7 @@ export function useTeaser() {
   let compile = C.COMPILING;
   if (counting && T.from && T.from.getTime() < startMs) {
     compile = Math.max(1, Math.min(99, Math.round(((now - T.from.getTime()) / (startMs - T.from.getTime())) * 100)));
-  } else if (live) {
+  } else if (live || ended) {
     compile = 99;
   }
   const open = phase === 'typing' || phase === 'done';
@@ -214,7 +225,7 @@ export function useTeaser() {
   return {
     ready, readyCount, total: fields.length,
     visible, type: TYPE, copy, name: EVENT_NAME, title: EVENT_NAME || copy.title,
-    phase, decrypt, open, shown, status, btn, fields, cells, counting, waiting, live, c, hex: HEX,
+    phase, decrypt, open, shown, status, btn, fields, cells, counting, waiting, live, ended, round: ROUND, cdLabel, cdWait, c, hex: HEX,
     label: `Something big is coming. Every detail will be revealed soon.`,
   };
 }

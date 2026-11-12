@@ -28,6 +28,22 @@ export const EVENT_NAME = 'Vibe-A-Thon';   // the name. The card title and the p
 export const EVENT_START = '';      // first day of the event. The timer starts counting down to it
 export const HIDE_AFTER = '';       // optional: the card + popup disappear after this moment.
                                     //   Empty = they hide 2 days after EVENT_START (or stay until you set SHOW_UPCOMING = false)
+
+/* -------------------------------------------------------------------------------------
+   TWO ROUNDS (hackathon) - the timer in the Cyber design counts down to the END of the current round
+   and says "Round 1 ends in" under the numbers.
+
+   AFTER ROUND 1 IS OVER:  change   CURRENT_ROUND = 1   to   CURRENT_ROUND = 2   - that is all.
+   The words become "Round 2 ends in" and the timer counts down to the end of Round 2.
+
+   ROUND_END: write the moment each round ends, in Indian time, as 'YYYY-MM-DDTHH:MM'  (example: '2026-12-05T23:59').
+   Leave a round '' until the leader tells you - the timer then shows dashes ( -- ).
+   The card + popup hide themselves 2 days after the end of Round 2 (or set HIDE_AFTER above).
+   ------------------------------------------------------------------------------------- */
+export const CURRENT_ROUND = 1;                // 1 or 2
+export const ROUND_END = { 1: '', 2: '' };     // when Round 1 ends, when Round 2 ends
+
+
 // A box left '' stays "Will be revealed soon". Type a detail and "Try to decrypt" types it out in its box.
 // Only the block of your EVENT_TYPE is used. Examples: Format '18 hours', Team size '4 members', Venue 'Seminar Hall'.
 export const DETAILS = {
@@ -103,7 +119,7 @@ export const DESIGNS = [
 // Only finished events dated on or after this day move the designs on (so old events never shift it).
 export const ROTATION_FROM = '2026-11-08';
 // Lock one design instead of the automatic order: 0 = automatic, or a number from 1 to 10 (see the list above).
-export const FORCE_DESIGN = 0;
+export const FORCE_DESIGN = 21;   // 21 = the Cyber look (cyberpunk page, see site/Cyber.jsx)
 // Preview any design on your computer: add ?design=4 to the address (example: localhost:5173/?design=4).
 // Only the popup: ?popup=glitch   Names: radar terminal glitch launch matrix ticket neon arcade git confetti
 

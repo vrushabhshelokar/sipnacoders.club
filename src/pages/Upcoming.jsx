@@ -8,17 +8,23 @@ import { PageHead } from '../site/ui';
 import { UpcomingBlock, useUpcoming } from '../site/events';
 import { isTeaserLive } from '../site/HackathonTeaser';
 import UpcomingSoon from '../site/UpcomingSoon';
+import { getDesign, EVENT_NAME, TYPE } from '../site/teaserCore';
+import { FLOW } from '../site/upcomingConfig';
+import '../site/Cyber.css';
 
 export default function Upcoming() {
   const list = useUpcoming();
   const quiet = !list.length && !isTeaserLive();   // nothing announced and the mystery card is switched off
+  const cyber = getDesign().card === 16;           // the Cyber design (21) gives the whole page its cyberpunk look
+  // Cyber design + EVENT_NAME written: the page is all about that one event (its name replaces "Upcoming events")
+  const named = cyber && !quiet && !!EVENT_NAME;
 
   return (
-    <>
+    <div className={cyber ? `up-cy${named ? ' up-cy-named' : ''}` : undefined}>
       <PageHead
-        eyebrow="Upcoming"
-        title="Upcoming events"
-        sub="Workshops, hackathons and contests. Here's what the club is planning next."
+        eyebrow={named ? 'Sipna Coders Club' : 'Upcoming'}
+        title={named ? EVENT_NAME : 'Upcoming events'}
+        sub={named ? (TYPE === 'hackathon' ? FLOW.sub : '') : "Workshops, hackathons and contests. Here's what the club is planning next."}
       />
       <section id="upcoming" className="s-section s-section-first">
         <div className="s-container">
@@ -30,6 +36,6 @@ export default function Upcoming() {
           )}
         </div>
       </section>
-    </>
+    </div>
   );
 }

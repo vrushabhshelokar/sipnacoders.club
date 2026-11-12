@@ -26,7 +26,7 @@
   'use strict';
 
   /* ---------------- settings ---------------- */
-  var ONCE_PER_SESSION = false;           // false = plays on every load / refresh; true = once per visit
+  var ONCE_PER_SESSION = true;            // true = plays once per visit (a refresh does NOT replay it); false = plays on every load / refresh
   var LOGO_SRC = '/coders_club_logo.png'; // the logo in /public
   var MAX_WAIT = 7000;                    // ms - never hide the site longer than this
 
