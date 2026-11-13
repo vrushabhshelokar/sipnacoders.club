@@ -138,7 +138,7 @@ export function UpcomingBlock() {
           Join the club to hear about it first and to get a seat.
         </p>
         <a className="s-btn s-btn-light" href={LINKS.joinForm} target="_blank" rel="noopener noreferrer">
-          <Icon.Bell size={16} /> Get notified
+          <Icon.ClipboardList  size={16} /> Register Now
         </a>
       </Reveal>
     );

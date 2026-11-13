@@ -245,7 +245,7 @@ export function Actions({ t, className = '' }) {
       )}
       <div className={`s-actions ${className}`}>
         <a className="s-btn s-btn-light" href={LINKS.joinForm} target="_blank" rel="noopener noreferrer">
-          <Icon.Bell size={16} /> Get notified
+          <Icon.ClipboardList  size={16} /> Register Now
         </a>
         <button
           type="button"

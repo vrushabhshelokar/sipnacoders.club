@@ -51,7 +51,7 @@ export { logo, groupPhoto, membershipPoster };
 
 /* ---------------- links ---------------- */
 export const LINKS = {
-  joinForm: 'https://forms.gle/5a85cYhy9zy8Jw5s9',       // "Join Coders Community" button
+  joinForm: '/register',       // "Join Coders Community" button
   membershipForm: 'https://forms.gle/JJd8cno31C1ExZMh8', // "Become a member" button
   instagram: 'https://www.instagram.com/sipnacoders.club/',
   linkedin: 'https://www.linkedin.com/company/sipna-coders-club/posts/',

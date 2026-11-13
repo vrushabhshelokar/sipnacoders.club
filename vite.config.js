@@ -21,5 +21,5 @@ export default defineConfig({
   },
 
   // ✅ Vite will now recognize .lottie files as assets
-  // assetsInclude: ['**/*.lottie'],
+  assetsInclude: ['**/*.lottie'],
 })
