@@ -1,0 +1,100 @@
+/* Code Clash: the Home page block (above Membership) and its popup card.
+   Green is the poster's own green (#06c86f). The block reuses the Membership classes (.s-join, .s-steps ...) in site.css. */
+/* scroll-margin: when the popup (or sipnacoders.club/#code-clash) jumps here, the card lands just under the menu bar */
+.s-section.cc-section { --cc: #06c86f; --cc-soft: #3ddc84; scroll-margin-top: calc(var(--nav) - 90px); }
+
+/* ---------- the block: Membership layout, green instead of blue ---------- */
+.s-join.cc-join {
+  background:
+    radial-gradient(800px circle at 100% 0%, rgba(6, 200, 111, .15), transparent 60%),
+    radial-gradient(500px circle at 0% 100%, rgba(76, 141, 255, .07), transparent 60%),
+    var(--card);
+}
+.s-join.cc-join .cc-poster {
+  aspect-ratio: 702 / 881; transform: rotate(2deg);   /* leans the other way to Membership, so the two blocks do not look copied */
+  box-shadow: 0 40px 100px -40px rgba(6, 200, 111, .55);
+}
+.s-join.cc-join:hover .cc-poster { transform: rotate(0deg) scale(1.01); }
+.cc-section .cc-eyebrow { color: var(--cc-soft); }
+.cc-section .cc-ic { color: var(--cc-soft); border-color: rgba(6, 200, 111, .45); background: rgba(6, 200, 111, .09); }
+.cc-section .cc-actions { margin-top: 32px; gap: 14px 22px; }
+.cc-note { font-size: 14px; color: var(--text-2); }
+
+/* ---------- the glowing Register now button (block + popup) ---------- */
+.cc-glow {
+  position: relative; overflow: hidden; isolation: isolate; gap: 10px; border: 0;
+  color: #031a0e; background: linear-gradient(135deg, #5df0a3 0%, #06c86f 55%, #04a95c 100%);
+  box-shadow: 0 0 0 0 rgba(6, 200, 111, .6), 0 0 26px 3px rgba(6, 200, 111, .5), 0 14px 40px -10px rgba(6, 200, 111, .75);
+  animation: cc-pulse 2.1s ease-out infinite;
+}
+.cc-glow:hover {
+  color: #031a0e; transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 0 0 0 rgba(6, 200, 111, .6), 0 0 38px 8px rgba(6, 200, 111, .65), 0 18px 46px -10px rgba(6, 200, 111, .9);
+}
+.cc-glow:focus-visible { outline: 2px solid #b9ffd8; outline-offset: 4px; }
+/* a bright streak that sweeps across the button */
+.cc-glow::after {
+  content: ''; position: absolute; z-index: -1; top: 0; bottom: 0; left: -60%; width: 45%; pointer-events: none;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, .7), transparent);
+  transform: skewX(-18deg); animation: cc-sweep 3.4s ease-in-out infinite;
+}
+@keyframes cc-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(6, 200, 111, .65), 0 0 26px 3px rgba(6, 200, 111, .45), 0 14px 40px -10px rgba(6, 200, 111, .7); }
+  70%  { box-shadow: 0 0 0 18px rgba(6, 200, 111, 0), 0 0 40px 8px rgba(6, 200, 111, .6), 0 14px 40px -10px rgba(6, 200, 111, .8); }
+  100% { box-shadow: 0 0 0 0 rgba(6, 200, 111, 0), 0 0 26px 3px rgba(6, 200, 111, .45), 0 14px 40px -10px rgba(6, 200, 111, .7); }
+}
+@keyframes cc-sweep { 0%, 55% { left: -60%; } 100% { left: 130%; } }
+
+/* ---------- the popup card (opens inside AnnouncePopup's .s-ann backdrop) ---------- */
+.s-ann.is-clash { --ann-a: #06c86f; }
+.cc-pop {
+  position: relative; width: 100%; max-width: 400px; max-height: calc(100vh - 40px); max-height: calc(100dvh - 40px); overflow: hidden auto;
+  border-radius: 28px; border: 1px solid rgba(6, 200, 111, .38);
+  background: linear-gradient(180deg, #0c1411, #070a09);
+  box-shadow: 0 50px 100px -30px rgba(0, 0, 0, .95), 0 0 90px -30px rgba(6, 200, 111, .6), inset 0 1px 0 rgba(255, 255, 255, .06);
+  touch-action: pan-y; overscroll-behavior: contain;
+  animation: s-ann-pop .5s var(--ease, cubic-bezier(.2, .8, .2, 1)) both;
+}
+.s-ann.is-out .cc-pop { animation: s-ann-pop-out .24s ease both; }
+/* thin green scan line along the top edge */
+.cc-pop::before {
+  content: ''; position: absolute; z-index: 3; left: 0; right: 0; top: 0; height: 2px; pointer-events: none;
+  background: linear-gradient(90deg, transparent, #06c86f, #8dffc0, transparent); background-size: 60% 100%; background-repeat: no-repeat;
+  animation: s-ann-scan 3.2s ease-in-out infinite;
+}
+/* the top of the poster (logos + CODE CLASH), fading into the card */
+.cc-pop-art { position: relative; aspect-ratio: 702 / 246; overflow: hidden; }
+.cc-pop-art img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+.cc-pop-art::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 60%, #0a100d 100%); pointer-events: none; }
+.cc-pop-body { position: relative; padding: 8px 26px 24px; text-align: center; }
+.cc-pop-flag {
+  display: inline-flex; align-items: center; gap: 8px; height: 28px; padding: 0 12px; border-radius: 999px;
+  font: 600 12.5px var(--sans); color: #8dffc0; background: rgba(6, 200, 111, .12); border: 1px solid rgba(6, 200, 111, .35);
+}
+.cc-pop-flag i { width: 7px; height: 7px; border-radius: 50%; background: #06c86f; box-shadow: 0 0 10px 2px rgba(6, 200, 111, .8); animation: cc-blink 1.6s ease-in-out infinite; }
+@keyframes cc-blink { 50% { opacity: .35; } }
+.cc-pop-title { margin: 14px 0 0; font: 700 clamp(26px, 7vw, 32px)/1.1 var(--display); letter-spacing: -.03em; color: #fff; text-wrap: balance; }
+.cc-pop-desc { margin: 10px auto 0; max-width: 320px; font-size: 15.5px; line-height: 1.5; color: var(--text-2); }
+.cc-pop-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 18px 0 0; }
+.cc-pop-facts > div { padding: 10px 4px; border-radius: 14px; background: rgba(255, 255, 255, .04); border: 1px solid rgba(255, 255, 255, .07); }
+.cc-pop-facts dt { font-size: 11.5px; color: var(--text-2); }
+.cc-pop-facts dd { margin: 3px 0 0; font: 600 clamp(12.5px, 3.6vw, 14px)/1.25 var(--display); color: #fff; white-space: nowrap; }
+.cc-pop-go { width: 100%; margin-top: 22px; }
+.cc-pop-later { display: block; margin: 12px auto 0; padding: 6px 12px; font: 500 14px var(--sans); color: var(--text-2); cursor: pointer; transition: color .2s; }
+.cc-pop-later:hover { color: #fff; }
+.cc-pop-later:focus-visible { outline: 2px solid #06c86f; outline-offset: 3px; border-radius: 8px; }
+
+@media (max-width: 640px) {
+  .cc-section .cc-actions { margin-top: 28px; }
+  .cc-section .cc-actions .cc-glow { width: 100%; }
+  .cc-note { width: 100%; text-align: center; }
+  .cc-pop { border-radius: 24px; }
+  .cc-pop-body { padding: 2px 20px 20px; }
+}
+@media (max-height: 640px) { .cc-pop-art { display: none; } .cc-pop-body { padding-top: 54px; } }
+
+/* people who asked their device for less motion: the glow stays, nothing moves */
+@media (prefers-reduced-motion: reduce) {
+  .cc-glow, .cc-glow::after, .cc-pop-flag i { animation: none; }
+  .cc-glow::after { display: none; }
+}
