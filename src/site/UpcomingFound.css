@@ -37,6 +37,29 @@
 .s-uf-go:hover { background: rgba(255, 255, 255, .2); gap: 8px; }
 .s-uf-go:focus-visible { outline: 2px solid #c792ea; outline-offset: 2px; }
 
+/* the Code Clash button (replaces the message line while the Code Clash block is on) */
+.s-uf-cc {
+  position: relative; isolation: isolate; display: inline-flex; align-items: center; gap: 13px; max-width: 100%; margin-top: 18px; padding: 10px 12px 10px 16px;
+  border-radius: 18px; color: #fff; text-decoration: none; background: rgba(6, 200, 111, .1); border: 1px solid rgba(61, 220, 132, .45);
+  box-shadow: 0 0 0 0 rgba(6, 200, 111, .35), 0 10px 30px -14px rgba(6, 200, 111, .75); animation: s-uf-cc-glow 2.6s ease-in-out infinite;
+}
+.s-hero.is-live .s-hero-copy > .s-uf-cc { transition-delay: .5s; }
+.s-hero .s-hero-copy > .s-uf-cc { align-self: flex-start; }
+/* hover glow sits on a pseudo-element, so it never fights the hero's slide-in transition */
+.s-uf-cc::before { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: rgba(6, 200, 111, .2); opacity: 0; transition: opacity .2s; }
+.s-uf-cc:hover::before { opacity: 1; }
+.s-uf-cc:focus-visible { outline: 2px solid #b9ffd8; outline-offset: 3px; }
+.s-uf-cc-dot { flex: none; width: 9px; height: 9px; border-radius: 50%; background: #3ddc84; box-shadow: 0 0 12px #3ddc84; animation: s-uf-pulse 1.5s ease-in-out infinite; }
+.s-uf-cc-txt { display: flex; flex-direction: column; gap: 3px; min-width: 0; text-align: left; }
+.s-uf-cc-txt b { font-size: 16px; font-weight: 700; line-height: 1.1; letter-spacing: -.005em; color: #fff; }
+.s-uf-cc-txt small { font: 500 11.5px/1.1 var(--mono, ui-monospace, monospace); color: #8fe9b9; }
+.s-uf-cc-go {
+  flex: none; display: grid; place-items: center; width: 34px; height: 34px; margin-left: 6px; border-radius: 50%;
+  color: #031a0e; background: linear-gradient(135deg, #5df0a3, #06c86f); box-shadow: 0 0 16px rgba(6, 200, 111, .55); transition: transform .2s;
+}
+.s-uf-cc:hover .s-uf-cc-go { transform: translateX(3px); }
+@keyframes s-uf-cc-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(6, 200, 111, 0), 0 10px 30px -14px rgba(6, 200, 111, .6); } 50% { box-shadow: 0 0 0 5px rgba(6, 200, 111, .13), 0 10px 34px -12px rgba(6, 200, 111, .9); } }
+
 @keyframes s-uf-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(199, 146, 234, 0), 0 10px 32px -14px rgba(199, 146, 234, .6); } 50% { box-shadow: 0 0 0 5px rgba(199, 146, 234, .12), 0 10px 36px -12px rgba(199, 146, 234, .9); } }
 @keyframes s-uf-newglow { 0%, 100% { box-shadow: 0 0 0 0 rgba(126, 231, 135, 0), 0 0 8px rgba(126, 231, 135, .6); } 50% { box-shadow: 0 0 0 4px rgba(126, 231, 135, .25), 0 0 16px rgba(126, 231, 135, .95); } }
 @keyframes s-uf-ring { 0% { transform: scale(.8); opacity: .9; } 100% { transform: scale(1.7); opacity: 0; } }
@@ -47,7 +70,12 @@
 @media (max-width: 480px) {
   .s-uf { font-size: 12.5px; padding: 8px 12px 8px 11px; }
 }
+/* phones: the Code Clash button is as wide as the two buttons above it */
+@media (max-width: 640px) {
+  .s-hero .s-hero-copy > .s-uf-cc { display: flex; width: 100%; }
+  .s-uf-cc-go { margin-left: auto; }
+}
 @media (prefers-reduced-motion: reduce) {
-  .s-hero .s-btn.has-found, .s-uf-count::after, .s-uf-new, .s-uf-dot, .s-uf-scan i, .s-uf.is-found .s-uf-t, .s-uf-go { animation: none !important; }
+  .s-hero .s-btn.has-found, .s-uf-count::after, .s-uf-new, .s-uf-dot, .s-uf-scan i, .s-uf.is-found .s-uf-t, .s-uf-go, .s-uf-cc, .s-uf-cc-dot { animation: none !important; }
   .s-uf-count::after { display: none; }
 }
