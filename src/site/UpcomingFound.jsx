@@ -1,12 +1,13 @@
 // "1 upcoming event found" message and count bubble for the Upcoming events button on the home page.
 // The number comes from the real events list plus the hackathon teaser, so it updates by itself.
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Icon } from './Icons';
 import { useIntroDone } from './ui';
 import { useUpcoming } from './events';
 import { isTeaserLive } from './HackathonTeaser';
 import { EVENT_NAME, HAS_DETAILS } from './teaserCore';
+import { CODE_CLASH_SECTION, CODE_CLASH_ID } from './eventSwitches';
 import './UpcomingFound.css';
 
 const reduced = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -38,7 +39,36 @@ export function NewTag() {
   return <span className="s-uf-new" aria-hidden="true">New</span>;
 }
 
-/* the line under the hero buttons: "scanning…" first, then "1 upcoming event found" */
+/* the Code Clash button under the hero buttons. Shown while CODE_CLASH_SECTION is on (site/eventSwitches.js).
+   Click = go to the Code Clash block on the Home page. To change the words, edit CLASH_BTN below. */
+const CLASH_BTN = { title: 'Code Clash', small: 'HackerRank' };
+
+function ClashButton() {
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const go = (e) => {
+    e.preventDefault();
+    if (pathname === '/') {
+      const el = document.getElementById(CODE_CLASH_ID);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      navigate({ pathname: '/', hash: `#${CODE_CLASH_ID}` });   // Layout.jsx scrolls to the id once the Home page is open
+    }
+  };
+  return (
+    <a className="s-uf-cc" href={`/#${CODE_CLASH_ID}`} onClick={go}>
+      <span className="s-uf-cc-dot" aria-hidden="true" />
+      <span className="s-uf-cc-txt">
+        <b>{CLASH_BTN.title}</b>
+        <small>{CLASH_BTN.small}</small>
+      </span>
+      <span className="s-uf-cc-go" aria-hidden="true"><Icon.ArrowRight size={16} /></span>
+    </a>
+  );
+}
+
+/* the line under the hero buttons. While the Code Clash block is on it is the Code Clash button.
+   Otherwise: "scanning…" first, then "1 upcoming event found" */
 export function FoundMessage({ n }) {
   const live = useIntroDone();
   const [found, setFound] = useState(() => reduced());
@@ -49,6 +79,7 @@ export function FoundMessage({ n }) {
     return () => clearTimeout(id);
   }, [live, found]);
 
+  if (CODE_CLASH_SECTION) return <ClashButton />;
   if (!n) return null;
   const text = `${n} upcoming event${n === 1 ? '' : 's'} found${hasFresh() ? ' · new details unlocked' : ''}`;
 
