@@ -1,0 +1,362 @@
+/* =====================================================================
+   SECTION 6 — EVENT SCHEDULE & TIMELINE
+   Written for site/EventSchedule.jsx. Reuses --cy-* design tokens.
+   ===================================================================== */
+
+.es-section {
+  margin-top: 96px;
+  position: relative;
+}
+
+/* ---- Section header ---- */
+.es-head {
+  max-width: 760px;
+  margin-bottom: 52px;
+}
+
+.es-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font: 600 13px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cy-mint, #7cf2d4);
+}
+
+.es-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 18px;
+  background: linear-gradient(
+    90deg,
+    var(--cy-red, #e8283e) 0 6px,
+    transparent 6px 9px,
+    var(--cy-red, #e8283e) 9px 15px,
+    transparent 15px 18px,
+    var(--cy-ash, #e5e7eb) 18px 24px
+  );
+  transform: skewX(-26deg);
+}
+
+.es-h {
+  position: relative;
+  display: block;
+  width: fit-content;
+  margin: 16px 0 0;
+  font: 400 clamp(36px, 5.2vw, 68px) / 0.96 var(--cy-disp, 'Anton', sans-serif);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--cy-ash, #e5e7eb);
+}
+
+.es-h::after {
+  content: '';
+  position: absolute;
+  left: 60%;
+  top: -10%;
+  width: 3px;
+  height: 120%;
+  pointer-events: none;
+  transform: skewX(-24deg);
+  background: var(--cy-red, #e8283e);
+  box-shadow: 0 0 14px 1px rgba(232, 40, 62, 0.85);
+}
+
+.es-sub {
+  margin: 16px 0 0;
+  padding-left: 16px;
+  border-left: 4px solid var(--cy-red, #e8283e);
+  font: 500 clamp(15px, 1.8vw, 17.5px) / 1.55 var(--cy-hud, 'Chakra Petch', sans-serif);
+  color: #b4bccb;
+  max-width: 560px;
+}
+
+/* =====================================================================
+   TIMELINE BODY
+   Two-column layout: left = time/phase, right = content.
+   A vertical spine sits between them.
+   ===================================================================== */
+.es-timeline {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ---- Vertical spine ---- */
+.es-spine {
+  position: absolute;
+  left: 200px; /* aligns with the node circles */
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    rgba(124, 242, 212, 0.6),
+    rgba(76, 141, 255, 0.4) 40%,
+    rgba(251, 188, 5, 0.4) 65%,
+    rgba(255, 84, 104, 0.6)
+  );
+  pointer-events: none;
+}
+
+/* =====================================================================
+   TIMELINE ROW
+   ===================================================================== */
+.es-row {
+  --ra: #7cf2d4;
+  --ra-rgb: 124, 242, 212;
+  position: relative;
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 0 48px;
+  padding: 0 0 36px;
+  align-items: start;
+}
+
+/* ---- Left: time meta ---- */
+.es-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  padding-top: 16px;
+  padding-right: 48px;
+  position: relative;
+}
+
+/* Phase badge */
+.es-phase {
+  display: inline-block;
+  padding: 3px 8px;
+  font: 600 10px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ra);
+  background: rgba(var(--ra-rgb), 0.08);
+  border: 1px solid rgba(var(--ra-rgb), 0.3);
+}
+
+/* Date/time text */
+.es-time {
+  font: 600 13px/1.4 var(--cy-hud, 'Chakra Petch', monospace);
+  color: rgba(255, 255, 255, 0.35);
+  text-align: right;
+}
+
+/* Sequence number */
+.es-num {
+  font: 400 11px/1 var(--cy-disp, 'Anton', sans-serif);
+  letter-spacing: 0.08em;
+  color: rgba(var(--ra-rgb), 0.3);
+}
+
+/* Node circle on the spine */
+.es-node {
+  position: absolute;
+  right: -8px; /* sits on the spine (200px - 8px center offset) */
+  top: 20px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(var(--ra-rgb), 0.15);
+  border: 2px solid var(--ra);
+  box-shadow: 0 0 12px rgba(var(--ra-rgb), 0.6);
+  z-index: 2;
+}
+
+/* Inner dot */
+.es-node::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--ra);
+}
+
+/* ---- Right: content card ---- */
+.es-card {
+  position: relative;
+  overflow: hidden;
+  padding: 20px 24px 22px;
+  background: radial-gradient(360px 180px at 0% 50%, rgba(var(--ra-rgb), 0.07), transparent 65%),
+              linear-gradient(165deg, rgba(13, 20, 32, 0.84), rgba(5, 8, 16, 0.94));
+  border: 1px solid rgba(var(--ra-rgb), 0.18);
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.es-card:hover {
+  transform: translateX(4px);
+  border-color: rgba(var(--ra-rgb), 0.4);
+}
+
+/* Left border accent */
+.es-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--ra), transparent 90%);
+}
+
+/* Corner tick */
+.es-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 10px;
+  height: 10px;
+  border-bottom: 2px solid var(--ra);
+  border-right: 2px solid var(--ra);
+  opacity: 0.5;
+}
+
+/* Card icon + milestone row */
+.es-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.es-icon {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  background: rgba(var(--ra-rgb), 0.1);
+  border: 1px solid rgba(var(--ra-rgb), 0.25);
+  color: var(--ra);
+  transform: skewX(-8deg);
+  flex: none;
+}
+
+.es-icon > svg {
+  transform: skewX(8deg);
+}
+
+.es-milestone {
+  margin: 0;
+  font: 600 16px/1.2 var(--cy-hud, 'Chakra Petch', sans-serif);
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+
+.es-desc {
+  margin: 0;
+  font: 500 13.5px/1.6 var(--cy-hud, 'Chakra Petch', sans-serif);
+  color: #9aa4b2;
+}
+
+/* TBD date badge on card */
+.es-date-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 4px 10px;
+  font: 600 11px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  letter-spacing: 0.12em;
+  color: rgba(var(--ra-rgb), 0.6);
+  background: rgba(var(--ra-rgb), 0.06);
+  border: 1px solid rgba(var(--ra-rgb), 0.2);
+}
+
+.es-date-badge::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ra);
+  opacity: 0.6;
+  animation: es-pulse 2s ease-in-out infinite;
+}
+
+@keyframes es-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 0.2; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .es-date-badge::before {
+    animation: none;
+  }
+}
+
+/* =====================================================================
+   RESPONSIVE
+   ===================================================================== */
+
+/* Tablet: spine moves to left edge, full-width cards */
+@media (max-width: 860px) {
+  .es-spine {
+    left: 20px;
+  }
+
+  .es-row {
+    grid-template-columns: minmax(0, 1fr);
+    padding-left: 52px;
+    padding-bottom: 32px;
+  }
+
+  .es-meta {
+    align-items: flex-start;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 10px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .es-num {
+    display: none;
+  }
+
+  .es-time {
+    text-align: left;
+  }
+
+  .es-node {
+    right: auto;
+    left: -44px;
+    top: 2px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 580px) {
+  .es-section {
+    margin-top: 64px;
+  }
+
+  .es-row {
+    padding-left: 44px;
+    padding-bottom: 28px;
+  }
+
+  .es-spine {
+    left: 14px;
+  }
+
+  .es-node {
+    left: -38px;
+    width: 14px;
+    height: 14px;
+  }
+
+  .es-card {
+    padding: 16px 18px 18px;
+  }
+
+  .es-milestone {
+    font-size: 14.5px;
+  }
+}

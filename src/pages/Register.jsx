@@ -37,7 +37,7 @@ export default function Register() {
           <div className="s-register">
 
             <iframe
-              data-tally-src={`https://tally.so/embed/${TALLY_FORM_ID}?hideTitle=1&transparentBackground=1&dynamicHeight=1`}
+              data-tally-src={`https://tally.so/embed/VpQzav?hideTitle=1&transparentBackground=1&dynamicHeight=1`}
               width="100%"
               height="0"
               title="Registration form"

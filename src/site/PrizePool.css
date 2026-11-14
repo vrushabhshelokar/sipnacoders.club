@@ -1,0 +1,854 @@
+/* =====================================================================
+   SECTION 5 — PRIZE POOL, REGISTRATION FEES & WHAT'S INCLUDED
+   Restructured Layout:
+   ROW 1: Two Equal Columns (PRIZE DISTRIBUTION // REGISTRATION MATRIX)
+   ROW 2: Full-Width Bottom Row (PARTICIPANT TIERS // RECOGNITION)
+   ===================================================================== */
+
+.pp-section {
+  margin-top: 96px;
+  position: relative;
+}
+
+/* ---- Section header ---- */
+.pp-head {
+  max-width: 760px;
+  margin-bottom: 44px;
+}
+
+.pp-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font: 600 13px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cy-mint, #7cf2d4);
+}
+
+.pp-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 18px;
+  background: linear-gradient(
+    90deg,
+    var(--cy-red, #e8283e) 0 6px,
+    transparent 6px 9px,
+    var(--cy-red, #e8283e) 9px 15px,
+    transparent 15px 18px,
+    var(--cy-ash, #e5e7eb) 18px 24px
+  );
+  transform: skewX(-26deg);
+}
+
+.pp-h {
+  position: relative;
+  display: block;
+  width: fit-content;
+  margin: 16px 0 0;
+  font: 400 clamp(36px, 5.2vw, 68px) / 0.96 var(--cy-disp, 'Anton', sans-serif);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--cy-ash, #e5e7eb);
+}
+
+.pp-h::after {
+  content: '';
+  position: absolute;
+  left: 48%;
+  top: -10%;
+  width: 3px;
+  height: 120%;
+  pointer-events: none;
+  transform: skewX(-24deg);
+  background: var(--cy-red, #e8283e);
+  box-shadow: 0 0 14px 1px rgba(232, 40, 62, 0.85);
+}
+
+.pp-sub {
+  margin: 16px 0 0;
+  padding-left: 16px;
+  border-left: 4px solid var(--cy-red, #e8283e);
+  font: 500 clamp(15px, 1.8vw, 17.5px) / 1.55 var(--cy-hud, 'Chakra Petch', sans-serif);
+  color: #b4bccb;
+  max-width: 580px;
+}
+
+/* =====================================================================
+   ROW 1: TWO EQUAL COLUMNS
+   ===================================================================== */
+.pp-top-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  align-items: stretch;
+}
+
+.pp-col-reveal {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Common Card Base Container */
+.pp-card {
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(165deg, rgba(12, 22, 36, 0.92), rgba(5, 8, 16, 0.98));
+  border: 1px solid rgba(124, 242, 212, 0.24);
+  box-shadow: 0 24px 48px -20px rgba(0, 0, 0, 0.8);
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+}
+
+/* Common Card Header Ribbon */
+.pp-card-ribbon {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 20px;
+  background: rgba(12, 22, 36, 0.85);
+  border-bottom: 1px solid rgba(124, 242, 212, 0.16);
+  font: 600 11px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  letter-spacing: 0.12em;
+  flex: none;
+}
+
+.pp-ribbon-tag {
+  color: var(--cy-mint, #7cf2d4);
+}
+
+.pp-ribbon-stat {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Corner Tick */
+.pp-card-corner {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  border-bottom: 2px solid var(--cy-mint, #7cf2d4);
+  border-right: 2px solid var(--cy-mint, #7cf2d4);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.pp-card-inner {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* =====================================================================
+   LEFT TOP CARD: PRIZE DISTRIBUTION // FINALE
+   ===================================================================== */
+.pp-prize-col-card {
+  background: radial-gradient(480px 240px at 0% 0%, rgba(124, 242, 212, 0.1), transparent 70%),
+              linear-gradient(165deg, rgba(12, 22, 36, 0.92), rgba(5, 8, 16, 0.98));
+  border-color: rgba(124, 242, 212, 0.32);
+}
+
+.pp-hero-ghost {
+  position: absolute;
+  right: 18px;
+  top: 50px;
+  font: 400 140px/1 var(--cy-disp, 'Anton', sans-serif);
+  color: var(--cy-mint, #7cf2d4);
+  opacity: 0.035;
+  pointer-events: none;
+  user-select: none;
+}
+
+.pp-pool-block {
+  margin-bottom: 16px;
+}
+
+.pp-pool-label {
+  display: block;
+  font: 700 11.5px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  letter-spacing: 0.2em;
+  color: rgba(124, 242, 212, 0.7);
+  margin-bottom: 6px;
+}
+
+.pp-pool-val {
+  font: 400 clamp(44px, 5.2vw, 68px) / 0.95 var(--cy-disp, 'Anton', sans-serif);
+  letter-spacing: 0.02em;
+  color: var(--cy-mint, #7cf2d4);
+  text-shadow: 0 0 32px rgba(124, 242, 212, 0.45);
+}
+
+/* 18-Hour Offline Finale Secondary Highlight */
+.pp-event-highlight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  background: rgba(124, 242, 212, 0.05);
+  border: 1px solid rgba(124, 242, 212, 0.2);
+  border-left: 3px solid var(--cy-mint, #7cf2d4);
+}
+
+.pp-event-badge {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  background: rgba(124, 242, 212, 0.12);
+  border: 1px solid rgba(124, 242, 212, 0.35);
+  color: var(--cy-mint, #7cf2d4);
+  transform: skewX(-8deg);
+  flex: none;
+}
+
+.pp-event-badge > svg {
+  transform: skewX(8deg);
+}
+
+.pp-event-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pp-event-label {
+  font: 600 10px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.pp-event-val {
+  font: 600 14px/1.2 var(--cy-hud, 'Chakra Petch', sans-serif);
+  color: #ffffff;
+  letter-spacing: 0.02em;
+}
+
+/* Prize Distribution Section */
+.pp-dist-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.pp-dist-header {
+  font: 700 11px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Prize Card Base */
+.pp-prize-card {
+  --pza: #7cf2d4;
+  --pza-rgb: 124, 242, 212;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(320px 160px at 0% 0%, rgba(var(--pza-rgb), 0.1), transparent 70%),
+              linear-gradient(165deg, rgba(14, 24, 38, 0.85), rgba(6, 10, 18, 0.95));
+  border: 1px solid rgba(var(--pza-rgb), 0.25);
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.pp-prize-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(var(--pza-rgb), 0.55);
+}
+
+.pp-prize-ghost {
+  position: absolute;
+  right: 12px;
+  bottom: -6px;
+  font: 400 80px/1 var(--cy-disp, 'Anton', sans-serif);
+  color: var(--pza);
+  opacity: 0.05;
+  pointer-events: none;
+  user-select: none;
+}
+
+.pp-prize-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 0;
+}
+
+.pp-prize-badge {
+  display: inline-block;
+  padding: 2px 7px;
+  font: 700 9.5px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pza);
+  background: rgba(var(--pza-rgb), 0.08);
+  border: 1px solid rgba(var(--pza-rgb), 0.35);
+}
+
+.pp-prize-icon {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  background: rgba(var(--pza-rgb), 0.1);
+  border: 1px solid rgba(var(--pza-rgb), 0.3);
+  color: var(--pza);
+  transform: skewX(-8deg);
+}
+
+.pp-prize-icon > svg {
+  transform: skewX(8deg);
+}
+
+.pp-prize-body {
+  padding: 10px 16px 14px;
+}
+
+.pp-prize-rank {
+  display: block;
+  font: 600 12px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9aa8b8;
+  margin-bottom: 2px;
+}
+
+.pp-prize-amt {
+  font: 400 32px/1 var(--cy-disp, 'Anton', sans-serif);
+  letter-spacing: 0.03em;
+  color: var(--pza);
+}
+
+/* 1st Prize Specific Prominence */
+.pp-prize-first {
+  border-width: 1.5px;
+  border-color: rgba(124, 242, 212, 0.45);
+  box-shadow: 0 0 20px -8px rgba(124, 242, 212, 0.25);
+}
+
+.pp-prize-first .pp-prize-amt {
+  font-size: clamp(38px, 4.2vw, 48px);
+  text-shadow: 0 0 20px rgba(124, 242, 212, 0.4);
+}
+
+/* 2nd & 3rd Prize Grid */
+.pp-runner-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* =====================================================================
+   RIGHT TOP CARD: REGISTRATION MATRIX // TWO-PHASE
+   ===================================================================== */
+.pp-fees-col-card {
+  background: radial-gradient(400px 200px at 100% 0%, rgba(76, 141, 255, 0.08), transparent 70%),
+              linear-gradient(165deg, rgba(12, 22, 36, 0.92), rgba(5, 8, 16, 0.98));
+}
+
+.pp-fees-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.pp-phases {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+/* Phase Box */
+.pp-phase-box {
+  padding: 16px 18px;
+  background: rgba(14, 24, 38, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+.pp-phase-r1 {
+  border-left-color: #4c8dff;
+}
+
+.pp-phase-r2 {
+  border-left-color: var(--cy-mint, #7cf2d4);
+  background: rgba(124, 242, 212, 0.03);
+  border-color: rgba(124, 242, 212, 0.18);
+}
+
+.pp-phase-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.pp-phase-badge {
+  display: inline-block;
+  font: 700 9.5px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #4c8dff;
+  margin-bottom: 4px;
+}
+
+.pp-phase-badge.highlight {
+  color: var(--cy-mint, #7cf2d4);
+}
+
+.pp-phase-name {
+  margin: 0;
+  font: 400 24px/1 var(--cy-disp, 'Anton', sans-serif);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.pp-phase-cost {
+  text-align: right;
+  flex: none;
+}
+
+.pp-cost-val {
+  display: block;
+  font: 400 30px/1 var(--cy-disp, 'Anton', sans-serif);
+  letter-spacing: 0.02em;
+  color: #ffffff;
+}
+
+.pp-cost-val.highlight {
+  color: var(--cy-mint, #7cf2d4);
+  text-shadow: 0 0 16px rgba(124, 242, 212, 0.4);
+}
+
+.pp-cost-unit {
+  font: 600 10.5px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.06em;
+}
+
+.pp-phase-desc {
+  margin: 0;
+  font: 500 13px/1.5 var(--cy-hud, 'Chakra Petch', sans-serif);
+  color: #a2b0c0;
+}
+
+.pp-phase-qualify-note {
+  margin: 0 0 10px;
+  font: 700 11.5px/1.4 var(--cy-hud, 'Chakra Petch', monospace);
+  color: var(--cy-mint, #7cf2d4);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Inclusions List */
+.pp-inclusions-block {
+  padding-top: 10px;
+  border-top: 1px solid rgba(124, 242, 212, 0.14);
+}
+
+.pp-inclusions-title {
+  display: block;
+  font: 700 10px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 8px;
+}
+
+.pp-inclusions-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.pp-inclusions-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font: 600 12.5px/1.4 var(--cy-hud, 'Chakra Petch', sans-serif);
+  color: #e5e7eb;
+}
+
+.pp-inc-check {
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  background: rgba(124, 242, 212, 0.12);
+  border: 1px solid rgba(124, 242, 212, 0.35);
+  color: var(--cy-mint, #7cf2d4);
+  border-radius: 2px;
+  flex: none;
+}
+
+/* Total Note Callout */
+.pp-total-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(10, 16, 26, 0.85);
+  border: 1px solid rgba(124, 242, 212, 0.18);
+  border-left: 3px solid var(--cy-mint, #7cf2d4);
+}
+
+.pp-note-icon {
+  color: var(--cy-mint, #7cf2d4);
+  margin-top: 2px;
+  flex: none;
+}
+
+.pp-note-text {
+  margin: 0;
+  font: 500 12px/1.55 var(--cy-hud, 'Chakra Petch', sans-serif);
+  color: #b0bdcc;
+}
+
+.pp-note-text strong {
+  color: #ffffff;
+}
+
+/* =====================================================================
+   ROW 2: FULL WIDTH (PARTICIPANT TIERS // RECOGNITION)
+   ===================================================================== */
+.pp-bottom-reveal {
+  margin-top: 24px;
+}
+
+.pp-bottom-row-card {
+  width: 100%;
+  background: radial-gradient(800px 300px at 50% 0%, rgba(124, 242, 212, 0.06), transparent 70%),
+              linear-gradient(165deg, rgba(12, 22, 36, 0.94), rgba(5, 8, 16, 0.98));
+  border: 1px solid rgba(124, 242, 212, 0.22);
+}
+
+.pp-bottom-inner {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 3-Column Grid on Desktop */
+.pp-tiers-container {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+/* Individual Tier Block */
+.pp-tier-block {
+  --tra: #7cf2d4;
+  --tra-rgb: 124, 242, 212;
+  position: relative;
+  padding: 18px 20px;
+  background: rgba(14, 24, 38, 0.55);
+  border: 1px solid rgba(var(--tra-rgb), 0.2);
+  border-left: 3px solid var(--tra);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+}
+
+.pp-tier-block:hover {
+  background: rgba(var(--tra-rgb), 0.04);
+  border-color: rgba(var(--tra-rgb), 0.4);
+  transform: translateY(-2px);
+}
+
+.pp-tier-block.is-winner {
+  background: radial-gradient(320px 120px at 0% 0%, rgba(124, 242, 212, 0.08), transparent 70%),
+              rgba(14, 24, 38, 0.7);
+  box-shadow: 0 0 20px -8px rgba(124, 242, 212, 0.15);
+}
+
+/* Header inside Tier Block */
+.pp-tb-head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.pp-tb-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pp-tb-id {
+  font: 700 10.5px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  color: var(--tra);
+  letter-spacing: 0.12em;
+}
+
+.pp-tb-tag {
+  font: 600 10px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.08em;
+}
+
+/* Distinction Badges: Winner / Physical / e-Certificate */
+.pp-cert-pill {
+  width: fit-content;
+  font: 700 9px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  letter-spacing: 0.14em;
+  padding: 4px 8px;
+  text-transform: uppercase;
+  border-radius: 2px;
+}
+
+.pill-winner {
+  color: #7cf2d4;
+  background: rgba(124, 242, 212, 0.12);
+  border: 1px solid rgba(124, 242, 212, 0.4);
+  box-shadow: 0 0 10px rgba(124, 242, 212, 0.3);
+}
+
+.pill-physical {
+  color: #60a5fa;
+  background: rgba(96, 165, 250, 0.12);
+  border: 1px solid rgba(96, 165, 250, 0.4);
+  box-shadow: 0 0 8px rgba(96, 165, 250, 0.25);
+}
+
+.pill-ecert {
+  color: #cbd5e1;
+  background: rgba(203, 213, 225, 0.08);
+  border: 1px solid rgba(203, 213, 225, 0.25);
+}
+
+/* Title & Scope */
+.pp-tb-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pp-tb-icon {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  background: rgba(var(--tra-rgb), 0.1);
+  border: 1px solid rgba(var(--tra-rgb), 0.3);
+  color: var(--tra);
+  transform: skewX(-6deg);
+  flex: none;
+}
+
+.pp-tb-icon > svg {
+  transform: skewX(6deg);
+}
+
+.pp-tb-title {
+  margin: 0 0 2px;
+  font: 600 15px/1.2 var(--cy-hud, 'Chakra Petch', sans-serif);
+  color: #ffffff;
+}
+
+.pp-tb-scope {
+  font: 500 11px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.04em;
+}
+
+/* Bullet list of rewards */
+.pp-tb-rewards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 12px;
+}
+
+.pp-tb-rewards li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font: 500 12.5px/1.5 var(--cy-hud, 'Chakra Petch', sans-serif);
+  color: #c0cad8;
+}
+
+.pp-tb-bullet {
+  flex: none;
+  display: inline-block;
+  margin-top: 6px;
+  width: 6px;
+  height: 2px;
+  background: var(--tra);
+  transform: skewX(-18deg);
+}
+
+/* Summary Certificate Matrix at Bottom */
+.pp-cert-summary {
+  padding: 16px 18px;
+  background: rgba(8, 14, 22, 0.85);
+  border: 1px solid rgba(124, 242, 212, 0.16);
+}
+
+.pp-cs-label {
+  display: block;
+  font: 700 10.5px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  letter-spacing: 0.16em;
+  color: rgba(124, 242, 212, 0.7);
+  margin-bottom: 12px;
+}
+
+.pp-cs-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pp-cs-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 14px;
+  background: rgba(14, 24, 38, 0.45);
+  border-left: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.pp-cs-cat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 150px;
+}
+
+.pp-cs-name {
+  font: 600 13px/1.2 var(--cy-hud, 'Chakra Petch', sans-serif);
+  color: #ffffff;
+}
+
+.pp-cs-scope {
+  font: 500 10.5px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.pp-cs-rec {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.pp-cs-badge {
+  font: 700 9px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  letter-spacing: 0.1em;
+  padding: 3px 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid;
+  border-radius: 2px;
+  flex: none;
+}
+
+.pp-cs-text {
+  font: 500 12.5px/1.4 var(--cy-hud, 'Chakra Petch', sans-serif);
+  color: #cbd5e1;
+  text-align: right;
+}
+
+/* =====================================================================
+   RESPONSIVE DESIGN
+   ===================================================================== */
+@media (max-width: 990px) {
+  .pp-top-row {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .pp-tiers-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .pp-section {
+    margin-top: 64px;
+  }
+
+  .pp-card-inner {
+    padding: 16px;
+  }
+
+  .pp-pool-val {
+    font-size: 50px;
+  }
+
+  .pp-event-highlight {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .pp-prize-first .pp-prize-amt {
+    font-size: 38px;
+  }
+
+  .pp-runner-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pp-phases {
+    gap: 12px;
+  }
+
+  .pp-phase-box {
+    padding: 14px;
+  }
+
+  .pp-total-note {
+    padding: 12px;
+  }
+
+  .pp-bottom-inner {
+    padding: 16px;
+  }
+
+  .pp-tier-block {
+    padding: 14px;
+  }
+
+  .pp-cert-summary {
+    padding: 12px;
+  }
+
+  .pp-cs-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .pp-cs-rec {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .pp-cs-text {
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pp-prize-card,
+  .pp-tier-block {
+    transition: none !important;
+  }
+}

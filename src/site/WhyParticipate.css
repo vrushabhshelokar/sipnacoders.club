@@ -1,0 +1,222 @@
+/* =====================================================================
+   SECTION 2 — WHY PARTICIPATE (Cyberpunk Aesthetic)
+   Written for site/WhyParticipate.jsx. Uses .up-cy design tokens.
+   ===================================================================== */
+
+.cy-why {
+  margin-top: 84px;
+  position: relative;
+}
+
+.cy-why-head {
+  max-width: 720px;
+  margin-bottom: 40px;
+}
+
+.cy-why-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font: 600 13px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cy-mint, #7cf2d4);
+}
+
+.cy-why-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 18px;
+  background: linear-gradient(90deg, var(--cy-red, #e8283e) 0 6px, transparent 6px 9px, var(--cy-red, #e8283e) 9px 15px, transparent 15px 18px, var(--cy-ash, #e5e7eb) 18px 24px);
+  transform: skewX(-26deg);
+}
+
+.cy-why-h {
+  position: relative;
+  display: block;
+  width: fit-content;
+  margin: 16px 0 0;
+  font: 400 clamp(36px, 5.2vw, 68px)/0.96 var(--cy-disp, 'Anton', sans-serif);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--cy-ash, #e5e7eb);
+}
+
+.cy-why-h::after {
+  content: '';
+  position: absolute;
+  left: 64%;
+  top: -12%;
+  width: 3px;
+  height: 124%;
+  pointer-events: none;
+  transform: skewX(-24deg);
+  background: var(--cy-red, #e8283e);
+  box-shadow: 0 0 14px 1px rgba(var(--cy-red-rgb, 232, 40, 62), 0.85);
+}
+
+.cy-why-sub {
+  margin: 16px 0 0;
+  padding-left: 16px;
+  border-left: 4px solid var(--cy-red, #e8283e);
+  font: 500 clamp(15px, 1.8vw, 17.5px)/1.55 var(--cy-hud, 'Chakra Petch', sans-serif);
+  color: #b4bccb;
+  max-width: 600px;
+}
+
+/* ---- Card Grid ---- */
+.cy-why-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+/* Individual card */
+.cy-why-card {
+  --card-accent: #7cf2d4;
+  position: relative;
+  overflow: hidden;
+  padding: 26px 24px 28px;
+  background: radial-gradient(380px 200px at 0% 0%, rgba(var(--card-rgb, 124, 242, 212), 0.1), transparent 70%),
+              linear-gradient(168deg, rgba(14, 22, 34, 0.78), rgba(7, 10, 18, 0.94));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(var(--card-rgb, 124, 242, 212), 0.16),
+              0 24px 48px -20px rgba(0, 0, 0, 0.6);
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.cy-why-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(var(--card-rgb, 124, 242, 212), 0.4);
+  box-shadow: inset 0 0 0 1px rgba(var(--card-rgb, 124, 242, 212), 0.35),
+              0 28px 52px -16px rgba(0, 0, 0, 0.8),
+              0 0 30px -10px rgba(var(--card-rgb, 124, 242, 212), 0.25);
+}
+
+.cy-why-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 48px;
+  height: 3px;
+  background: var(--card-accent);
+  transform: skewX(-24deg);
+}
+
+/* Background watermark number */
+.cy-why-ghost {
+  position: absolute;
+  right: 18px;
+  top: 4px;
+  font: 400 110px/1 var(--cy-disp, 'Anton', sans-serif);
+  color: var(--card-accent);
+  opacity: 0.05;
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
+}
+
+/* Top telemetry row */
+.cy-why-tele {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.cy-why-idx {
+  font: 600 13px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  letter-spacing: 0.12em;
+  color: var(--card-accent);
+}
+
+.cy-why-tag {
+  font: 600 11px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  background: rgba(var(--card-rgb, 124, 242, 212), 0.08);
+  border: 1px solid rgba(var(--card-rgb, 124, 242, 212), 0.25);
+  color: #e5e7eb;
+}
+
+/* Icon block */
+.cy-why-icon-wrap {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 18px;
+  background: rgba(var(--card-rgb, 124, 242, 212), 0.08);
+  border: 1px solid rgba(var(--card-rgb, 124, 242, 212), 0.3);
+  color: var(--card-accent);
+  transform: skewX(-8deg);
+}
+
+.cy-why-icon-wrap > svg {
+  transform: skewX(8deg);
+}
+
+/* Title and description */
+.cy-why-title {
+  margin: 0;
+  font: 600 19px/1.3 var(--cy-hud, 'Chakra Petch', sans-serif);
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.cy-why-desc {
+  margin: 10px 0 0;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: #aeb8c8;
+}
+
+/* Corner accent indicator */
+.cy-why-corner {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  border-bottom: 2px solid var(--card-accent);
+  border-right: 2px solid var(--card-accent);
+  opacity: 0.6;
+}
+
+/* =====================================================================
+   RESPONSIVE DESIGN
+   ===================================================================== */
+@media (max-width: 1080px) {
+  .cy-why-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .cy-why {
+    margin-top: 60px;
+  }
+  .cy-why-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .cy-why-card {
+    padding: 22px 18px 24px;
+  }
+  .cy-why-ghost {
+    font-size: 80px;
+    right: 12px;
+  }
+  .cy-why-title {
+    font-size: 18px;
+  }
+  .cy-why-desc {
+    font-size: 14px;
+  }
+}

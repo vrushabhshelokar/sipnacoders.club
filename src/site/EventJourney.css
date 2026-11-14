@@ -1,0 +1,360 @@
+/* =====================================================================
+   SECTION 3 — EVENT JOURNEY (Have Any Questions?)
+   Written for site/EventJourney.jsx. Reuses .up-cy design tokens.
+   ===================================================================== */
+
+.ej-section {
+  margin-top: 96px;
+  position: relative;
+}
+
+/* ---- Section header ---- */
+.ej-head {
+  max-width: 760px;
+  margin-bottom: 52px;
+}
+
+.ej-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font: 600 13px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cy-mint, #7cf2d4);
+}
+
+.ej-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 18px;
+  background: linear-gradient(
+    90deg,
+    var(--cy-red, #e8283e) 0 6px,
+    transparent 6px 9px,
+    var(--cy-red, #e8283e) 9px 15px,
+    transparent 15px 18px,
+    var(--cy-ash, #e5e7eb) 18px 24px
+  );
+  transform: skewX(-26deg);
+}
+
+.ej-h {
+  position: relative;
+  display: block;
+  width: fit-content;
+  margin: 16px 0 0;
+  font: 400 clamp(36px, 5.2vw, 68px) / 0.96 var(--cy-disp, 'Anton', sans-serif);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--cy-ash, #e5e7eb);
+}
+
+.ej-h::after {
+  content: '';
+  position: absolute;
+  left: 56%;
+  top: -10%;
+  width: 3px;
+  height: 120%;
+  pointer-events: none;
+  transform: skewX(-24deg);
+  background: var(--cy-red, #e8283e);
+  box-shadow: 0 0 14px 1px rgba(232, 40, 62, 0.85);
+}
+
+.ej-sub {
+  margin: 16px 0 0;
+  padding-left: 16px;
+  border-left: 4px solid var(--cy-red, #e8283e);
+  font: 500 clamp(15px, 1.8vw, 17.5px) / 1.55 var(--cy-hud, 'Chakra Petch', sans-serif);
+  color: #b4bccb;
+  max-width: 560px;
+}
+
+/* =====================================================================
+   STAGE PIPELINE — DESKTOP
+   ===================================================================== */
+.ej-pipeline {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  position: relative;
+}
+
+/* Horizontal connecting conduit line between all stages */
+.ej-pipeline::before {
+  content: '';
+  position: absolute;
+  top: 54px; /* aligns vertically with the center of the stage number badge */
+  left: calc(12.5% + 24px); /* starts from center of first badge */
+  right: calc(12.5% + 24px); /* ends at center of last badge */
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--ej-c1, #7cf2d4),
+    var(--ej-c2, #4c8dff) 33%,
+    var(--ej-c3, #fbbc05) 66%,
+    var(--ej-c4, #ff5468)
+  );
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* Connector node dots at each junction */
+.ej-pipeline::after {
+  content: '';
+  display: none; /* each card handles its own node */
+}
+
+/* =====================================================================
+   STAGE CARD
+   ===================================================================== */
+.ej-stage {
+  --sa: #7cf2d4;
+  --sa-rgb: 124, 242, 212;
+  position: relative;
+  padding: 0 14px;
+}
+
+/* The numbered node badge */
+.ej-node {
+  position: relative;
+  z-index: 2;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 24px;
+  font: 400 22px/1 var(--cy-disp, 'Anton', sans-serif);
+  letter-spacing: 0.03em;
+  color: var(--sa);
+  border: 2px solid rgba(var(--sa-rgb), 0.6);
+  background: #07121e;
+  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+  box-shadow: 0 0 20px -6px rgba(var(--sa-rgb), 0.6),
+              inset 0 0 12px -4px rgba(var(--sa-rgb), 0.1);
+}
+
+/* Pulsing glow ring on node */
+.ej-node::before {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+  background: transparent;
+  border: 1px solid rgba(var(--sa-rgb), 0.2);
+}
+
+/* Card body */
+.ej-card {
+  position: relative;
+  overflow: hidden;
+  padding: 24px 20px 26px;
+  background: radial-gradient(
+    320px 160px at 50% 0%,
+    rgba(var(--sa-rgb), 0.1),
+    transparent 70%
+  ), linear-gradient(170deg, rgba(14, 22, 34, 0.82), rgba(7, 10, 18, 0.95));
+  border: 1px solid rgba(var(--sa-rgb), 0.2);
+  box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.6);
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.ej-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(var(--sa-rgb), 0.45);
+  box-shadow: 0 24px 44px -16px rgba(0, 0, 0, 0.8),
+              0 0 24px -8px rgba(var(--sa-rgb), 0.2);
+}
+
+/* Top accent bar */
+.ej-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 44%;
+  height: 2px;
+  background: var(--sa);
+  transform: skewX(-24deg);
+  transform-origin: left center;
+}
+
+/* Ghost stage number watermark */
+.ej-ghost {
+  position: absolute;
+  right: 10px;
+  bottom: -4px;
+  font: 400 86px/1 var(--cy-disp, 'Anton', sans-serif);
+  color: var(--sa);
+  opacity: 0.045;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Tag label */
+.ej-tag {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 3px 8px;
+  font: 600 10.5px/1 var(--cy-hud, 'Chakra Petch', monospace);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sa);
+  background: rgba(var(--sa-rgb), 0.08);
+  border: 1px solid rgba(var(--sa-rgb), 0.3);
+}
+
+/* Icon */
+.ej-icon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  color: var(--sa);
+}
+
+.ej-icon-box {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  background: rgba(var(--sa-rgb), 0.1);
+  border: 1px solid rgba(var(--sa-rgb), 0.28);
+  transform: skewX(-8deg);
+}
+
+.ej-icon-box > svg {
+  transform: skewX(8deg);
+}
+
+/* Stage title */
+.ej-title {
+  margin: 0 0 10px;
+  font: 600 17px/1.25 var(--cy-hud, 'Chakra Petch', sans-serif);
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+
+/* Summary sentence */
+.ej-summary {
+  margin: 0 0 14px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #aeb8c8;
+}
+
+/* Bullet points */
+.ej-points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.ej-points li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font: 500 13px/1.5 var(--cy-hud, 'Chakra Petch', sans-serif);
+  color: #c0cad8;
+}
+
+/* Bullet marker: a small skewed accent dash */
+.ej-points li::before {
+  content: '';
+  flex: none;
+  display: inline-block;
+  margin-top: 6px;
+  width: 10px;
+  height: 2px;
+  background: var(--sa);
+  transform: skewX(-18deg);
+  opacity: 0.9;
+}
+
+/* Corner accent tick */
+.ej-corner {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  border-bottom: 2px solid var(--sa);
+  border-right: 2px solid var(--sa);
+  opacity: 0.55;
+}
+
+/* =====================================================================
+   RESPONSIVE
+   ===================================================================== */
+
+/* Tablet: 2×2 grid */
+@media (max-width: 1080px) {
+  .ej-pipeline {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 36px 20px;
+  }
+  .ej-pipeline::before {
+    display: none; /* hide horizontal connector on 2×2 */
+  }
+  /* vertical connector between top and bottom rows */
+  .ej-stage:nth-child(1),
+  .ej-stage:nth-child(2) {
+    padding-bottom: 0;
+  }
+  .ej-stage {
+    padding: 0 8px;
+  }
+}
+
+/* Mobile: single-column vertical pipeline */
+@media (max-width: 640px) {
+  .ej-section {
+    margin-top: 64px;
+  }
+  .ej-pipeline {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .ej-pipeline::before {
+    display: none;
+  }
+  .ej-stage {
+    padding: 0;
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 0 20px;
+    align-items: start;
+  }
+  /* Vertical connector line down left side */
+  .ej-stage:not(:last-child)::after {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 23px; /* center of 48px node */
+    top: 48px;
+    bottom: -20px;
+    width: 2px;
+    background: linear-gradient(to bottom, rgba(var(--sa-rgb), 0.5), rgba(var(--sa-rgb), 0.05));
+    pointer-events: none;
+  }
+  .ej-node {
+    margin: 0;
+    grid-column: 1;
+    grid-row: 1 / 3;
+    align-self: start;
+    margin-top: 0;
+  }
+  .ej-card {
+    grid-column: 2;
+    margin-bottom: 32px;
+  }
+  .ej-ghost {
+    font-size: 60px;
+  }
+}

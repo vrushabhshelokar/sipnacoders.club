@@ -8,7 +8,13 @@ import { Reveal } from './ui';
 import PosterStage from './PosterStage';
 import { CardTitle } from './NameReveal';
 import { Actions, FieldValue, Guard, getDesign, isTeaserLive, useTeaser } from './teaserCore';
+import WhyParticipate from './WhyParticipate';
+import EventJourney from './EventJourney';
+import RuleBook from './RuleBook';
+import PrizePool from './PrizePool';
+import EventSchedule from './EventSchedule';
 import EventFlow from './EventFlow';
+import FinaleSchedule from './FinaleSchedule';
 import './HackathonTeaser.css';
 
 export { isTeaserLive };
@@ -104,7 +110,13 @@ export default function HackathonTeaser() {
           </Guard>
         )}
       </Reveal>
+      <WhyParticipate />
+      <EventJourney />
+      <RuleBook />
+      <PrizePool />
+      <EventSchedule />
       <EventFlow />
+      <FinaleSchedule />
     </>
   );
 }
