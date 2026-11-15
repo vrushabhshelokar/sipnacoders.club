@@ -1,5 +1,6 @@
 // Section: VIBE-A-THON // 18-HOUR FINALE DAY SCHEDULE
 // Clean, minimal, chronological event-day schedule for 26–27 December 2026 at Sipna COET.
+import { useState } from 'react';
 import { Reveal } from './ui';
 import { Icon } from './Icons';
 import { FINALE_EVENT_INFO, FINALE_SCHEDULE } from '../data/vibeathonData';
@@ -61,9 +62,30 @@ function ScheduleItem({ item }) {
   );
 }
 
+// Temporary teaser switch: set to false when ready to reveal the complete schedule
+const IS_TEASER = true;
+
 export default function FinaleSchedule() {
+  const [activeDay, setActiveDay] = useState('all');
+
+  const visibleDays = activeDay === 'all'
+    ? FINALE_SCHEDULE
+    : FINALE_SCHEDULE.filter((d) => d.dayId === activeDay);
+
+  // Compact Minimal Teaser Mode
+  if (IS_TEASER) {
+    return (
+      <section id="finale-schedule" className="fs-section fs-teaser-only" aria-label="Finale Day Schedule — Reveal Soon">
+        <div className="fs-compact-teaser">
+          <span className="fs-compact-x" aria-hidden="true">✕</span>
+          <span className="fs-compact-text">Event Day Schedule REVEAL SOON</span>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section className="fs-section" aria-labelledby="fs-heading">
+    <section id="finale-schedule" className="fs-section" aria-labelledby="fs-heading">
       <Reveal className="fs-head">
         <span className="fs-eyebrow">18-Hour Offline Finale // Schedule</span>
         <h2 id="fs-heading" className="fs-h">Finale Day Schedule</h2>
@@ -97,34 +119,68 @@ export default function FinaleSchedule() {
         </div>
       </Reveal>
 
-      {/* Main Two-Day Timeline Container */}
-      <div className="fs-timeline-container">
-        {/* Continuous Spine Line */}
-        <div className="fs-spine" aria-hidden="true" />
+      {/* Main Schedule Stage */}
+      <div className="fs-schedule-stage">
+        {/* Mobile Day Filter Tabs */}
+        <div className="fs-filter-bar" role="tablist" aria-label="Filter schedule by day">
+          <button
+            type="button"
+            className={`fs-filter-btn ${activeDay === 'all' ? 'is-active' : ''}`}
+            onClick={() => setActiveDay('all')}
+            role="tab"
+            aria-selected={activeDay === 'all'}
+          >
+            All Days
+          </button>
+          <button
+            type="button"
+            className={`fs-filter-btn ${activeDay === 'day-01' ? 'is-active' : ''}`}
+            onClick={() => setActiveDay('day-01')}
+            role="tab"
+            aria-selected={activeDay === 'day-01'}
+          >
+            Day 01 (26 Dec)
+          </button>
+          <button
+            type="button"
+            className={`fs-filter-btn ${activeDay === 'day-02' ? 'is-active' : ''}`}
+            onClick={() => setActiveDay('day-02')}
+            role="tab"
+            aria-selected={activeDay === 'day-02'}
+          >
+            Day 02 (27 Dec)
+          </button>
+        </div>
 
-        {FINALE_SCHEDULE.map((dayBlock, dayIdx) => (
-          <div key={dayBlock.dayId} className="fs-day-block">
-            {/* Day Header Banner */}
-            <Reveal delay={dayIdx * 80}>
-              <div className="fs-day-header" aria-label={`${dayBlock.dayNumber} - ${dayBlock.dateLabel}`}>
-                <div className="fs-day-badge">
-                  <span className="fs-day-num">{dayBlock.dayNumber}</span>
-                  <span className="fs-day-date">{dayBlock.dateLabel}</span>
+        {/* Schedule Content */}
+        <div className="fs-timeline-container">
+          {/* Continuous Spine Line */}
+          <div className="fs-spine" aria-hidden="true" />
+
+          {visibleDays.map((dayBlock, dayIdx) => (
+            <div key={dayBlock.dayId} className="fs-day-block">
+              {/* Day Header Banner */}
+              <Reveal delay={dayIdx * 80}>
+                <div className="fs-day-header" aria-label={`${dayBlock.dayNumber} - ${dayBlock.dateLabel}`}>
+                  <div className="fs-day-badge">
+                    <span className="fs-day-num">{dayBlock.dayNumber}</span>
+                    <span className="fs-day-date">{dayBlock.dateLabel}</span>
+                  </div>
+                  <p className="fs-day-summary">{dayBlock.summary}</p>
                 </div>
-                <p className="fs-day-summary">{dayBlock.summary}</p>
-              </div>
-            </Reveal>
+              </Reveal>
 
-            {/* List of Day Activities */}
-            <div className="fs-items-list" role="list" aria-label={`Schedule for ${dayBlock.dayNumber}`}>
-              {dayBlock.events.map((item, itemIdx) => (
-                <Reveal key={item.id} delay={60 + itemIdx * 40} role="listitem">
-                  <ScheduleItem item={item} />
-                </Reveal>
-              ))}
+              {/* List of Day Activities */}
+              <div className="fs-items-list" role="list" aria-label={`Schedule for ${dayBlock.dayNumber}`}>
+                {dayBlock.events.map((item, itemIdx) => (
+                  <Reveal key={item.id} delay={60 + itemIdx * 40} role="listitem">
+                    <ScheduleItem item={item} />
+                  </Reveal>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );

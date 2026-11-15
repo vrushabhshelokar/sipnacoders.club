@@ -48,12 +48,12 @@ function TimelineRow({ item, index }) {
 
 export default function EventSchedule() {
   return (
-    <section className="es-section" aria-labelledby="es-heading">
+    <section id="schedule" className="es-section" aria-labelledby="es-heading">
       <Reveal className="es-head">
         <span className="es-eyebrow">Event Timeline</span>
-        <h2 id="es-heading" className="es-h">Tentative Schedule</h2>
+        <h2 id="es-heading" className="es-h">Milestone Schedule</h2>
         <p className="es-sub">
-          These dates are tentative and subject to change. Any updates will be communicated to all registered participants.
+          Official competition roadmap from registration opening through Round 1 submissions, Top 75 qualifiers, and the offline finale.
         </p>
       </Reveal>
 

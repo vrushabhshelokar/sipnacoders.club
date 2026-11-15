@@ -648,32 +648,59 @@
 
 @media (max-width: 680px) {
   .rb-section {
-    margin-top: 64px;
+    margin-top: 48px;
+  }
+  .rb-head {
+    margin-bottom: 24px;
+  }
+  .rb-sub {
+    font-size: 14.5px;
+    margin-top: 12px;
   }
 
   .rb-controls {
-    gap: 12px;
-    padding: 10px 14px;
+    gap: 8px;
+    padding: 6px 10px;
+    margin-bottom: 10px;
+  }
+
+  .rb-tabs-wrap {
+    margin-bottom: 12px;
   }
 
   .rb-tabs {
-    padding: 4px 6px 8px;
+    padding: 2px 4px 6px;
+    gap: 4px;
   }
 
   .rb-tab {
-    min-width: 136px;
-    padding: 10px 12px;
-    font-size: 12px;
+    min-width: auto;
+    padding: 6px 10px;
+    font-size: 11px;
+    gap: 6px;
+  }
+
+  .rb-tab-label {
+    white-space: nowrap;
   }
 
   .rb-holo-content {
-    padding: 24px 18px 28px;
+    padding: 16px 14px 18px;
+  }
+
+  /* Hide decorative mock telemetry pillar on mobile to focus on directives */
+  .rb-pillar {
+    display: none;
+  }
+
+  .rb-holo-grid {
+    gap: 0;
   }
 
   .rb-hud-ribbon,
   .rb-hud-footer {
-    padding: 8px 16px;
-    font-size: 9.5px;
+    padding: 6px 12px;
+    font-size: 9px;
   }
 
   .rb-hud-ribbon-right,
@@ -681,26 +708,45 @@
     display: none;
   }
 
-  .rb-feed-title {
-    font-size: 26px;
+  .rb-feed-head {
+    margin-bottom: 12px;
   }
 
-  .rb-pillar-id {
-    font-size: 42px;
+  .rb-feed-kicker {
+    font-size: 10px;
+    margin-bottom: 4px;
+  }
+
+  .rb-feed-title {
+    font-size: 20px;
+  }
+
+  .rb-feed-intro {
+    font-size: 13px;
+    line-height: 1.45;
+    margin-top: 4px;
   }
 
   .rb-holo-ghost {
-    font-size: 100px;
-    right: 12px;
+    display: none;
+  }
+
+  .rb-rules {
+    gap: 8px;
   }
 
   .rb-rule-item {
-    padding: 10px 12px;
-    gap: 10px;
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .rb-rule-index {
+    font-size: 11.5px;
   }
 
   .rb-rule-text {
-    font-size: 13.5px;
+    font-size: 12.8px;
+    line-height: 1.45;
   }
 }
 
@@ -718,4 +764,119 @@
 .rb-rule-index-danger {
   color: #ff3b3b;
   text-shadow: 0 0 8px rgba(255, 59, 59, 0.45);
+}
+
+/* Mobile-only clean accordion (hidden on desktop) */
+.rb-mobile-accordion {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .rb-controls,
+  .rb-tabs-wrap,
+  .rb-holo-screen {
+    display: none;
+  }
+
+  .rb-mobile-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .rb-acc-item {
+    background: rgba(12, 18, 28, 0.85);
+    border: 1px solid rgba(124, 242, 212, 0.18);
+    border-radius: 4px;
+    overflow: hidden;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+
+  .rb-acc-item.is-open {
+    border-color: rgba(124, 242, 212, 0.4);
+    background: rgba(10, 16, 26, 0.95);
+  }
+
+  .rb-acc-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #ffffff;
+  }
+
+  .rb-acc-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .rb-acc-idx {
+    font: 700 11px/1 var(--cy-hud, 'Chakra Petch', monospace);
+    color: var(--cy-mint, #7cf2d4);
+  }
+
+  .rb-acc-icon {
+    display: grid;
+    place-items: center;
+    color: var(--cy-mint, #7cf2d4);
+  }
+
+  .rb-acc-title {
+    font: 600 13.5px/1 var(--cy-hud, 'Chakra Petch', sans-serif);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .rb-acc-content {
+    padding: 10px 14px 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    animation: rb-acc-in 0.2s ease-out;
+  }
+
+  @keyframes rb-acc-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .rb-acc-intro {
+    font: 500 12px/1.45 var(--cy-hud, 'Chakra Petch', sans-serif);
+    color: #94a3b8;
+    margin: 0 0 10px 0;
+  }
+
+  .rb-acc-points {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .rb-acc-points li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 6px 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 3px;
+    border-left: 2px solid rgba(124, 242, 212, 0.35);
+  }
+
+  .rb-acc-num {
+    font: 700 10.5px/1.3 var(--cy-hud, 'Chakra Petch', monospace);
+    color: var(--cy-mint, #7cf2d4);
+    flex-shrink: 0;
+  }
+
+  .rb-acc-text {
+    font: 400 12px/1.45 var(--cy-hud, 'Chakra Petch', sans-serif);
+    color: #e2e8f0;
+  }
 }

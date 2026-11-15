@@ -104,6 +104,13 @@
   .s-flow .s-fl-linklabel { flex-direction: row; max-width: none; text-align: left; }
   .s-flow .s-fl-linklabel svg { transform: rotate(90deg); }
 }
+@media (max-width: 768px) {
+  /* Suppress redundant duplicate flow section on mobile: covered in Event Journey and Rule Book */
+  .s-flow {
+    display: none !important;
+  }
+}
+
 @media (max-width: 640px) {
   .s-flow { margin-top: 56px; }
   .s-flow .s-fl { padding: 24px 20px 22px; border-radius: 20px; }

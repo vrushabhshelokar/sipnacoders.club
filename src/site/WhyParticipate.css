@@ -189,6 +189,11 @@
   opacity: 0.6;
 }
 
+/* Progressive disclosure container: hidden on desktop */
+.cy-why-more-wrap {
+  display: none;
+}
+
 /* =====================================================================
    RESPONSIVE DESIGN
    ===================================================================== */
@@ -200,23 +205,80 @@
 
 @media (max-width: 640px) {
   .cy-why {
-    margin-top: 60px;
+    margin-top: 48px;
+  }
+  .cy-why-head {
+    margin-bottom: 24px;
+  }
+  .cy-why-sub {
+    font-size: 14.5px;
+    margin-top: 12px;
   }
   .cy-why-grid {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 10px;
   }
   .cy-why-card {
-    padding: 22px 18px 24px;
+    padding: 14px 14px 16px;
+  }
+  .cy-why-tele {
+    margin-bottom: 8px;
   }
   .cy-why-ghost {
-    font-size: 80px;
-    right: 12px;
+    display: none;
   }
   .cy-why-title {
-    font-size: 18px;
+    font-size: 15.5px;
+    margin-top: 6px;
   }
   .cy-why-desc {
-    font-size: 14px;
+    font-size: 12.8px;
+    line-height: 1.45;
+    margin-top: 6px;
+  }
+  .cy-why-corner {
+    width: 10px;
+    height: 10px;
+  }
+
+  /* Progressive disclosure for mobile (cuts ~600px of vertical scrolling) */
+  .cy-why-card-extra {
+    display: none;
+  }
+  .cy-why-card-extra.is-expanded {
+    display: block;
+    animation: cy-why-fade 0.22s ease-out;
+  }
+
+  @keyframes cy-why-fade {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .cy-why-more-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+  }
+
+  .cy-why-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: rgba(14, 24, 38, 0.7);
+    border: 1px solid rgba(124, 242, 212, 0.3);
+    border-radius: 4px;
+    font: 600 12px/1 var(--cy-hud, 'Chakra Petch', monospace);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--cy-mint, #7cf2d4);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .cy-why-toggle-btn:hover {
+    background: rgba(124, 242, 212, 0.12);
+    border-color: var(--cy-mint, #7cf2d4);
   }
 }

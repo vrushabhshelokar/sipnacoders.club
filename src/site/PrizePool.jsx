@@ -21,7 +21,7 @@ export default function PrizePool() {
   const runnerUpPrizes = distribution.filter((p) => p.rank !== '01');
 
   return (
-    <section className="pp-section" aria-labelledby="pp-heading">
+    <section id="prize-pool" className="pp-section" aria-labelledby="pp-heading">
       <Reveal className="pp-head">
         <span className="pp-eyebrow">Rewards &amp; Registration</span>
         <h2 id="pp-heading" className="pp-h">Prizes &amp; Fees</h2>

@@ -52,6 +52,7 @@ function StageCard({ stage }) {
 export default function EventJourney() {
   return (
     <section
+      id="event-journey"
       className="ej-section"
       aria-labelledby="ej-heading"
       style={{

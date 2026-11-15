@@ -8,6 +8,8 @@ import { Reveal } from './ui';
 import PosterStage from './PosterStage';
 import { CardTitle } from './NameReveal';
 import { Actions, FieldValue, Guard, getDesign, isTeaserLive, useTeaser } from './teaserCore';
+import EventSnapshot from './EventSnapshot';
+import StickyNav from './StickyNav';
 import WhyParticipate from './WhyParticipate';
 import EventJourney from './EventJourney';
 import RuleBook from './RuleBook';
@@ -110,6 +112,8 @@ export default function HackathonTeaser() {
           </Guard>
         )}
       </Reveal>
+      <EventSnapshot />
+      <StickyNav />
       <WhyParticipate />
       <EventJourney />
       <RuleBook />

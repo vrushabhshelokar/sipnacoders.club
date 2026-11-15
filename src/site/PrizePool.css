@@ -782,66 +782,189 @@
 
 @media (max-width: 680px) {
   .pp-section {
-    margin-top: 64px;
+    margin-top: 48px;
+  }
+  .pp-head {
+    margin-bottom: 24px;
+  }
+  .pp-sub {
+    font-size: 14.5px;
+    margin-top: 12px;
   }
 
   .pp-card-inner {
-    padding: 16px;
+    padding: 14px;
+  }
+
+  .pp-hero-ghost {
+    display: none;
+  }
+
+  .pp-pool-label {
+    font-size: 10px;
   }
 
   .pp-pool-val {
-    font-size: 50px;
+    font-size: 38px;
+    line-height: 1;
+  }
+
+  .pp-pool-block {
+    margin-bottom: 12px;
   }
 
   .pp-event-highlight {
-    padding: 10px 12px;
+    padding: 8px 10px;
     gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .pp-event-val {
+    font-size: 13.5px;
+  }
+
+  .pp-dist-header {
+    font-size: 10px;
+    margin-bottom: 8px;
+  }
+
+  .pp-prize-first {
+    padding: 12px 14px;
+    margin-bottom: 8px;
   }
 
   .pp-prize-first .pp-prize-amt {
-    font-size: 38px;
+    font-size: 30px;
   }
 
+  .pp-prize-ghost {
+    display: none;
+  }
+
+  /* 2nd and 3rd side by side on mobile for compact layout */
   .pp-runner-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .pp-prize-runner {
+    padding: 10px 10px;
+  }
+
+  .pp-prize-runner .pp-prize-amt {
+    font-size: 20px;
+  }
+
+  .pp-prize-rank {
+    font-size: 11px;
   }
 
   .pp-phases {
-    gap: 12px;
+    gap: 10px;
   }
 
   .pp-phase-box {
-    padding: 14px;
+    padding: 12px;
+  }
+
+  .pp-phase-name {
+    font-size: 16px;
+  }
+
+  .pp-cost-val {
+    font-size: 24px;
+  }
+
+  .pp-inclusions-block {
+    margin-top: 10px;
+    padding-top: 8px;
+  }
+
+  .pp-inclusions-list li {
+    font-size: 12.5px;
   }
 
   .pp-total-note {
-    padding: 12px;
+    padding: 10px 12px;
+    margin-top: 12px;
+  }
+
+  .pp-note-text {
+    font-size: 11.5px;
+    line-height: 1.45;
+  }
+
+  .pp-bottom-reveal {
+    margin-top: 16px;
   }
 
   .pp-bottom-inner {
-    padding: 16px;
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .pp-tiers-container {
+    gap: 10px;
   }
 
   .pp-tier-block {
-    padding: 14px;
+    padding: 12px 14px;
   }
 
-  .pp-cert-summary {
-    padding: 12px;
+  .pp-tb-title {
+    font-size: 15px;
   }
 
-  .pp-cs-row {
-    flex-direction: column;
-    align-items: flex-start;
+  .pp-tb-scope {
+    font-size: 11px;
+  }
+
+  .pp-tb-rewards {
+    margin-top: 8px;
     gap: 6px;
   }
 
-  .pp-cs-rec {
-    justify-content: flex-start;
-    flex-wrap: wrap;
+  .pp-tb-rewards li {
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  .pp-cert-summary {
+    padding: 10px 12px;
+    margin-top: 10px;
+  }
+
+  .pp-cs-label {
+    font-size: 9.5px;
+    margin-bottom: 8px;
+  }
+
+  .pp-cs-grid {
+    gap: 6px;
+  }
+
+  .pp-cs-row {
+    padding: 6px 8px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .pp-cs-name {
+    font-size: 12.5px;
+  }
+
+  .pp-cs-scope {
+    font-size: 10px;
+  }
+
+  .pp-cs-badge {
+    font-size: 9.5px;
+    padding: 2px 5px;
   }
 
   .pp-cs-text {
+    font-size: 11.5px;
     text-align: left;
   }
 }

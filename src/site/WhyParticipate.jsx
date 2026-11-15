@@ -1,4 +1,5 @@
 // Section 2: Why Participate? — Vibe-A-Thon
+import { useState } from 'react';
 import { Reveal } from './ui';
 import { Icon } from './Icons';
 import { WHY_PARTICIPATE } from '../data/vibeathonData';
@@ -13,8 +14,10 @@ function hexToRgb(hex) {
 }
 
 export default function WhyParticipate() {
+  const [expanded, setExpanded] = useState(false);
+
   return (
-    <section className="cy-why" aria-labelledby="cy-why-heading">
+    <section id="why-participate" className="cy-why" aria-labelledby="cy-why-heading">
       <Reveal className="cy-why-head">
         <span className="cy-why-eyebrow">Advantage Protocol</span>
         <h2 id="cy-why-heading" className="cy-why-h">
@@ -29,12 +32,15 @@ export default function WhyParticipate() {
         {WHY_PARTICIPATE.map((item, index) => {
           const IconComponent = Icon[item.icon] || Icon.Code;
           const rgb = hexToRgb(item.accent);
+          const isExtraOnMobile = index >= 3;
 
           return (
             <Reveal
               key={item.num}
               as="article"
-              className="cy-why-card"
+              className={`cy-why-card ${isExtraOnMobile ? 'cy-why-card-extra' : ''} ${
+                isExtraOnMobile && expanded ? 'is-expanded' : ''
+              }`}
               delay={index * 80}
               style={{
                 '--card-accent': item.accent,
@@ -60,6 +66,21 @@ export default function WhyParticipate() {
             </Reveal>
           );
         })}
+      </div>
+
+      {/* Mobile-only progressive disclosure button */}
+      <div className="cy-why-more-wrap">
+        <button
+          type="button"
+          className="cy-why-toggle-btn"
+          onClick={() => setExpanded(!expanded)}
+          aria-expanded={expanded}
+        >
+          <span>{expanded ? 'Show Fewer Advantages' : `View All ${WHY_PARTICIPATE.length} Advantages`}</span>
+          <span className="cy-why-toggle-icon" aria-hidden="true">
+            <Icon.ChevronDown size={14} style={{ transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease' }} />
+          </span>
+        </button>
       </div>
     </section>
   );

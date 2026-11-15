@@ -11,6 +11,7 @@ const TOTAL = RULEBOOK_CATEGORIES.length;
 export default function RuleBook() {
   const [activeIdx, setActiveIdx] = useState(0);
   const [fading, setFading] = useState(false);
+  const [mobileOpenCat, setMobileOpenCat] = useState('01');
   const tabsRef = useRef(null);
   const timeoutRef = useRef(null);
 
@@ -37,7 +38,7 @@ export default function RuleBook() {
   const IconC = Icon[cat.icon] || Icon.Files;
 
   return (
-    <section className="rb-section" aria-labelledby="rb-heading">
+    <section id="rules" className="rb-section" aria-labelledby="rb-heading">
       <Reveal className="rb-head">
         <span className="rb-eyebrow">Event Protocols</span>
         <h2 id="rb-heading" className="rb-h">The Rule Book</h2>
@@ -222,6 +223,50 @@ export default function RuleBook() {
           <span className="rb-footer-code">// SEC_HASH: 0x98A4_{cat.id}9C // SIPNA CODERS CLUB</span>
           <span className="rb-footer-sync">LIVE HUD STREAM // DECRYPTED</span>
         </div>
+      </div>
+
+      {/* Mobile-Only Accordion (Active exclusively on mobile viewports <= 768px) */}
+      <div className="rb-mobile-accordion" role="region" aria-label="Mobile Rule Book Accordion">
+        {RULEBOOK_CATEGORIES.map((c) => {
+          const isOpen = mobileOpenCat === c.id;
+          const CIcon = Icon[c.icon] || Icon.Files;
+          return (
+            <div key={c.id} className={`rb-acc-item ${isOpen ? 'is-open' : ''}`}>
+              <button
+                type="button"
+                className="rb-acc-trigger"
+                onClick={() => setMobileOpenCat(isOpen ? null : c.id)}
+                aria-expanded={isOpen}
+              >
+                <div className="rb-acc-left">
+                  <span className="rb-acc-idx">0{c.id}</span>
+                  <div className="rb-acc-icon" aria-hidden="true"><CIcon size={14} /></div>
+                  <span className="rb-acc-title">{c.title}</span>
+                </div>
+                <Icon.ChevronDown
+                  size={14}
+                  style={{
+                    transform: isOpen ? 'rotate(180deg)' : 'none',
+                    transition: 'transform 0.2s ease',
+                  }}
+                />
+              </button>
+              {isOpen && (
+                <div className="rb-acc-content">
+                  <p className="rb-acc-intro">{c.intro}</p>
+                  <ul className="rb-acc-points">
+                    {c.points.map((pt, i) => (
+                      <li key={pt}>
+                        <span className="rb-acc-num">{c.id}.0{i + 1}</span>
+                        <span className="rb-acc-text">{pt}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </section>
   );
