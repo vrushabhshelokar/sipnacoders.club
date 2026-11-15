@@ -33,7 +33,7 @@ export default function Register() {
             <h1 className="sr-only">Register — Vibe-A-Thon</h1>
             <div className="s-register-visual-wrap">
               <img
-                src="/register-visual.png"
+                src="/register-visual.webp"
                 alt="Vibe-A-Thon — The 18-Hour AI Build-A-Thon"
                 className="s-register-visual-img"
                 width={458}

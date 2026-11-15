@@ -450,7 +450,7 @@ a.s-contact:hover { transform: translateY(-3px); border-color: var(--border-2); 
     content: "";
     position: absolute;
     inset: 0;
-    background: url("/form_back1.png") center / cover no-repeat;
+    background: url("/form_back1.webp") center / cover no-repeat;
     opacity: 0.22; /* Adjust image opacity */
     z-index: -1;
     pointer-events: none;

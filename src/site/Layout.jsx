@@ -29,14 +29,7 @@ const TITLES = {
 };
 const FOOTER_LINKS = [...NAV, { to: '/upcoming', label: 'Upcoming' }];
 
-// load the fonts once
-if (typeof document !== 'undefined' && !document.getElementById('s-fonts')) {
-  const l = document.createElement('link');
-  l.id = 's-fonts';
-  l.rel = 'stylesheet';
-  l.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap';
-  document.head.appendChild(l);
-}
+
 
 export default function Layout({ children }) {
   const { pathname, hash } = useLocation();

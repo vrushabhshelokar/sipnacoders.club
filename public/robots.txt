@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://sipnacoders-club.vercel.app/sitemap.xml
+Sitemap: https://sipnacoders.club/sitemap.xml
