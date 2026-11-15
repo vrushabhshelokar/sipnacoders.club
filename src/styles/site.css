@@ -410,6 +410,30 @@ a.s-contact:hover { transform: translateY(-3px); border-color: var(--border-2); 
 .s-form-note { margin: 0; font-size: 13.5px; color: var(--muted); }
 
 /* ---------- register / 404 ---------- */
+.s-register-pagehead {
+  padding-bottom: 24px;
+}
+.s-register-visual-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 0 auto;
+}
+.s-register-visual-img {
+  display: block;
+  width: 100%;
+  max-width: 440px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 24px rgba(219, 58, 77, 0.22));
+}
+.s-register-sub {
+  text-align: center;
+  margin: 16px auto 0;
+  max-width: 580px;
+}
+
 .s-register {
     position: relative;
     isolation: isolate;
@@ -895,6 +919,18 @@ a.s-contact:hover { transform: translateY(-3px); border-color: var(--border-2); 
   .s-contact-act { width: 100%; padding-left: 64px; }
   .s-form { padding: 24px; }
   /* Register page — edge-to-edge on mobile */
+  .s-register-pagehead {
+    padding-top: calc(var(--nav) + 36px);
+    padding-bottom: 12px;
+  }
+  .s-register-visual-img {
+    max-width: min(340px, 86vw);
+  }
+  .s-register-sub {
+    font-size: 14.5px;
+    margin-top: 12px;
+    padding: 0 8px;
+  }
   .s-section:has(.s-register) { padding-left: 0; padding-right: 0; }
   .s-section:has(.s-register) .s-container { padding: 0 10px; max-width: none; }
   .s-register {

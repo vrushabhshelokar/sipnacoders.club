@@ -1,7 +1,7 @@
 
 import { useEffect } from 'react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
-import { PageHead } from '../site/ui';
+import { Reveal } from '../site/ui';
 import formAnimation from '../assets/form.lottie';
 import formAnimation1 from '../assets/form1.lottie';
 
@@ -26,11 +26,26 @@ export default function Register() {
 
   return (
     <>
-      <PageHead
-        eyebrow="Register"
-        title="Register"
-        sub="Fill the form below to participate. Limited seats available."
-      />
+      <header className="s-pagehead s-register-pagehead">
+        <div className="s-pagehead-glow" aria-hidden="true" />
+        <div className="s-container">
+          <Reveal>
+            <h1 className="sr-only">Register — Vibe-A-Thon</h1>
+            <div className="s-register-visual-wrap">
+              <img
+                src="/register-visual.png"
+                alt="Vibe-A-Thon — The 18-Hour AI Build-A-Thon"
+                className="s-register-visual-img"
+                width={458}
+                height={200}
+              />
+            </div>
+            <p className="s-sub s-sub-lg s-register-sub">
+              Fill the form below to participate. Limited seats available.
+            </p>
+          </Reveal>
+        </div>
+      </header>
 
       <section className="s-section s-section-first">
         <div className="s-container">
