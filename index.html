@@ -5,12 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
     <!-- Title + description: what Google and browser tabs show.
-         If you connect your own domain, replace https://sipnacoders-club.vercel.app everywhere in this file
-         (and in public/robots.txt + public/sitemap.xml). -->
+         The site address below is the real domain (https://sipnacoders.club). If the domain ever changes, replace it
+         everywhere in this file (and in public/robots.txt + public/sitemap.xml). -->
     <title>Sipna Coders Club | Coding club of Sipna COET, Amravati</title>
     <meta name="description" content="Sipna Coders Club is the coding community of Sipna College of Engineering &amp; Technology, Amravati. Workshops, hackathons, seminars and build nights in web development, DSA, AI, cloud and app development." />
-    <link rel="canonical" href="https://sipnacoders-club.vercel.app/" />
+    <link rel="canonical" href="https://sipnacoders.club/" />
     <meta name="theme-color" content="#06070a" />
+
+    <!-- Fonts: asked for ONCE, here, so the browser starts fetching them before it has even read our CSS and JS.
+         (They used to be asked for later, from Cyber.css and from Layout.jsx.) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Chakra+Petch:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" />
 
     <!-- Icons + "Add to Home Screen" -->
     <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
@@ -24,8 +30,8 @@
     <meta property="og:site_name" content="Sipna Coders Club" />
     <meta property="og:title" content="Sipna Coders Club | Compile your future" />
     <meta property="og:description" content="The coding community of Sipna College of Engineering &amp; Technology, Amravati. Workshops, hackathons, seminars and build nights." />
-    <meta property="og:url" content="https://sipnacoders-club.vercel.app/" />
-    <meta property="og:image" content="https://sipnacoders-club.vercel.app/og-image.jpg" />
+    <meta property="og:url" content="https://sipnacoders.club/" />
+    <meta property="og:image" content="https://sipnacoders.club/og-image.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Sipna Coders Club: Compile your future" />
@@ -33,7 +39,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Sipna Coders Club | Compile your future" />
     <meta name="twitter:description" content="The coding community of Sipna College of Engineering &amp; Technology, Amravati." />
-    <meta name="twitter:image" content="https://sipnacoders-club.vercel.app/og-image.jpg" />
+    <meta name="twitter:image" content="https://sipnacoders.club/og-image.jpg" />
 
     <!-- Tells Google who we are (can show the logo and social links in search results) -->
     <script type="application/ld+json">
@@ -41,8 +47,8 @@
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": "Sipna Coders Club",
-        "url": "https://sipnacoders-club.vercel.app/",
-        "logo": "https://sipnacoders-club.vercel.app/icons/icon-512.png",
+        "url": "https://sipnacoders.club/",
+        "logo": "https://sipnacoders.club/icons/icon-512.png",
         "email": "team@sipnacoders.club",
         "sameAs": [
           "https://www.instagram.com/sipnacoders.club/",

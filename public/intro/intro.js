@@ -30,7 +30,7 @@
   /* ---------------- settings ---------------- */
   var ONCE_EVER = true;                   // true = each visitor sees the intro only ONE time (first visit), after that the site opens directly; false = plays on every load / refresh
   var SEEN_KEY = 'scc-intro-seen';        // change this name (e.g. 'scc-intro-seen-2') if you make a new intro and want everybody to see it once more
-  var LOGO_SRC = '/coders_club_logo.png'; // the logo in /public
+  var LOGO_SRC = '/coders_club_logo.webp'; // the logo in /public
   var MAX_WAIT = 7000;                    // ms - never hide the site longer than this
 
   /* ---------------- play only once per visitor ---------------- */

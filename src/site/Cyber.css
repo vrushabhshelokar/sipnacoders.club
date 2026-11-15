@@ -1,7 +1,7 @@
 /* Design 21 "Cyber": cyberpunk Upcoming events page (card look 16 + popup + page header + event flow). Dark background, to match the site.
    Written for site/Cyber.jsx. The page-level rules start with ".up-cy" (added by pages/Upcoming.jsx while this design is on).
    ✏️ Colours and fonts: change the variables in the first block. */
-@import url('https://fonts.googleapis.com/css2?family=Anton&family=Chakra+Petch:wght@400;500;600;700&display=swap');
+
 
 .cy, .up-cy, .s-ann .pp-cyber {
   --cy-ash: #e5e7eb; --cy-ash-2: #d2d6de; --cy-ink: #090b11; --cy-navy: #0f1a30; --cy-paper: #080b12; --cy-red-lt: #f36476;
