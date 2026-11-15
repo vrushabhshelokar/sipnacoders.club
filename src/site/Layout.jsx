@@ -7,6 +7,7 @@ import Dock from './Dock';
 import { MatrixEgg, ScrollProgress } from './Extras';
 import AnnouncePopup from './AnnouncePopup';
 import { CountBubble, NewTag, upcomingLabel, useUpcomingCount } from './UpcomingFound';
+import VisitorTracker from './VisitorTracker';
 import './NavFix.css';
 import './UpcomingPage.css';
 import { LINKS, logo } from '../data/site';
@@ -17,7 +18,15 @@ const NAV = [
   { to: '/team', label: 'Team' },
   { to: '/connect', label: 'Connect' },
 ];
-const TITLES = { '/': 'Home', '/upcoming': 'Upcoming events', '/events': 'Events', '/team': 'Team', '/connect': 'Connect', '/register': 'Register' };
+const TITLES = {
+  '/': 'Home',
+  '/upcoming': 'Upcoming events',
+  '/events': 'Events',
+  '/team': 'Team',
+  '/connect': 'Connect',
+  '/register': 'Register',
+  '/admin/visitor-analytics': 'Admin Visitor Analytics',
+};
 const FOOTER_LINKS = [...NAV, { to: '/upcoming', label: 'Upcoming' }];
 
 // load the fonts once
@@ -114,6 +123,7 @@ export default function Layout({ children }) {
       <Dock />
       <MatrixEgg />
       <AnnouncePopup />
+      <VisitorTracker />
     </>
   );
 }

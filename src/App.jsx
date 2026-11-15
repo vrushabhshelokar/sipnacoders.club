@@ -7,6 +7,7 @@ import Team from './pages/Team';
 import Connect from './pages/Connect';
 import Register from './pages/Register';
 import NotFound from './pages/NotFound';
+import AdminAnalytics from './pages/AdminAnalytics';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/team" element={<Team />} />
           <Route path="/connect" element={<Connect />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/admin/visitor-analytics" element={<AdminAnalytics />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>
