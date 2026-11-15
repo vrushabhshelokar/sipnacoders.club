@@ -1,0 +1,440 @@
+/* =====================================================================================
+   Vibe-A-Thon (Upcoming) page: MOBILE-ONLY polish + premium finish.
+   Everything below sits inside one @media (max-width: 768px) block, so laptops and desktops
+   keep the exact original look. The ORIGINAL cyber look is kept on mobile too, just refined.
+   Loaded last from src/pages/Upcoming.jsx. To get the exact old page back, delete that one import line.
+   Nothing here edits the text/data files. Everything is hidden with CSS, never deleted.
+   ===================================================================================== */
+
+/* Arrow bar of the mobile card sliders (added by mobileSlider.js). Hidden everywhere except phones. */
+.ms-bar { display: none; }
+/* HackerRank Reward lines inside the Champion card (added by mobileSlider.js). Hidden everywhere except phones. */
+.pp-champ-perks { display: none; }
+
+@media (max-width: 768px) {
+  /* -------------------------------------------------------------------------------------
+     1. "The Two-Round Event Flow" stays hidden on mobile (EventFlow.css already does this at 768px;
+        this line just keeps it that way). On laptop it is shown exactly as before.
+        The code is untouched. Hide it on laptop too by moving this line outside the @media block.
+     ------------------------------------------------------------------------------------- */
+  .up-cy .s-flow { display: none !important; }
+
+  /* -------------------------------------------------------------------------------------
+     1b. FIRST SCREEN = HERO ONLY. On a phone the "Signal Detected / VIBE-A-THON" card takes over the
+        whole first screen. "Telemetry // Quick Specifications" and the sticky Why Join / Register
+        bar start below the fold and appear only when the visitor scrolls.
+        78px = distance from the top of the page to the card, 78px bottom padding keeps the card
+        centred between the top bar and the bottom dock. svh = real visible height on phones
+        (browser address bar included), vh is the fallback for older browsers.
+        Delete this block to get the old stacked first screen back.
+     ------------------------------------------------------------------------------------- */
+  .up-cy-named #upcoming > .s-container > .rv:first-child {
+    min-height: calc(100vh - 78px);
+    min-height: calc(100svh - 78px);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-bottom: 78px;
+  }
+
+  /* -------------------------------------------------------------------------------------
+     1c. BIGGER HERO ON PHONES (<= 640px). The old phone hero was squeezed small so that Quick Specs
+        could fit under it. Now the hero owns the screen, so everything inside it is larger and
+        has room to breathe: bigger title, countdown, detail boxes and buttons, with real gaps.
+        Same card, same colours, same layout, just bigger. The card stretches to the full free
+        height (between the top bar and the bottom dock) and spreads its rows evenly.
+        --u = 1px on an 844px-high phone, scales down/up with the screen height, so the card fits
+        small phones too. Text never goes below 10-11px.
+        Delete this block to get the old compact hero back (the full-screen centring in 1b stays).
+     ------------------------------------------------------------------------------------- */
+  @media (max-width: 640px) {
+    .up-cy-named #upcoming .rv:first-child { --u: 1px; }
+    @supports (height: 1svh) {
+      .up-cy-named #upcoming .rv:first-child { --u: clamp(.8px, calc(100svh / 844), 1.12px); }
+    }
+
+    /* the card fills the free height: top bar (78px) ... bottom dock (78px) */
+    .up-cy .cy { display: flex; flex-direction: column; min-height: calc(100vh - 156px); min-height: calc(100svh - 156px); }
+    .up-cy .cy-grid {
+      flex: 1 1 auto; align-content: space-between; align-items: center;
+      padding: calc(var(--u) * 20) 16px calc(var(--u) * 20);
+    }
+    .up-cy .cy-frame { inset: 6px; }
+
+    /* flag + title + tagline */
+    .up-cy .cy-flag { font-size: max(11.5px, calc(var(--u) * 13)); gap: 8px; letter-spacing: .14em; }
+    .up-cy .cy-stripes i { width: 5px; height: max(14px, calc(var(--u) * 17)); }
+    .up-cy .cy-title { margin: 0; font-size: clamp(36px, min(15vw, calc(var(--u) * 56)), 62px); line-height: .94; }
+    .up-cy .cy-lede { margin: 0; }
+    .up-cy .cy-lede span { font-size: max(13px, calc(var(--u) * 16)); padding: 7px 18px 5px 12px; }
+
+    /* countdown */
+    .up-cy .cy-countdown-wrap { margin: 0; }
+    .up-cy .cy-countdown-card { padding: calc(var(--u) * 16) 14px calc(var(--u) * 14); }
+    .up-cy .cy-cd-bracket { width: 8px; height: 8px; }
+    .up-cy .cy-cd-header { flex-wrap: wrap; gap: 6px 12px; padding-bottom: calc(var(--u) * 10); margin-bottom: calc(var(--u) * 12); }
+    .up-cy .cy-cd-heading, .up-cy .cy-cd-meta { font-size: 10.5px; white-space: nowrap; }
+    .up-cy .cy-cd-heading { letter-spacing: .1em; }
+    .up-cy .cy-cd-meta { letter-spacing: .04em; }
+    .up-cy .cy-cd-grid { gap: 8px; }
+    .up-cy .cy-cd-num-box { padding: calc(var(--u) * 11) 2px calc(var(--u) * 8); }
+    .up-cy .cy-cd-val { font-size: clamp(28px, min(9.4vw, calc(var(--u) * 38)), 42px); }
+    .up-cy .cy-cd-unit { font-size: max(9.5px, calc(var(--u) * 10.5)); margin-top: calc(var(--u) * 6); letter-spacing: .12em; }
+    .up-cy .cy-cd-sep { display: block; top: calc(var(--u) * 16); right: -6px; font-size: 16px; }
+
+    /* the five "Ready to decrypt" boxes: more padding, more gap, bigger text */
+    .up-cy .cy-fields { gap: 8px; margin-top: 0; }
+    .up-cy .cy-f { padding: calc(var(--u) * 11) 12px calc(var(--u) * 11) 15px; clip-path: polygon(0 0, calc(100% - 11px) 0, 100% 11px, 100% 100%, 0 100%); }
+    .up-cy .cy-f::before { width: 3px; }
+    .up-cy .cy-k { font-size: max(10px, calc(var(--u) * 11)); letter-spacing: .14em; }
+    .up-cy .cy-v { margin-top: calc(var(--u) * 7); font-size: max(12.5px, calc(var(--u) * 14)); line-height: 1.25; white-space: normal; overflow: visible; text-overflow: clip; }
+
+    /* hint + buttons */
+    .up-cy .cy .s-hint { margin: 0; padding: calc(var(--u) * 10) 12px; font-size: max(12px, calc(var(--u) * 13)); line-height: 1.4; }
+    .up-cy .cy .s-actions { margin: 0; gap: calc(var(--u) * 12); }
+    .up-cy .cy .s-actions .s-btn { height: max(44px, calc(var(--u) * 52)); font-size: max(13px, calc(var(--u) * 14.5)); letter-spacing: .08em; }
+    .up-cy .cy .s-actions .s-mys-dec { height: max(42px, calc(var(--u) * 48)); font-size: max(12.5px, calc(var(--u) * 13.5)); }
+
+    /* short phones (667px high or less, e.g. iPhone SE / 8): a bit tighter so the card still fits above the dock */
+    @media (max-height: 700px) {
+      .up-cy .cy-grid { padding: 12px 14px; }
+      .up-cy .cy-flag { font-size: 11.5px; }
+      .up-cy .cy-stripes i { height: 14px; }
+      .up-cy .cy-title { font-size: clamp(34px, min(14vw, 42px), 46px); }
+      .up-cy .cy-lede span { font-size: 12.5px; padding: 5px 14px 4px 10px; }
+      .up-cy .cy-countdown-card { padding: 10px 12px 9px; }
+      .up-cy .cy-cd-header { padding-bottom: 7px; margin-bottom: 8px; }
+      .up-cy .cy-cd-num-box { padding: 7px 2px 5px; }
+      .up-cy .cy-cd-val { font-size: clamp(24px, 8vw, 28px); }
+      .up-cy .cy-cd-unit { font-size: 9.5px; margin-top: 4px; }
+      .up-cy .cy-cd-sep { top: 9px; }
+      .up-cy .cy-fields { gap: 6px; }
+      .up-cy .cy-f { padding: 7px 10px 7px 13px; }
+      .up-cy .cy-k { font-size: 9.5px; }
+      .up-cy .cy-v { margin-top: 4px; font-size: 12px; }
+      .up-cy .cy .s-hint { padding: 7px 10px; font-size: 11.5px; }
+      .up-cy .cy .s-actions { gap: 8px; }
+      .up-cy .cy .s-actions .s-btn { height: 42px; font-size: 13px; }
+      .up-cy .cy .s-actions .s-mys-dec { height: 38px; font-size: 12px; }
+    }
+  }
+
+  /* -------------------------------------------------------------------------------------
+     1d. CARD SLIDERS ("Why Participate?" and "Have Any Questions?"). On a phone the cards sit side by
+        side: one card at a time, Previous / Next arrow buttons below (swiping works too).
+        mobileSlider.js adds the arrow bar and marks the card grid with data-ms-track. Without that
+        file the cards simply stay stacked as before. Laptop is not touched.
+        Delete this block (and the import of mobileSlider.js) to get the stacked cards back.
+     ------------------------------------------------------------------------------------- */
+  .up-cy [data-ms-track] {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap;
+    gap: 12px !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 2px 0 6px;
+    outline: none;
+  }
+  .up-cy [data-ms-track]::-webkit-scrollbar { display: none; }
+  .up-cy [data-ms-track]::before, .up-cy [data-ms-track]::after { display: none !important; }
+  .up-cy [data-ms-track] > * {
+    flex: 0 0 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+    /* off-screen cards must already be visible when they slide in (no fade-in wait) */
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  /* all 6 advantages are in the slider, so the "View All 6" toggle is not needed */
+  .up-cy .cy-why-card-extra { display: block !important; animation: none !important; }
+  .up-cy [data-ms-track] ~ .cy-why-more-wrap { display: none !important; }
+
+  /* Why Participate: one big readable card */
+  .up-cy .cy-why-grid[data-ms-track] .cy-why-card { padding: 22px 20px 24px; }
+  .up-cy .cy-why-grid[data-ms-track] .cy-why-icon-wrap { width: 48px; height: 48px; margin-bottom: 16px; }
+  .up-cy .cy-why-grid[data-ms-track] .cy-why-title { margin-top: 0; font-size: 19px; }
+  .up-cy .cy-why-grid[data-ms-track] .cy-why-desc { margin-top: 10px; font-size: 14.5px; line-height: 1.6; }
+
+  /* Have Any Questions?: number badge on top, card below, same height for every stage */
+  .up-cy .ej-pipeline[data-ms-track] > * { display: flex; flex-direction: column; }
+  .up-cy .ej-pipeline[data-ms-track] .ej-stage { flex: 1 1 auto; display: flex; flex-direction: column; padding: 0; }
+  .up-cy .ej-pipeline[data-ms-track] .ej-stage::after { display: none !important; }
+  .up-cy .ej-pipeline[data-ms-track] .ej-node { margin: 0 0 12px; align-self: flex-start; }
+  .up-cy .ej-pipeline[data-ms-track] .ej-card { flex: 1 1 auto; margin: 0; padding: 22px 20px 24px; }
+  .up-cy .ej-pipeline[data-ms-track] .ej-title { margin-top: 10px; font-size: 19px; }
+  .up-cy .ej-pipeline[data-ms-track] .ej-summary { margin: 6px 0 0; font-size: 14.5px; line-height: 1.55; }
+
+  /* the arrow bar: [<]   01 / 06  ▬ • • •   [>]   (takes the colour of the card on screen) */
+  .up-cy .ms-bar {
+    --ms-c: #7cf2d4;
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    margin-top: 14px;
+  }
+  .up-cy .ms-btn {
+    flex: none; width: 48px; height: 48px; padding: 0;
+    display: grid; place-items: center;
+    color: var(--ms-c); background: rgba(14, 24, 38, .78);
+    border: 1px solid color-mix(in srgb, var(--ms-c) 55%, transparent); border-radius: 0;
+    clip-path: polygon(0 0, calc(100% - 11px) 0, 100% 11px, 100% 100%, 11px 100%, 0 calc(100% - 11px));
+    cursor: pointer; -webkit-tap-highlight-color: transparent;
+    transition: background .15s ease, opacity .15s ease;
+  }
+  .up-cy .ms-btn:active:not(:disabled) { background: color-mix(in srgb, var(--ms-c) 22%, transparent); }
+  .up-cy .ms-btn:disabled { opacity: .28; cursor: default; }
+  .up-cy .ms-btn:focus-visible { outline: 2px solid var(--ms-c); outline-offset: 2px; }
+  .up-cy .ms-mid { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 9px; }
+  .up-cy .ms-count { font: 600 12.5px/1 var(--cy-hud, 'Chakra Petch', monospace); letter-spacing: .18em; color: rgba(229, 231, 235, .8); font-variant-numeric: tabular-nums; }
+  .up-cy .ms-dots { display: flex; gap: 6px; align-items: center; }
+  .up-cy .ms-dots i { display: block; width: 7px; height: 5px; background: rgba(255, 255, 255, .2); transform: skewX(-24deg); transition: width .2s ease, background .2s ease; }
+  .up-cy .ms-dots i.is-on { width: 22px; background: var(--ms-c); }
+
+  /* -------------------------------------------------------------------------------------
+     1e. STACKED DECK (Prizes & Fees). Instead of sliding sideways, the cards lie on top of each other
+        like a fanned deck: the front card is shown in full, the card behind it peeks out at the side,
+        tilted and dimmed. The arrows, the dots and a swipe bring the next card to the front.
+        mobileSlider.js marks the grid with data-ms-stack and gives every card data-pos:
+        0 = front, 1 / 2 = behind on the right, -1 / -2 = behind on the left.
+        To get plain sideways sliding for a deck, delete  stack: true  from its line in mobileSlider.js.
+        Delete this block to drop the deck look everywhere.
+     ------------------------------------------------------------------------------------- */
+  /* the tilted cards may reach the screen edge, never beyond it: the page (main.s-main) already clips sideways */
+  .up-cy [data-ms-track][data-ms-stack] {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0 !important;
+    overflow: visible;
+    scroll-snap-type: none;
+    touch-action: pan-y;
+    padding: 6px 0 30px;   /* room under the front card for the tilted cards behind it */
+    -webkit-user-select: none; user-select: none;
+  }
+  .up-cy [data-ms-track][data-ms-stack] > * {
+    grid-area: 1 / 1;
+    width: calc(100% - var(--ms-inset, 22px));   /* a little narrower than the section, so the cards behind stick out at both sides */
+    justify-self: center;
+    flex: none;
+    scroll-snap-align: none;
+    transform-origin: 50% 100%;
+    transition: transform .55s cubic-bezier(.2, .8, .2, 1), filter .55s ease !important;
+    will-change: transform;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* the Participant Tiers deck already sits inside a padded card: it needs less inset, and its cards are lighter, so they dim less */
+  .up-cy .pp-tiers-container[data-ms-stack] { --ms-inset: 10px; --ms-dim: .9; }
+  /* the card headings of the prize deck are a bit narrower now: keep each on one line */
+  .up-cy [data-ms-stack] .pp-card-ribbon { padding: 11px 14px; gap: 8px; letter-spacing: .07em; font-size: 10.5px; }
+  .up-cy [data-ms-stack] .pp-ribbon-tag, .up-cy [data-ms-stack] .pp-ribbon-stat { white-space: nowrap; }
+  @media (max-width: 380px) {
+    .up-cy [data-ms-stack] .pp-card-ribbon { padding: 11px 12px; letter-spacing: .05em; font-size: 10px; }
+  }
+  /* no see-through: whatever is behind must not show through the front card */
+  .up-cy [data-ms-stack] .pp-card { background-color: #060a12; }
+  .up-cy .pp-tiers-container[data-ms-stack] > .pp-tier-block { background-color: #0a1018; }
+
+  /* front card (follows the finger while dragging: --dx / --dr are set by the script) */
+  .up-cy [data-ms-track][data-ms-stack] > [data-pos="0"] {
+    z-index: 5;
+    transform: translateX(var(--dx, 0px)) rotate(calc(var(--dr, 0) * 1deg)) !important;
+    filter: drop-shadow(0 16px 20px rgba(0, 0, 0, .55));
+  }
+  .up-cy [data-ms-stack].is-drag > [data-pos="0"] { transition: filter .55s ease !important; }
+  /* the cards behind: tilted, smaller, dimmer, not clickable themselves */
+  .up-cy [data-ms-track][data-ms-stack] > [data-pos="1"],
+  .up-cy [data-ms-track][data-ms-stack] > [data-pos="-1"],
+  .up-cy [data-ms-track][data-ms-stack] > [data-pos="2"],
+  .up-cy [data-ms-track][data-ms-stack] > [data-pos="-2"] { pointer-events: none; }
+  .up-cy [data-ms-track][data-ms-stack] > [data-pos="1"] {
+    z-index: 4; filter: brightness(var(--ms-dim, .62)) saturate(.9);
+    transform: translate(22px, 12px) rotate(5deg) scale(.96) !important;
+  }
+  .up-cy [data-ms-track][data-ms-stack] > [data-pos="-1"] {
+    z-index: 4; filter: brightness(var(--ms-dim, .62)) saturate(.9);
+    transform: translate(-22px, 12px) rotate(-5deg) scale(.96) !important;
+  }
+  .up-cy [data-ms-track][data-ms-stack] > [data-pos="2"] {
+    z-index: 3; filter: brightness(calc(var(--ms-dim, .62) * .68)) saturate(.85);
+    transform: translate(34px, 22px) rotate(9deg) scale(.92) !important;
+  }
+  .up-cy [data-ms-track][data-ms-stack] > [data-pos="-2"] {
+    z-index: 3; filter: brightness(calc(var(--ms-dim, .62) * .68)) saturate(.85);
+    transform: translate(-34px, 22px) rotate(-9deg) scale(.92) !important;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .up-cy [data-ms-track][data-ms-stack] > * { transition: none !important; }
+  }
+
+  /* -------------------------------------------------------------------------------------
+     2. Repeats hidden (every fact is still on the page somewhere else: Milestone Schedule,
+        Rule Book, Prizes & Fees, Quick Specs). Delete a rule to bring its text back.
+     ------------------------------------------------------------------------------------- */
+  /* Participant Roadmap: the 3 bullets per stage repeat the Milestone Schedule + Rule Book */
+  .up-cy .ej-points { display: none; }
+
+  /* -------------------------------------------------------------------------------------
+     2b. PRIZES & FEES on a phone. Two sliders (arrow buttons, one card at a time, see 1d):
+          A. Prize Distribution // Finale card, with the Registration Matrix // Two-Phase card behind it.
+             The Champion card also lists the HackerRank Reward of the winners, as small dots (copied by
+             mobileSlider.js from the Winners & Runners-Up tier, so nothing is lost).
+          B. Participant Tiers // Recognition: Round 1 Participants card, with the Other Round 2
+             Participants card behind it. Below the slider: the Certificate Distribution Summary
+             (rows: podium, Round 1, Round 2).
+        The Winners & Runners-Up tier card is cut on phones: its cash amounts are in the prize cards,
+        its HackerRank rewards are in the Champion card, and the summary still has its row.
+        Laptop: unchanged. Delete this block to get the old phone look back.
+     ------------------------------------------------------------------------------------- */
+  .up-cy .pp-tier-block.is-winner { display: none; }
+  .up-cy .pp-tiers-container { display: flex; flex-direction: column; gap: 10px; }
+  .up-cy .pp-tier-03 { order: 1; }
+  .up-cy .pp-tier-02 { order: 2; }
+  /* the "TIER 03 / TIER 02" chips would read backwards in the new order, so they are hidden */
+  .up-cy .pp-tb-id { display: none; }
+  /* Certificate Distribution Summary rows: 1st/2nd/3rd place, then Round 1, then Other Round 2
+     (the data lists Round 2 before Round 1, so the last two rows are swapped here) */
+  .up-cy .pp-cs-grid > .pp-cs-row:nth-child(1) { order: 1; }
+  .up-cy .pp-cs-grid > .pp-cs-row:nth-child(3) { order: 2; }
+  .up-cy .pp-cs-grid > .pp-cs-row:nth-child(2) { order: 3; }
+
+  /* Registration Matrix card sits in the slider next to the taller prize card: keep its content together in the
+     middle of the card instead of leaving a hole between the fee boxes and the total note */
+  .up-cy .pp-top-row[data-ms-track] .pp-fees-inner { justify-content: center; }
+  .up-cy .pp-top-row[data-ms-track] .pp-phases { margin-bottom: 0; }
+  .up-cy .pp-top-row[data-ms-track] .pp-total-note { margin-top: 14px; }
+
+  /* tier cards inside the slider: one card at a time, so a little more room and bigger text */
+  .up-cy .pp-tiers-container[data-ms-track] .pp-tier-block { padding: 16px; }
+  .up-cy .pp-tiers-container[data-ms-track] .pp-tb-rewards li { font-size: 13px; line-height: 1.4; }
+
+  /* 2nd / 3rd prize cards are half a phone wide: the rank chip ("2ND RUNNER-UP") and the little icon do not both fit,
+     the icon was cut off at the card edge. The chip already says the rank, so the icon is dropped on narrow phones. */
+  @media (max-width: 480px) {
+    .up-cy .pp-prize-runner .pp-prize-icon { display: none; }
+  }
+
+  /* HackerRank Reward: the winners' rewards as small dotted lines in the free space of the Champion (1st prize) card.
+     (copied by mobileSlider.js from the Winners & Runners-Up tier, which is cut on phones) */
+  .up-cy .pp-champ-perks {
+    display: block; margin: -2px 16px 14px; padding-top: 11px;
+    border-top: 1px solid rgba(var(--pza-rgb), .22);
+  }
+  .up-cy .pp-champ-perks-head {
+    display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 10px;
+    margin-bottom: 8px;
+    font: 700 10.5px/1.25 var(--cy-hud, 'Chakra Petch', monospace); letter-spacing: .12em; text-transform: uppercase;
+  }
+  .up-cy .pp-champ-perks-head b { font-weight: 700; color: var(--pza); }
+  .up-cy .pp-champ-perks-head span { font-weight: 600; color: rgba(255, 255, 255, .45); letter-spacing: .1em; }
+  .up-cy .pp-champ-perks ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; }
+  .up-cy .pp-champ-perks li { position: relative; padding-left: 15px; font-size: 13px; line-height: 1.4; color: #d3dbe7; }
+  .up-cy .pp-champ-perks li::before {
+    content: ''; position: absolute; left: 2px; top: .56em; width: 5px; height: 5px; border-radius: 50%;
+    background: var(--pza); box-shadow: 0 0 6px rgba(var(--pza-rgb), .7);
+  }
+
+  /* -------------------------------------------------------------------------------------
+     3. Phone polish (same design, just easier to read and no awkward wrapping)
+     ------------------------------------------------------------------------------------- */
+  @media (max-width: 640px) {
+    /* small labels were 8-10px: lift them to a readable size */
+    .up-cy .snap-label { font-size: 10px; letter-spacing: .12em; }
+    .up-cy .snap-sub { font-size: 11px; }
+    .up-cy .snap-meta { font-size: 10px; }
+    .up-cy .st-btn-fee { font-size: 10.5px; }
+    .up-cy .ej-tag { font-size: 11.5px; }
+    .up-cy :is(.rb-acc-idx, .rb-acc-num) { font-size: 12px; }
+    .up-cy :is(.pp-pool-label, .pp-event-label, .pp-dist-header, .pp-inclusions-title, .pp-cs-scope, .pp-tb-tag, .pp-tb-id, .pp-cost-unit, .es-phase, .es-date-badge) { font-size: 11px; }
+    .up-cy :is(.pp-prize-badge, .pp-phase-badge, .pp-cert-pill, .pp-cs-label, .pp-cs-badge) { font-size: 10.5px; }
+
+    /* "RUNNER-UP" / "2ND RUNNER-UP" tags broke onto two lines */
+    .up-cy :is(.pp-prize-badge, .pp-phase-badge, .pp-cert-pill, .pp-cs-badge) { white-space: nowrap; letter-spacing: .08em; }
+
+    /* "PARTICIPANT TIERS // RECOGNITION" header and its side text wrapped badly */
+    .up-cy .pp-bottom-row-card .pp-card-ribbon { flex-direction: column; align-items: flex-start; gap: 6px; line-height: 1.3; }
+    .up-cy .pp-ribbon-stat { color: rgba(255, 255, 255, .6); }
+
+    /* roadmap cards are shorter now that the repeated bullets are hidden */
+    .up-cy .ej-card { padding-bottom: 20px; }
+  }
+
+  /* -------------------------------------------------------------------------------------
+     4. OPTIONAL: if the president wants it calmer, remove the comment marks around a line.
+        (All off by default, so the page looks like the old one.)
+     ------------------------------------------------------------------------------------- */
+  /* red slash through the section titles
+  .up-cy :is(.cy-why-h, .ej-h, .rb-h, .pp-h, .es-h)::after,
+  .up-cy :is(.cy-why-h, .ej-h, .rb-h, .pp-h, .es-h)::before { content: none; display: none; }
+  */
+  /* big faded background numbers / letters inside the cards
+  .up-cy :is(.cy-why-ghost, .ej-ghost, .pp-hero-ghost, .pp-prize-ghost, .rb-holo-ghost) { display: none; }
+  */
+  /* the [SYS.01] style codes on the "Why participate" cards
+  .up-cy :is(.cy-why-idx, .cy-why-tag) { display: none; }
+  */
+
+  /* =====================================================================================
+     5. PREMIUM FINISH (same colours and shapes, just a finer, calmer finish)
+        Cleaner cards (hairline border, small cut corner, no tinted glow), no neon glow on
+        numbers, no red slash through titles, no [SYS.01] codes, more air between sections.
+        To go back to the plain old look: delete everything from here to the end of the file.
+     ===================================================================================== */
+  .up-cy { --pa-line: rgba(255,255,255,.08); --pa-card: linear-gradient(180deg, rgba(17,24,35,.96), rgba(9,13,20,.98)); }
+  .up-cy :is(.cy-why-h, .ej-h, .rb-h, .pp-h, .es-h)::after,
+  .up-cy :is(.cy-why-h, .ej-h, .rb-h, .pp-h, .es-h)::before { content: none; display: none; }
+  .up-cy :is(.cy-why-sub, .ej-sub, .rb-sub, .pp-sub, .es-sub) { border-left: 0; padding-left: 0; color: #a9b4c2; line-height: 1.65; }
+  .up-cy :is(.cy-why-eyebrow, .ej-eyebrow, .rb-eyebrow, .pp-eyebrow, .es-eyebrow) { letter-spacing: .2em; font-size: 11px; opacity: .9; }
+
+  /* cards: calmer material, smaller cut corner, hairline border + top highlight */
+  .up-cy :is(.cy-why-card, .ej-card, .es-card, .pp-prize-card, .pp-phase-box, .snap-card) {
+    background: var(--pa-card);
+    border: 1px solid var(--pa-line);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  }
+  .up-cy .ej-card { border-top: 2px solid rgba(var(--sa-rgb), .75); }
+  .up-cy .pp-tier-block { background: linear-gradient(180deg, rgba(17,24,35,.9), rgba(9,13,20,.95)); border-color: var(--pa-line); border-left-width: 2px; }
+  .up-cy :is(.cy-why-ghost, .ej-ghost, .pp-hero-ghost, .pp-prize-ghost, .rb-holo-ghost) { opacity: .035; }
+  .up-cy .cy-why-card { padding: 22px 20px 24px; }
+  .up-cy .ej-card { padding: 20px 18px 22px; }
+  .up-cy .cy-why-title, .up-cy .ej-title { letter-spacing: -.005em; }
+  .up-cy :is(.cy-why-desc, .ej-summary, .es-desc, .pp-phase-desc) { color: #a9b4c2; line-height: 1.65; }
+
+  /* numbers: clean, no neon glow */
+  .up-cy .pp-pool-val { text-shadow: none; background: linear-gradient(180deg, #c9fff1 0%, #7cf2d4 60%, #4fd1b3 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .up-cy :is(.pp-prize-amt, .pp-cost-val) { text-shadow: none; }
+  .up-cy .pp-card { box-shadow: none; border-color: var(--pa-line); }
+  .up-cy .pp-card-ribbon { background: rgba(255,255,255,.025); border-bottom-color: var(--pa-line); }
+  .up-cy .rb-acc-item { background: var(--pa-card); border-color: var(--pa-line); }
+  .up-cy .es-card { padding: 18px 20px 20px; }
+
+  /* ---- premium finish, round 2 ---- */
+  /* more air between sections (phone) */
+  @media (max-width: 640px) {
+    .up-cy :is(.cy-why, .ej-section, .rb-section, .pp-section, .es-section) { margin-top: 64px; }
+    .up-cy :is(.cy-why-head, .ej-head, .rb-head, .pp-head, .es-head) { margin-bottom: 26px; }
+  }
+  /* decorative sci-fi codes off: [SYS.01], AI_WORKFLOWS, PRODUCTION ... */
+  .up-cy :is(.cy-why-idx, .cy-why-tag, .cy-why-tele) { display: none; }
+  .up-cy .cy-why-top, .up-cy .cy-why-meta { margin-bottom: 0; }
+  /* labels: quieter, lighter tracking, outline only */
+  .up-cy :is(.ej-tag, .pp-tb-tag, .pp-cert-pill, .es-phase, .es-date-badge, .pp-prize-badge, .pp-phase-badge) { letter-spacing: .1em; background: transparent; }
+  .up-cy .ej-tag { border-color: rgba(var(--sa-rgb), .45); color: rgb(var(--sa-rgb)); }
+  /* the 1st prize gets the stage */
+  .up-cy .pp-prize-first .pp-prize-amt { background: linear-gradient(180deg, #d9fff5, #7cf2d4 65%, #4fd1b3); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  /* ribbons / headers: flat hairline, no tint */
+  .up-cy .pp-card-ribbon { background: transparent; border-bottom: 1px solid var(--pa-line); }
+  /* tabular numerals for money and dates */
+  .up-cy :is(.pp-pool-val, .pp-prize-amt, .pp-cost-val, .snap-val, .es-date-badge, .cy-cd-val) { font-variant-numeric: tabular-nums; }
+  /* soft focus ring + smoother press */
+  .up-cy :is(.ej-card, .cy-why-card, .es-card):hover { transform: none; }
+  /* runner-up cards: amount, tag and top line all use the same colour (2nd = amber, 3rd = red) */
+  .up-cy .pp-prize-card { border-top: 2px solid rgba(var(--pza-rgb), .75); }
+  .up-cy .pp-runner-grid .pp-prize-amt { color: var(--pza); background: none; -webkit-text-fill-color: currentColor; }
+}
