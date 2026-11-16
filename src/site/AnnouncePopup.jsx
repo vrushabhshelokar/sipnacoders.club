@@ -20,6 +20,7 @@ import { NEW_POPUPS, POPUP_NAMES } from './designs';
 import {
   CODE_CLASH_POPUP, VIBEATHON_POPUP, CODE_CLASH_SECTION, CODE_CLASH_ID, CODE_CLASH_SEEN_KEY, CODE_CLASH_SKIP_ON,
 } from './eventSwitches';
+import { useSwitch } from './liveSettings';
 import './AnnouncePopup.css';
 
 const STYLES = POPUP_NAMES;
@@ -59,15 +60,19 @@ export default function AnnouncePopup() {
   const from = useRef(null);
 
   const design = getDesign();
+  // the dashboard (Site controls) can change these without a deploy; the values in eventSwitches.js are the defaults
+  const clashPopupOn = useSwitch('codeClashPopup', CODE_CLASH_POPUP);
+  const clashSectionOn = useSwitch('codeClashSection', CODE_CLASH_SECTION);
+  const vibePopupOn = useSwitch('vibePopup', VIBEATHON_POPUP);
   const vibePreview = previewName() || (design.preview ? design.popup : null);   // ?popup=glitch or ?design=4 in the address
   // Code Clash popup: on while its switch and the block's switch are on (eventSwitches.js). It wins over the Vibe-A-Thon one.
   const clashPreview = !vibePreview && clashPreviewOn();
-  const clash = clashPreview || (!vibePreview && CODE_CLASH_POPUP && CODE_CLASH_SECTION);
+  const clash = clashPreview || (!vibePreview && clashPopupOn && clashSectionOn);
   const preview = clashPreview ? 'clash' : vibePreview;
   const seenKey = clash ? CODE_CLASH_SEEN_KEY : POPUP_SEEN_KEY;
   const skip = !preview && (clash ? CODE_CLASH_SKIP_ON : POPUP_SKIP_ON).includes(pathname);
   // Vibe-A-Thon: is there an upcoming event that is not over yet?
-  const active = clash || !!preview || (VIBEATHON_POPUP && SHOW_UPCOMING && SHOW_POPUP && (isTeaserLive() || upcoming.length > 0));
+  const active = clash || !!preview || (vibePopupOn && SHOW_UPCOMING && SHOW_POPUP && (isTeaserLive() || upcoming.length > 0));
   const name = clash ? 'clash' : (preview || pick(design.popup) || 'radar');
 
   // open it once the opening animation is over (the design is loaded first, so nothing flashes)

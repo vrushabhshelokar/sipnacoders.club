@@ -3,6 +3,7 @@
 import { Icon } from './Icons';
 import { Reveal } from './ui';
 import { CODE_CLASH_FORM, CODE_CLASH_ID, CODE_CLASH_SECTION } from './eventSwitches';
+import { useSwitch } from './liveSettings';
 import clashPoster from '../assets/posters/code_clash.webp';
 import './CodeClash.css';
 
@@ -14,7 +15,9 @@ const DETAILS = [
 ];
 
 export default function CodeClash() {
-  if (!CODE_CLASH_SECTION) return null;
+  const sectionOn = useSwitch('codeClashSection', CODE_CLASH_SECTION);   // dashboard -> Site controls
+  const regOpen = useSwitch('codeClashRegistration', true);
+  if (!sectionOn) return null;
   return (
     <section id={CODE_CLASH_ID} className="s-section cc-section">
       <div className="s-container">
@@ -38,9 +41,15 @@ export default function CodeClash() {
               })}
             </ul>
             <div className="s-actions cc-actions">
-              <a className="s-btn s-btn-lg cc-glow" href={CODE_CLASH_FORM} target="_blank" rel="noopener noreferrer">
-                <span>Register now</span> <Icon.ArrowUpRight size={18} />
-              </a>
+              {regOpen ? (
+                <a className="s-btn s-btn-lg cc-glow" href={CODE_CLASH_FORM} target="_blank" rel="noopener noreferrer">
+                  <span>Register now</span> <Icon.ArrowUpRight size={18} />
+                </a>
+              ) : (
+                <span className="s-btn s-btn-lg" aria-disabled="true" style={{ opacity: 0.55, cursor: 'not-allowed' }}>
+                  <span>Registration closed</span>
+                </span>
+              )}
               <span className="cc-note">Registration fee ₹49 · Solo entry</span>
             </div>
           </div>

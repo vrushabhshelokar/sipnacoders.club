@@ -8,6 +8,7 @@ import { useUpcoming } from './events';
 import { isTeaserLive } from './HackathonTeaser';
 import { EVENT_NAME, HAS_DETAILS } from './teaserCore';
 import { CODE_CLASH_SECTION, CODE_CLASH_ID } from './eventSwitches';
+import { useSwitch } from './liveSettings';
 import './UpcomingFound.css';
 
 const reduced = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -71,6 +72,7 @@ function ClashButton() {
    Otherwise: "scanning…" first, then "1 upcoming event found" */
 export function FoundMessage({ n }) {
   const live = useIntroDone();
+  const clashOn = useSwitch('codeClashSection', CODE_CLASH_SECTION);   // dashboard -> Site controls
   const [found, setFound] = useState(() => reduced());
 
   useEffect(() => {
@@ -79,7 +81,7 @@ export function FoundMessage({ n }) {
     return () => clearTimeout(id);
   }, [live, found]);
 
-  if (CODE_CLASH_SECTION) return <ClashButton />;
+  if (clashOn) return <ClashButton />;
   if (!n) return null;
   const text = `${n} upcoming event${n === 1 ? '' : 's'} found${hasFresh() ? ' · new details unlocked' : ''}`;
 

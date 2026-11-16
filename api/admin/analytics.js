@@ -1,26 +1,14 @@
-import { Redis } from '@upstash/redis';
 import crypto from 'node:crypto';
+import {
+  KEYS, applyPatch, getRedisClient, istDay, parseCookies, parseStoredSettings, readBody, sendResponse,
+} from '../../api-lib/shared.js';
 
-const KEY_TOTAL_VISITORS = 'scc:visitors:total';
-const KEY_UNIQUE_SET = 'scc:visitors:unique_set';
 const SESSION_COOKIE_NAME = 'scc_admin_session';
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24; // 24 hours
+const RANGE_DAYS = 30;                         // how many days the dashboard can show
 
 function getAdminSecret() {
   return process.env.ADMIN_PASSWORD || process.env.ADMIN_SECRET || process.env.ADMIN_API_KEY || null;
-}
-
-function parseCookies(cookieHeader) {
-  const cookies = {};
-  if (!cookieHeader) return cookies;
-  const parts = cookieHeader.split(';');
-  for (const part of parts) {
-    const [name, ...val] = part.split('=');
-    if (name) {
-      cookies[name.trim()] = val.join('=').trim();
-    }
-  }
-  return cookies;
 }
 
 function safeCompare(a, b) {
@@ -76,50 +64,23 @@ function isAuthenticated(req, secret) {
   return false;
 }
 
-function sendResponse(res, statusCode, data, headers = {}) {
-  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
-
-  for (const [key, value] of Object.entries(headers)) {
-    res.setHeader(key, value);
+// One day's hash ({ visits, 'pv:/team': 3, 'dev:mobile': 9, ... }) -> a tidy object for the dashboard
+function shapeDay(date, hash, unique) {
+  const day = { date, visits: 0, unique: Number(unique) || 0, pages: {}, devices: {}, sources: {}, clicks: {} };
+  const parts = { 'pv:': 'pages', 'dev:': 'devices', 'src:': 'sources', 'clk:': 'clicks' };
+  for (const [field, value] of Object.entries(hash || {})) {
+    const n = Number(value) || 0;
+    if (field === 'visits') { day.visits = n; continue; }
+    for (const [prefix, bucket] of Object.entries(parts)) {
+      if (field.startsWith(prefix)) { day[bucket][field.slice(prefix.length)] = n; break; }
+    }
   }
-
-  if (typeof res.status === 'function' && typeof res.json === 'function') {
-    return res.status(statusCode).json(data);
+  // keep each list short, so one noisy day can never make the response huge
+  for (const bucket of ['pages', 'sources']) {
+    const top = Object.entries(day[bucket]).sort((a, b) => b[1] - a[1]).slice(0, 40);
+    day[bucket] = Object.fromEntries(top);
   }
-
-  res.statusCode = statusCode;
-  res.setHeader('Content-Type', 'application/json');
-  return res.end(JSON.stringify(data));
-}
-
-function getRedisClient() {
-  const url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
-
-  if (!url || !token) return null;
-
-  try {
-    return new Redis({ url, token });
-  } catch (err) {
-    console.error('Failed to initialize Redis client:', err.message);
-    return null;
-  }
-}
-
-async function getRequestBody(req) {
-  if (req.body && typeof req.body === 'object') return req.body;
-  if (typeof req.body === 'string') {
-    try { return JSON.parse(req.body); } catch { return {}; }
-  }
-  return new Promise((resolve) => {
-    let data = '';
-    req.on('data', chunk => { data += chunk; });
-    req.on('end', () => {
-      try { resolve(data ? JSON.parse(data) : {}); } catch { resolve({}); }
-    });
-  });
+  return day;
 }
 
 export default async function handler(req, res) {
@@ -138,9 +99,9 @@ export default async function handler(req, res) {
     });
   }
 
-  // Handle Authentication actions (login / logout / check)
+  // Handle Authentication actions (login / logout / check) and saving the site switches
   if (req.method === 'POST') {
-    const body = await getRequestBody(req);
+    const body = await readBody(req);
     const action = body.action || 'login';
 
     if (action === 'logout') {
@@ -153,6 +114,29 @@ export default async function handler(req, res) {
     if (action === 'check') {
       const auth = isAuthenticated(req, secret);
       return sendResponse(res, auth ? 200 : 401, { authenticated: auth });
+    }
+
+    // Save the site switches (registration open/close, popups, countdown dates)
+    if (action === 'save-settings') {
+      if (!isAuthenticated(req, secret)) {
+        return sendResponse(res, 401, { authenticated: false, error: 'Unauthorized: please log in again.' });
+      }
+      const redis = getRedisClient();
+      if (!redis) {
+        return sendResponse(res, 503, { ok: false, error: 'Redis is not configured, so switches cannot be saved.' });
+      }
+      try {
+        const current = parseStoredSettings(await redis.get(KEYS.settings));
+        const { next, rejected } = applyPatch(current, body.settings);
+        if (rejected.length) {
+          return sendResponse(res, 400, { ok: false, error: `Invalid value for: ${rejected.join(', ')}` });
+        }
+        await redis.set(KEYS.settings, JSON.stringify(next));
+        return sendResponse(res, 200, { ok: true, settings: next });
+      } catch (err) {
+        console.error('Save settings error:', err.message);
+        return sendResponse(res, 500, { ok: false, error: 'Could not save the switches.' });
+      }
     }
 
     // Default POST action: Login
@@ -191,17 +175,39 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Read-only operations: get total and scard of unique set
-    // Notice: INCR is never called here. Admin refreshes do NOT inflate counts.
-    const pipeline = redis.pipeline();
-    pipeline.get(KEY_TOTAL_VISITORS);
-    pipeline.scard(KEY_UNIQUE_SET);
+    // Read-only operations. Notice: nothing is counted here. Admin refreshes do NOT inflate counts.
+    const dates = Array.from({ length: RANGE_DAYS }, (_, i) => istDay(RANGE_DAYS - 1 - i));   // oldest first, today last
+    const uniqueKeys = dates.map(KEYS.dayUnique);
 
-    const [totalRaw, uniqueCount] = await pipeline.exec();
+    const pipeline = redis.pipeline();
+    pipeline.get(KEYS.total);
+    pipeline.scard(KEYS.unique);
+    pipeline.get(KEYS.settings);
+    dates.forEach((d) => pipeline.hgetall(KEYS.day(d)));
+    uniqueKeys.forEach((k) => pipeline.pfcount(k));
+    pipeline.pfcount(...uniqueKeys.slice(-7));    // distinct browsers over 7 days
+    pipeline.pfcount(...uniqueKeys);              // distinct browsers over 30 days
+    const out = await pipeline.exec();
+
+    const [totalRaw, uniqueCount, settingsRaw] = out;
+    const hashes = out.slice(3, 3 + RANGE_DAYS);
+    const dayUniques = out.slice(3 + RANGE_DAYS, 3 + 2 * RANGE_DAYS);
+    const week7 = out[3 + 2 * RANGE_DAYS];
+    const month30 = out[3 + 2 * RANGE_DAYS + 1];
+
+    const days = dates.map((d, i) => shapeDay(d, hashes[i], dayUniques[i]));
+    const sumVisits = (list) => list.reduce((s, d) => s + d.visits, 0);
+    const today = days[days.length - 1];
 
     return sendResponse(res, 200, {
+      configured: true,
       total: Number(totalRaw) || 0,
       unique: Number(uniqueCount) || 0,
+      today: { visits: today.visits, unique: today.unique },
+      week: { visits: sumVisits(days.slice(-7)), unique: Number(week7) || 0 },
+      month: { visits: sumVisits(days), unique: Number(month30) || 0 },
+      days,
+      settings: parseStoredSettings(settingsRaw),
       updatedAt: new Date().toISOString(),
     });
   } catch (err) {

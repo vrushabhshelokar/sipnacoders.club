@@ -27,6 +27,15 @@ export default defineConfig(({ mode }) => {
                 console.error('Local dev API error:', err);
                 next();
               }
+            } else if (url === '/api/settings' || url.startsWith('/api/settings?')) {
+              try {
+                const { default: handler } = await import('./api/settings.js');
+                req.query = {};
+                return handler(req, res);
+              } catch (err) {
+                console.error('Local dev Settings API error:', err);
+                next();
+              }
             } else if (url === '/api/admin/analytics' || url.startsWith('/api/admin/analytics?')) {
               try {
                 const { default: handler } = await import('./api/admin/analytics.js');

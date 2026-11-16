@@ -1,5 +1,261 @@
-import { useEffect, useState } from 'react';
-import { Icon } from '../site/Icons';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import './AdminAnalytics.css';
+import { CODE_CLASH_POPUP, VIBEATHON_POPUP, CODE_CLASH_SECTION } from '../site/eventSwitches';
+import * as C from '../site/upcomingConfig';
+
+/* ---------------------------------------------------------------------------------------------
+   Private admin dashboard (/admin/visitor-analytics)
+   1) Visitor analytics: daily graph, top pages, devices, where people came from, register clicks
+   2) Site controls: registration open/close, popups on/off, countdown dates (no deploy needed)
+   --------------------------------------------------------------------------------------------- */
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const dayLabel = (iso) => `${Number(iso.slice(8, 10))} ${MONTHS[Number(iso.slice(5, 7)) - 1]}`;
+const fmt = (n) => (typeof n === 'number' ? n.toLocaleString('en-IN') : '—');
+const pct = (part, whole) => (whole > 0 ? Math.round((part / whole) * 100) : 0);
+
+const PAGE_NAMES = {
+  '/': 'Home', '/upcoming': 'Upcoming', '/events': 'Events', '/team': 'Team', '/connect': 'Connect', '/register': 'Register', '/other': 'Other pages',
+};
+const SOURCE_NAMES = {
+  direct: 'Direct or unknown', instagram: 'Instagram', whatsapp: 'WhatsApp', linkedin: 'LinkedIn', facebook: 'Facebook', google: 'Google',
+  x: 'X (Twitter)', youtube: 'YouTube', telegram: 'Telegram', discord: 'Discord', reddit: 'Reddit', unstop: 'Unstop', hackerrank: 'HackerRank', search: 'Other search',
+};
+const DEVICE_NAMES = { mobile: 'Phone', desktop: 'Laptop / desktop', tablet: 'Tablet' };
+const CLICK_NAMES = {
+  'register-vibeathon': 'Vibe-A-Thon register button', 'register-codeclash': 'Code Clash register button', membership: 'Membership form button',
+};
+
+// what the code files say today. The dashboard shows these until an admin changes something.
+const FILE_DEFAULTS = {
+  vibeRegistration: true,
+  codeClashRegistration: true,
+  codeClashPopup: CODE_CLASH_POPUP,
+  vibePopup: VIBEATHON_POPUP,
+  codeClashSection: CODE_CLASH_SECTION,
+  eventStart: C.EVENT_START || '',
+  currentRound: Math.round(Number(C.CURRENT_ROUND)) === 2 ? 2 : 1,
+  roundEnd1: (C.ROUND_END && C.ROUND_END[1]) || '',
+  roundEnd2: (C.ROUND_END && C.ROUND_END[2]) || '',
+};
+const SETTING_KEYS = Object.keys(FILE_DEFAULTS);
+
+const SWITCH_GROUPS = [
+  {
+    title: 'Registration',
+    items: [
+      { key: 'vibeRegistration', label: 'Vibe-A-Thon registration', on: 'Open', off: 'Closed', hint: 'Closed: the Register page shows "Registrations are closed" instead of the form.' },
+      { key: 'codeClashRegistration', label: 'Code Clash registration', on: 'Open', off: 'Closed', hint: 'Closed: the Register now button on the Home page becomes "Registration closed".' },
+    ],
+  },
+  {
+    title: 'Popups and blocks',
+    items: [
+      { key: 'codeClashPopup', label: 'Code Clash popup', on: 'On', off: 'Off', hint: 'Only one popup shows per visit. If both are on, the Code Clash one wins.' },
+      { key: 'vibePopup', label: 'Vibe-A-Thon popup', on: 'On', off: 'Off', hint: 'Needs the Upcoming card to be live (it is, while the event is announced).' },
+      { key: 'codeClashSection', label: 'Code Clash block on the Home page', on: 'Shown', off: 'Hidden', hint: 'Also controls the Code Clash button under the hero buttons and the Code Clash popup.' },
+    ],
+  },
+];
+
+/* ------------------------------------------------ small pieces ------------------------------------------------ */
+
+function RangeToggle({ value, onChange }) {
+  return (
+    <div className="ad-range" role="radiogroup" aria-label="Date range">
+      {[7, 30].map((d) => (
+        <button key={d} type="button" role="radio" aria-checked={value === d} className={value === d ? 'is-on' : ''} onClick={() => onChange(d)}>
+          Last {d} days
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function Kpi({ label, value, sub }) {
+  return (
+    <div className="s-analytics-card ad-kpi">
+      <div className="ad-kpi-label">{label}</div>
+      <div className="ad-kpi-value">{fmt(value)}</div>
+      <div className="ad-kpi-sub">{sub}</div>
+    </div>
+  );
+}
+
+// rows: [{ label, value }]. The bar is scaled to `scale` (default: the biggest row). Value and share sit at the tip.
+function BarList({ rows, total, scale, empty = 'No data in this range yet.' }) {
+  if (!rows.length) return <p className="ad-empty">{empty}</p>;
+  const max = scale || Math.max(...rows.map((r) => r.value), 1);
+  return (
+    <ul className="ad-bars">
+      {rows.map((r) => (
+        <li key={r.label} title={`${r.label}: ${fmt(r.value)}${total ? ` (${pct(r.value, total)}%)` : ''}`}>
+          <span className="ad-bars-label">{r.label}</span>
+          <span className="ad-bars-track"><i style={{ width: `${Math.max(2, Math.min(100, (r.value / max) * 100))}%` }} /></span>
+          <span className="ad-bars-val">{fmt(r.value)}{total ? <small>{pct(r.value, total)}%</small> : null}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function Toggle({ id, checked, onChange, labelledBy }) {
+  return (
+    <button id={id} type="button" role="switch" aria-checked={checked} aria-labelledby={labelledBy} className={`ad-toggle ${checked ? 'is-on' : ''}`} onClick={() => onChange(!checked)}>
+      <i />
+    </button>
+  );
+}
+
+/* a clean top value and step for the y axis: at most 4 steps */
+function axisTicks(maxVal) {
+  const raw = Math.max(4, maxVal);
+  const mag = 10 ** Math.floor(Math.log10(raw / 4));
+  const step = [1, 2, 5, 10].map((m) => m * mag).find((s) => raw / s <= 4);
+  const top = Math.ceil(raw / step) * step;
+  const ticks = [];
+  for (let v = 0; v <= top; v += step) ticks.push(v);
+  return { top, ticks };
+}
+
+// bars = visits per day, line = unique visitors per day. Hover or arrow keys read one day. A table view sits below.
+function DailyChart({ days }) {
+  const wrap = useRef(null);
+  const [width, setWidth] = useState(640);
+  const [hover, setHover] = useState(null);
+
+  useEffect(() => {
+    const el = wrap.current;
+    if (!el) return undefined;
+    const measure = () => setWidth(Math.max(280, Math.round(el.getBoundingClientRect().width)));
+    measure();
+    if (typeof ResizeObserver === 'undefined') return undefined;
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const H = 230;
+  const m = { l: 40, r: 12, t: 22, b: 28 };
+  const innerW = width - m.l - m.r;
+  const innerH = H - m.t - m.b;
+  const n = days.length;
+  const band = innerW / n;
+  const barW = Math.max(3, Math.min(24, band - 2));
+  const maxVal = Math.max(...days.map((d) => Math.max(d.visits, d.unique)), 0);
+  const { top, ticks } = axisTicks(maxVal);
+  const y = (v) => m.t + innerH - (v / top) * innerH;
+  const cx = (i) => m.l + band * i + band / 2;
+  const base = m.t + innerH;
+  const peak = days.reduce((best, d, i) => (d.visits > days[best].visits ? i : best), 0);
+  const labelEvery = Math.max(1, Math.ceil(n / Math.max(2, Math.floor(innerW / 58))));
+
+  const barPath = (i, v) => {
+    const h = base - y(v);
+    if (h <= 0) return '';
+    const r = Math.min(4, barW / 2, h);
+    const x0 = cx(i) - barW / 2;
+    const x1 = x0 + barW;
+    const yt = y(v);
+    return `M${x0},${base}V${yt + r}Q${x0},${yt} ${x0 + r},${yt}H${x1 - r}Q${x1},${yt} ${x1},${yt + r}V${base}Z`;
+  };
+
+  const line = days.map((d, i) => `${i ? 'L' : 'M'}${cx(i)},${y(d.unique)}`).join('');
+  const last = days[n - 1];
+  const hd = hover === null ? null : days[hover];
+  const tipLeft = hover === null ? 0 : Math.min(width - 80, Math.max(80, cx(hover)));
+
+  const onMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const i = Math.floor((e.clientX - rect.left - m.l) / band);
+    setHover(Math.max(0, Math.min(n - 1, i)));
+  };
+  const onKey = (e) => {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); setHover((h) => Math.max(0, (h === null ? n : h) - 1)); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); setHover((h) => Math.min(n - 1, (h === null ? -1 : h) + 1)); }
+    else if (e.key === 'Escape') setHover(null);
+  };
+
+  const total = days.reduce((s, d) => s + d.visits, 0);
+
+  return (
+    <div className="ad-chart">
+      <div className="ad-legend" aria-hidden="true">
+        <span><i className="ad-key-bar" /> Visits</span>
+        <span><i className="ad-key-line" /> Unique visitors</span>
+      </div>
+      <div className="ad-chart-wrap" ref={wrap}>
+        <svg
+          width={width}
+          height={H}
+          role="img"
+          tabIndex={0}
+          aria-label={`Daily visits for the last ${n} days. ${fmt(total)} visits in total. Busiest day ${dayLabel(days[peak].date)} with ${days[peak].visits}. Use the left and right arrow keys to read each day.`}
+          onKeyDown={onKey}
+          onBlur={() => setHover(null)}
+          onPointerMove={onMove}
+          onPointerLeave={() => setHover(null)}
+        >
+          {ticks.map((t) => (
+            <g key={t}>
+              <line x1={m.l} x2={width - m.r} y1={y(t)} y2={y(t)} className={t === 0 ? 'ad-axis' : 'ad-grid'} />
+              <text x={m.l - 8} y={y(t) + 4} textAnchor="end" className="ad-tick">{t >= 10000 ? `${t / 1000}K` : t}</text>
+            </g>
+          ))}
+          {days.map((d, i) => ((n - 1 - i) % labelEvery === 0 ? (
+            <text key={d.date} x={cx(i)} y={H - 8} textAnchor="middle" className="ad-tick">{dayLabel(d.date)}</text>
+          ) : null))}
+          {days.map((d, i) => (
+            <path key={d.date} d={barPath(i, d.visits)} className={`ad-bar ${hover === i ? 'is-hot' : ''}`} />
+          ))}
+          {hover !== null && <line x1={cx(hover)} x2={cx(hover)} y1={m.t} y2={base} className="ad-cross" />}
+          <path d={line} className="ad-line" />
+          <circle cx={cx(n - 1)} cy={y(last.unique)} r="4" className="ad-dot" />
+          {days[peak].visits > 0 && (
+            <text x={cx(peak)} y={y(days[peak].visits) - 7} textAnchor="middle" className="ad-peak">{days[peak].visits}</text>
+          )}
+        </svg>
+        {hd && (
+          <div className="ad-tip" style={{ left: tipLeft }} role="status">
+            <div className="ad-tip-date">{dayLabel(hd.date)}</div>
+            <div><i className="ad-key-bar" /> <b>{fmt(hd.visits)}</b> visits</div>
+            <div><i className="ad-key-line" /> <b>{fmt(hd.unique)}</b> unique</div>
+          </div>
+        )}
+      </div>
+      <details className="ad-table-view">
+        <summary>View as table</summary>
+        <table>
+          <thead><tr><th>Day</th><th>Visits</th><th>Unique visitors</th></tr></thead>
+          <tbody>
+            {[...days].reverse().map((d) => (
+              <tr key={d.date}><td>{dayLabel(d.date)}</td><td>{fmt(d.visits)}</td><td>{fmt(d.unique)}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </details>
+    </div>
+  );
+}
+
+/* sum the daily objects for the chosen range */
+function aggregate(days) {
+  const sum = { visits: 0, pages: {}, devices: {}, sources: {}, clicks: {} };
+  for (const d of days) {
+    sum.visits += d.visits;
+    for (const bucket of ['pages', 'devices', 'sources', 'clicks']) {
+      for (const [k, v] of Object.entries(d[bucket] || {})) sum[bucket][k] = (sum[bucket][k] || 0) + v;
+    }
+  }
+  return sum;
+}
+
+const toRows = (obj, names, limit = 8) => Object.entries(obj)
+  .map(([k, v]) => ({ label: names[k] || k, value: v }))
+  .sort((a, b) => b.value - a.value)
+  .slice(0, limit);
+
+/* ------------------------------------------------ the page ------------------------------------------------ */
 
 export default function AdminAnalytics() {
   const [authenticated, setAuthenticated] = useState(false);
@@ -8,79 +264,72 @@ export default function AdminAnalytics() {
   const [loginError, setLoginError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const [stats, setStats] = useState({ total: null, unique: null, updatedAt: null });
+  const [data, setData] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [statsError, setStatsError] = useState('');
+  const [range, setRange] = useState(7);
+
+  const [overrides, setOverrides] = useState({});   // what the admin saved (missing key = the code file decides)
+  const [draft, setDraft] = useState(null);         // unsaved edits
+  const [saving, setSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState({ type: '', text: '' });
+  const [confirmReset, setConfirmReset] = useState(false);
+
+  const effective = useMemo(() => ({ ...FILE_DEFAULTS, ...overrides }), [overrides]);
+  const view = draft || effective;
+  const dirty = !!draft && SETTING_KEYS.some((k) => draft[k] !== effective[k]);
+
+  const loadStats = useCallback(async () => {
+    setRefreshing(true);
+    setStatsError('');
+    try {
+      const res = await fetch('/api/admin/analytics', { method: 'GET', headers: { Accept: 'application/json' } });
+      if (res.status === 401) {
+        setAuthenticated(false);
+        return false;
+      }
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      setData(json);
+      setOverrides(json.settings || {});
+      setAuthenticated(true);
+      return true;
+    } catch {
+      setStatsError('Failed to fetch updated statistics.');
+      return false;
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
 
   // Check existing session on mount
   useEffect(() => {
-    let isMounted = true;
-
-    async function checkSession() {
-      try {
-        const res = await fetch('/api/admin/analytics', {
-          method: 'GET',
-          headers: { Accept: 'application/json' },
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          if (isMounted) {
-            setAuthenticated(true);
-            setStats({
-              total: typeof data.total === 'number' ? data.total : null,
-              unique: typeof data.unique === 'number' ? data.unique : null,
-              updatedAt: data.updatedAt || new Date().toISOString(),
-            });
-          }
-        } else {
-          if (isMounted) {
-            setAuthenticated(false);
-          }
-        }
-      } catch {
-        if (isMounted) {
-          setAuthenticated(false);
-        }
-      } finally {
-        if (isMounted) {
-          setCheckingAuth(false);
-        }
-      }
-    }
-
-    checkSession();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+    let alive = true;
+    (async () => {
+      await loadStats();
+      if (alive) setCheckingAuth(false);
+    })();
+    return () => { alive = false; };
+  }, [loadStats]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!password.trim()) return;
-
     setSubmitting(true);
     setLoginError('');
-
     try {
       const res = await fetch('/api/admin/analytics', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({ action: 'login', password: password.trim() }),
       });
-
-      const data = await res.json();
-
-      if (res.ok && data.authenticated) {
-        setAuthenticated(true);
+      const json = await res.json();
+      if (res.ok && json.authenticated) {
         setPassword('');
-        fetchStats();
+        setAuthenticated(true);
+        loadStats();
       } else {
-        setLoginError(data.error || 'Invalid admin credentials.');
+        setLoginError(json.error || 'Invalid admin credentials.');
       }
     } catch {
       setLoginError('Authentication service unreachable.');
@@ -93,72 +342,87 @@ export default function AdminAnalytics() {
     try {
       await fetch('/api/admin/analytics', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({ action: 'logout' }),
       });
     } catch {
       // Ignore
     } finally {
       setAuthenticated(false);
-      setStats({ total: null, unique: null, updatedAt: null });
+      setData(null);
+      setDraft(null);
     }
   };
 
-  const fetchStats = async () => {
-    setRefreshing(true);
-    setStatsError('');
+  const edit = (key, value) => {
+    setSaveMsg({ type: '', text: '' });
+    setConfirmReset(false);
+    setDraft((d) => ({ ...(d || effective), [key]: value }));
+  };
 
+  const postSettings = async (patch) => {
+    setSaving(true);
+    setSaveMsg({ type: '', text: '' });
     try {
       const res = await fetch('/api/admin/analytics', {
-        method: 'GET',
-        headers: { Accept: 'application/json' },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ action: 'save-settings', settings: patch }),
       });
-
-      if (res.status === 401) {
-        setAuthenticated(false);
-        return;
+      const json = await res.json().catch(() => ({}));
+      if (res.status === 401) { setAuthenticated(false); return false; }
+      if (!res.ok || !json.ok) {
+        setSaveMsg({ type: 'err', text: json.error || 'Could not save. Try again.' });
+        return false;
       }
-
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
-      }
-
-      const data = await res.json();
-      setStats({
-        total: typeof data.total === 'number' ? data.total : null,
-        unique: typeof data.unique === 'number' ? data.unique : null,
-        updatedAt: data.updatedAt || new Date().toISOString(),
-      });
+      setOverrides(json.settings || {});
+      setDraft(null);
+      return true;
     } catch {
-      setStatsError('Failed to fetch updated statistics.');
+      setSaveMsg({ type: 'err', text: 'Could not reach the server. Nothing was saved.' });
+      return false;
     } finally {
-      setRefreshing(false);
+      setSaving(false);
     }
   };
 
-  const formatNumber = (num) => {
-    if (typeof num === 'number') return num.toLocaleString('en-US');
-    return '—';
+  const save = async () => {
+    if (!draft) return;
+    const patch = {};
+    for (const k of SETTING_KEYS) {
+      if (draft[k] === effective[k]) continue;
+      patch[k] = draft[k] === '' ? null : draft[k];   // an emptied date goes back to the code file's value
+    }
+    if (!Object.keys(patch).length) return;
+    if (await postSettings(patch)) {
+      setSaveMsg({ type: 'ok', text: 'Saved. The site picks it up within about a minute (people already on a page see it on their next page load).' });
+    }
   };
 
-  const formatTimestamp = (isoString) => {
-    if (!isoString) return '—';
+  const resetAll = async () => {
+    if (!confirmReset) { setConfirmReset(true); return; }
+    setConfirmReset(false);
+    const patch = Object.fromEntries(SETTING_KEYS.map((k) => [k, null]));
+    if (await postSettings(patch)) {
+      setSaveMsg({ type: 'ok', text: 'Everything is back to the values written in the code files.' });
+    }
+  };
+
+  const days = useMemo(() => (data && data.days ? data.days.slice(-range) : []), [data, range]);
+  const agg = useMemo(() => aggregate(days), [days]);
+  const pageTotal = Object.values(agg.pages).reduce((s, v) => s + v, 0);
+  const deviceTotal = Object.values(agg.devices).reduce((s, v) => s + v, 0);
+  const sourceTotal = Object.values(agg.sources).reduce((s, v) => s + v, 0);
+  const registerClicks = (agg.clicks['register-vibeathon'] || 0) + (agg.clicks['register-codeclash'] || 0);
+  const registerViews = agg.pages['/register'] || 0;
+  const configured = !data || data.configured !== false;
+
+  const formatTimestamp = (iso) => {
+    if (!iso) return '—';
     try {
-      const date = new Date(isoString);
-      return date.toLocaleString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true,
-      });
+      return new Date(iso).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true });
     } catch {
-      return isoString;
+      return iso;
     }
   };
 
@@ -172,13 +436,13 @@ export default function AdminAnalytics() {
     );
   }
 
-  return (
-    <div className="s-container s-analytics-wrap">
-      {!authenticated ? (
+  if (!authenticated) {
+    return (
+      <div className="s-container s-analytics-wrap">
         <div className="s-login-card">
           <div className="s-analytics-tag">RESTRICTED</div>
           <h2>ADMIN ACCESS</h2>
-          <p>Enter the admin secret key to access visitor analytics.</p>
+          <p>Enter the admin secret key to open the dashboard.</p>
           <form className="s-login-form" onSubmit={handleLogin}>
             <input
               type="password"
@@ -190,76 +454,168 @@ export default function AdminAnalytics() {
               autoFocus
               required
             />
-            <button
-              type="submit"
-              className="s-btn s-btn-light"
-              disabled={submitting}
-              style={{ width: '100%' }}
-            >
-              {submitting ? 'Authenticating...' : 'Unlock Analytics'}
+            <button type="submit" className="s-btn s-btn-light" disabled={submitting} style={{ width: '100%' }}>
+              {submitting ? 'Authenticating...' : 'Unlock Dashboard'}
             </button>
             {loginError && <div className="s-login-error">{loginError}</div>}
           </form>
         </div>
-      ) : (
-        <>
-          <div className="s-analytics-header">
-            <div className="s-analytics-tag">PRIVATE DASHBOARD</div>
-            <h1 className="s-analytics-title">VISITOR ANALYTICS</h1>
-            <p className="s-analytics-sub">
-              Persistent website traffic analytics stored securely in Upstash Redis.
-            </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="s-container s-analytics-wrap ad">
+      <div className="s-analytics-header ad-head">
+        <div>
+          <div className="s-analytics-tag">PRIVATE DASHBOARD</div>
+          <h1 className="s-analytics-title">ADMIN DASHBOARD</h1>
+          <p className="s-analytics-sub">Visitor analytics and site controls. Counts are anonymous and stored in Upstash Redis.</p>
+        </div>
+        <div className="ad-head-actions">
+          <span className="ad-updated">Updated <b>{formatTimestamp(data && data.updatedAt)}</b></span>
+          <button type="button" className="s-btn s-btn-light s-btn-refresh" onClick={loadStats} disabled={refreshing}>
+            {refreshing ? 'Refreshing...' : 'Refresh Data'}
+          </button>
+          <button type="button" className="s-btn s-btn-logout" onClick={handleLogout}>Logout</button>
+        </div>
+      </div>
+
+      {statsError && <div className="ad-alert ad-alert-err">{statsError}</div>}
+      {!configured && (
+        <div className="ad-alert ad-alert-err">
+          Redis is not connected on this server, so there is no data and the switches cannot be saved. Add the Upstash variables (UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN) and redeploy.
+        </div>
+      )}
+
+      {configured && data && (
+        <div className={refreshing ? 'ad-body is-loading' : 'ad-body'}>
+          <div className="ad-kpis">
+            <Kpi label="Today" value={data.today.visits} sub={`${fmt(data.today.unique)} unique visitors`} />
+            <Kpi label="Last 7 days" value={data.week.visits} sub={`${fmt(data.week.unique)} unique visitors`} />
+            <Kpi label="Last 30 days" value={data.month.visits} sub={`${fmt(data.month.unique)} unique visitors`} />
+            <Kpi label="All time" value={data.total} sub={`${fmt(data.unique)} unique visitors`} />
+          </div>
+          <p className="ad-note">A visit is one page load by one browser. Unique visitors are distinct browsers, so someone using two devices counts twice. Days follow Indian time. Daily numbers start from the day this update went live; the all-time numbers include everything before.</p>
+
+          <div className="ad-filter">
+            <RangeToggle value={range} onChange={setRange} />
           </div>
 
-          {statsError && (
-            <div style={{ padding: '12px 18px', background: 'rgba(234, 67, 53, 0.1)', border: '1px solid rgba(234, 67, 53, 0.3)', borderRadius: 10, color: '#ff8a80', marginBottom: 20, fontSize: 14 }}>
-              {statsError}
-            </div>
-          )}
+          <section className="ad-panel" aria-labelledby="ad-h-daily">
+            <h2 id="ad-h-daily">Visitors per day</h2>
+            <DailyChart days={days} />
+          </section>
 
-          <div className="s-analytics-grid">
-            <div className="s-analytics-card">
-              <div className="s-analytics-card-label">TOTAL VISITORS</div>
-              <div className="s-analytics-card-value">{formatNumber(stats.total)}</div>
-              <p className="s-analytics-card-desc">
-                Cumulative page visits across all sessions.
+          <div className="ad-two">
+            <section className="ad-panel" aria-labelledby="ad-h-pages">
+              <h2 id="ad-h-pages">Top pages</h2>
+              <p className="ad-sub">Page views, every time a page is opened.</p>
+              <BarList rows={toRows(agg.pages, PAGE_NAMES)} total={pageTotal} />
+            </section>
+
+            <section className="ad-panel" aria-labelledby="ad-h-dev">
+              <h2 id="ad-h-dev">Phone or laptop</h2>
+              <p className="ad-sub">Share of visits by device.</p>
+              <BarList rows={toRows(agg.devices, DEVICE_NAMES)} total={deviceTotal} />
+            </section>
+
+            <section className="ad-panel" aria-labelledby="ad-h-src">
+              <h2 id="ad-h-src">Where visitors came from</h2>
+              <p className="ad-sub">Share of visits by source.</p>
+              <BarList rows={toRows(agg.sources, SOURCE_NAMES)} total={sourceTotal} />
+              <p className="ad-note ad-note-tight">
+                Instagram, WhatsApp and many apps hide where a click came from, and those show up as "Direct or unknown". To track one poster or link, add a tag to it:
+                {' '}<code>sipnacoders.club/?src=poster1</code> or <code>sipnacoders.club/?src=whatsapp-group</code>. The tag appears here by name.
               </p>
-            </div>
+            </section>
 
-            <div className="s-analytics-card">
-              <div className="s-analytics-card-label">UNIQUE VISITORS</div>
-              <div className="s-analytics-card-value">{formatNumber(stats.unique)}</div>
-              <p className="s-analytics-card-desc">
-                Distinct anonymous browser identifiers tracked.
+            <section className="ad-panel" aria-labelledby="ad-h-reg">
+              <h2 id="ad-h-reg">Registration interest</h2>
+              <p className="ad-sub">How many visitors reached a registration step.</p>
+              <BarList
+                scale={agg.visits}
+                total={agg.visits}
+                rows={[
+                  { label: 'Visits', value: agg.visits },
+                  { label: 'Register page views', value: registerViews },
+                  { label: 'Register button clicks', value: registerClicks },
+                ]}
+              />
+              <h3 className="ad-h3">Button clicks</h3>
+              <BarList rows={toRows(agg.clicks, CLICK_NAMES)} empty="No clicks counted in this range yet." />
+              <p className="ad-note ad-note-tight">These are clicks, not submitted forms. Tally and Google Forms do not report back yet, so the list of people who actually registered comes in the next step.</p>
+            </section>
+          </div>
+
+          <section className="ad-panel ad-controls" aria-labelledby="ad-h-ctl">
+            <h2 id="ad-h-ctl">Site controls</h2>
+            <p className="ad-sub">Change the live site without a deploy. Anything you do not change keeps the value written in the code files.</p>
+
+            {SWITCH_GROUPS.map((g) => (
+              <div className="ad-group" key={g.title}>
+                <h3 className="ad-h3">{g.title}</h3>
+                {g.items.map((it) => {
+                  const on = !!view[it.key];
+                  const edited = it.key in overrides;
+                  return (
+                    <div className="ad-row" key={it.key}>
+                      <div className="ad-row-text">
+                        <span id={`lbl-${it.key}`} className="ad-row-label">{it.label}{edited && <em>edited here</em>}</span>
+                        <span className="ad-row-hint">{it.hint}</span>
+                      </div>
+                      <div className="ad-row-ctl">
+                        <span className={`ad-state ${on ? 'is-on' : ''}`}>{on ? it.on : it.off}</span>
+                        <Toggle id={`sw-${it.key}`} labelledBy={`lbl-${it.key}`} checked={on} onChange={(v) => edit(it.key, v)} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+
+            <div className="ad-group">
+              <h3 className="ad-h3">Countdown (Indian time)</h3>
+              <p className="ad-row-hint ad-hint-block">
+                The Vibe-A-Thon card counts down to the event start. In the two-round design it counts down to the end of the current round instead. Leave a date empty to use the code file.
               </p>
+              <div className="ad-fields">
+                <label className="ad-field">
+                  <span>Event start</span>
+                  <input type="datetime-local" value={view.eventStart} onChange={(e) => edit('eventStart', e.target.value)} />
+                </label>
+                <label className="ad-field">
+                  <span>Current round</span>
+                  <select value={view.currentRound} onChange={(e) => edit('currentRound', Number(e.target.value))}>
+                    <option value={1}>Round 1</option>
+                    <option value={2}>Round 2</option>
+                  </select>
+                </label>
+                <label className="ad-field">
+                  <span>Round 1 ends</span>
+                  <input type="datetime-local" value={view.roundEnd1} onChange={(e) => edit('roundEnd1', e.target.value)} />
+                </label>
+                <label className="ad-field">
+                  <span>Round 2 ends</span>
+                  <input type="datetime-local" value={view.roundEnd2} onChange={(e) => edit('roundEnd2', e.target.value)} />
+                </label>
+              </div>
             </div>
-          </div>
 
-          <div className="s-analytics-bar">
-            <div className="s-analytics-time">
-              Last Updated: <b>{formatTimestamp(stats.updatedAt)}</b>
-            </div>
-
-            <div className="s-analytics-actions">
-              <button
-                type="button"
-                className="s-btn s-btn-light s-btn-refresh"
-                onClick={fetchStats}
-                disabled={refreshing}
-              >
-                {refreshing ? 'Refreshing...' : 'Refresh Data'}
+            <div className="ad-savebar">
+              <button type="button" className="s-btn s-btn-light" onClick={save} disabled={!dirty || saving}>
+                {saving ? 'Saving...' : 'Save changes'}
               </button>
-
-              <button
-                type="button"
-                className="s-btn s-btn-logout"
-                onClick={handleLogout}
-              >
-                Logout
+              <button type="button" className="s-btn s-btn-ghost" onClick={() => { setDraft(null); setSaveMsg({ type: '', text: '' }); }} disabled={!dirty || saving}>
+                Discard
               </button>
+              <button type="button" className="ad-link" onClick={resetAll} disabled={saving || (!confirmReset && Object.keys(overrides).length === 0)}>
+                {confirmReset ? 'Click again to reset everything' : 'Reset all to the code files'}
+              </button>
+              <span className="ad-savemsg" role="status" data-type={saveMsg.type}>{saveMsg.text}{dirty && !saveMsg.text ? 'You have unsaved changes.' : ''}</span>
             </div>
-          </div>
-        </>
+          </section>
+        </div>
       )}
     </div>
   );

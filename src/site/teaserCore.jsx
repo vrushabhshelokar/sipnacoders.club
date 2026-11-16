@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { Icon } from './Icons';
 import { LINKS, pastEvents } from '../data/site';
 import { dateFromText, getPast, toDate } from './time';
+import { liveValue, useLiveSettings } from './liveSettings';
 import * as C from './upcomingConfig';
 import { CARD_LOOKS, DESIGNS as DESIGN_LIST, POSTER_EFFECTS } from './designs';
 
@@ -15,14 +16,19 @@ export const EVENT_NAME = String(C.EVENT_NAME || '').trim();
 // has any detail been filled in for this kind of event? (then the card tells visitors to press "Try to decrypt")
 export const HAS_DETAILS = Object.values((C.DETAILS && C.DETAILS[TYPE]) || {}).some((v) => String(v || '').trim());
 
-const T = { from: toDate(C.TEASER_FROM), start: toDate(C.EVENT_START), end: toDate(C.HIDE_AFTER) };
+// the dashboard (Site controls) can change the event start, the round dates and the current round; the values in
+// upcomingConfig.js are the defaults
+const liveT = () => ({ from: toDate(C.TEASER_FROM), start: toDate(liveValue('eventStart', C.EVENT_START)), end: toDate(C.HIDE_AFTER) });
 // when the card and the popup go away by themselves: HIDE_AFTER, else 2 days after EVENT_START, else never (the switch decides)
 // two rounds: CURRENT_ROUND (1 or 2) and ROUND_END in upcomingConfig.js. The card goes 2 days after the end of Round 2.
-const ROUND = Math.round(Number(C.CURRENT_ROUND)) === 2 ? 2 : 1;
-const roundEnd = (n) => toDate((C.ROUND_END || {})[n]);
-const FINAL = roundEnd(2);
-const END = T.end || (FINAL ? new Date(FINAL.getTime() + 2 * 864e5) : T.start ? new Date(T.start.getTime() + 2 * 864e5) : null);
-const stillOn = (now) => !END || now < END.getTime();
+const liveRound = () => (Math.round(Number(liveValue('currentRound', C.CURRENT_ROUND))) === 2 ? 2 : 1);
+const roundEnd = (n) => toDate(liveValue(`roundEnd${n}`, (C.ROUND_END || {})[n]));
+const stillOn = (now) => {
+  const t = liveT();
+  const final = roundEnd(2);
+  const end = t.end || (final ? new Date(final.getTime() + 2 * 864e5) : t.start ? new Date(t.start.getTime() + 2 * 864e5) : null);
+  return !end || now < end.getTime();
+};
 
 /* is the mystery card (and with it the popup) live right now? */
 export const isTeaserLive = () => !!C.SHOW_UPCOMING && stillOn(Date.now());
@@ -134,6 +140,9 @@ export function FieldValue({ f }) {
 /* everything a card design needs: timer, detail boxes, progress, the decrypt button */
 export function useTeaser() {
   const now = useNow();
+  useLiveSettings();            // re-render when the dashboard values arrive
+  const T = liveT();
+  const ROUND = liveRound();
   // once the name is announced, the card must not say "the name will be announced soon"
   const copy = EVENT_NAME && TYPE === 'hackathon'
     ? { ...COPY[TYPE], desc: COPY[TYPE].desc.replace('The name, dates,', 'The dates,') }

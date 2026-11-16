@@ -2,13 +2,18 @@
 import { useEffect } from 'react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { Reveal } from '../site/ui';
+import { useSwitch } from '../site/liveSettings';
+import RegistrationClosed from '../site/RegistrationClosed';
 import formAnimation from '../assets/form.lottie';
 import formAnimation1 from '../assets/form1.lottie';
 
 const TALLY_FORM_ID = 'VpQzav';
 
 export default function Register() {
+  const open = useSwitch('vibeRegistration', true);   // dashboard -> Site controls
+
   useEffect(() => {
+    if (!open) return;
     if (window.Tally) {
       window.Tally.loadEmbeds();
       return;
@@ -22,7 +27,9 @@ export default function Register() {
     s.src = 'https://tally.so/widgets/embed.js';
     s.onload = () => window.Tally?.loadEmbeds();
     document.body.appendChild(s);
-  }, []);
+  }, [open]);
+
+  if (!open) return <RegistrationClosed />;
 
   return (
     <>

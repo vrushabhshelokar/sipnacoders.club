@@ -1,9 +1,7 @@
-import { Redis } from '@upstash/redis';
 import crypto from 'node:crypto';
-
-// Upstash Redis storage keys
-const KEY_TOTAL_VISITORS = 'scc:visitors:total';
-const KEY_UNIQUE_SET = 'scc:visitors:unique_set';
+import {
+  KEYS, KEEP_DAYS, getRedisClient, parseCookies, readBody, sendResponse, istDay,
+} from '../api-lib/shared.js';
 
 // First-party cookie configuration
 const COOKIE_NAME = 'scc_vid';
@@ -16,49 +14,71 @@ function isBot(userAgent) {
   return Boolean(userAgent && BOT_REGEX.test(userAgent));
 }
 
-function parseCookies(cookieHeader) {
-  const cookies = {};
-  if (!cookieHeader) return cookies;
-  const parts = cookieHeader.split(';');
-  for (const part of parts) {
-    const [name, ...val] = part.split('=');
-    if (name) {
-      cookies[name.trim()] = val.join('=').trim();
-    }
-  }
-  return cookies;
+/* ---------------------------------------------------------------------------------------------
+   What the website sends (POST, JSON). An old cached copy of the site sends nothing: that counts as a plain visit.
+     { t: 'visit', path, src, ref }   once when a page is opened   -> visits, unique, device, source, page
+     { t: 'pv',    path }             every later page change      -> page views
+     { t: 'click', k }                a register / membership button -> clicks
+   Only the values below are stored, so nobody can fill Redis with random names.
+   If you add a new page to the site, add its path to PAGES.
+   --------------------------------------------------------------------------------------------- */
+const PAGES = new Set(['/', '/upcoming', '/events', '/team', '/connect', '/register']);
+const CLICKS = new Set(['register-vibeathon', 'register-codeclash', 'membership']);
+
+// where a visitor came from, by the website name in the referrer
+const SOURCE_BY_HOST = [
+  [/instagram|l\.instagram/, 'instagram'],
+  [/whatsapp|wa\.me/, 'whatsapp'],
+  [/linkedin|lnkd\.in/, 'linkedin'],
+  [/facebook|fb\.com|fb\.me|messenger/, 'facebook'],
+  [/(^|\.)t\.co$|twitter|(^|\.)x\.com$/, 'x'],
+  [/youtube|youtu\.be/, 'youtube'],
+  [/telegram|(^|\.)t\.me$/, 'telegram'],
+  [/discord/, 'discord'],
+  [/reddit/, 'reddit'],
+  [/unstop/, 'unstop'],
+  [/hackerrank/, 'hackerrank'],
+  [/google\./, 'google'],
+  [/bing\.|duckduckgo|yahoo|ecosia/, 'search'],
+];
+
+function cleanPath(p) {
+  if (typeof p !== 'string') return null;
+  let path = p.split('?')[0].split('#')[0].toLowerCase();
+  if (path.length > 1) path = path.replace(/\/+$/, '');
+  return PAGES.has(path) ? path : '/other';
 }
 
-function sendResponse(res, statusCode, data, headers = {}) {
-  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
-
-  for (const [key, value] of Object.entries(headers)) {
-    res.setHeader(key, value);
-  }
-
-  if (typeof res.status === 'function' && typeof res.json === 'function') {
-    return res.status(statusCode).json(data);
-  }
-
-  res.statusCode = statusCode;
-  res.setHeader('Content-Type', 'application/json');
-  return res.end(JSON.stringify(data));
+// a tag the club puts in its own links: sipnacoders.club/?src=poster1
+function cleanTag(s) {
+  return String(s || '').toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 20);
 }
 
-function getRedisClient() {
-  const url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+function deviceOf(ua) {
+  if (/ipad|tablet|(android(?!.*mobile))/i.test(ua)) return 'tablet';
+  if (/mobi|iphone|ipod|android/i.test(ua)) return 'mobile';
+  return 'desktop';
+}
 
-  if (!url || !token) return null;
+function sourceOf(body, ua, ownHost) {
+  const tag = cleanTag(body.src);
+  if (tag) return tag;
 
-  try {
-    return new Redis({ url, token });
-  } catch (err) {
-    console.error('Failed to initialize Redis client:', err.message);
-    return null;
+  if (typeof body.ref === 'string' && body.ref) {
+    try {
+      const host = new URL(body.ref).hostname.replace(/^www\./, '').toLowerCase();
+      if (host && host !== ownHost) {
+        for (const [re, name] of SOURCE_BY_HOST) if (re.test(host)) return name;
+        return host.replace(/[^a-z0-9.-]/g, '').slice(0, 30) || 'direct';
+      }
+    } catch { /* not a link: ignore */ }
   }
+
+  // Instagram, Facebook and LinkedIn apps open links in their own browser and hide the referrer, but tell on themselves here
+  if (/instagram/i.test(ua)) return 'instagram';
+  if (/FBAN|FBAV/.test(ua)) return 'facebook';
+  if (/LinkedInApp/i.test(ua)) return 'linkedin';
+  return 'direct';
 }
 
 export default async function handler(req, res) {
@@ -83,10 +103,34 @@ export default async function handler(req, res) {
     const userAgent = req.headers['user-agent'] || '';
     const referer = req.headers['referer'] || '';
 
-    // Ignore bots and requests originating from admin dashboard
-    const isBotRequest = isBot(userAgent);
-    const isAdminReferer = referer.includes('/admin');
+    // Ignore bots and requests originating from the admin dashboard
+    if (isBot(userAgent) || referer.includes('/admin')) {
+      return sendResponse(res, 200, { ok: true });
+    }
 
+    const body = await readBody(req);
+    if (typeof body.path === 'string' && body.path.startsWith('/admin')) {
+      return sendResponse(res, 200, { ok: true });
+    }
+
+    const type = body.t === 'pv' || body.t === 'click' ? body.t : 'visit';
+    const day = istDay();
+    const dayKey = KEYS.day(day);
+    const path = cleanPath(body.path);
+
+    // ---- later page change ----
+    if (type === 'pv') {
+      if (path) await redis.hincrby(dayKey, `pv:${path}`, 1);
+      return sendResponse(res, 200, { ok: true });
+    }
+
+    // ---- button click ----
+    if (type === 'click') {
+      if (CLICKS.has(body.k)) await redis.hincrby(dayKey, `clk:${body.k}`, 1);
+      return sendResponse(res, 200, { ok: true });
+    }
+
+    // ---- a page was opened (counts as one visit) ----
     const cookies = parseCookies(req.headers.cookie);
     let vid = cookies[COOKIE_NAME];
     let isNewVisitorCookie = false;
@@ -99,17 +143,27 @@ export default async function handler(req, res) {
     }
 
     const responseHeaders = {};
-    if (isNewVisitorCookie && !isBotRequest && !isAdminReferer) {
+    if (isNewVisitorCookie) {
       const isSecure = process.env.NODE_ENV === 'production' || req.headers['x-forwarded-proto'] === 'https';
       responseHeaders['Set-Cookie'] = `${COOKIE_NAME}=${vid}; Path=/; Max-Age=${COOKIE_MAX_AGE_SECONDS}; SameSite=Lax; HttpOnly${isSecure ? '; Secure' : ''}`;
     }
 
-    if (!isBotRequest && !isAdminReferer) {
-      // Atomic pipeline: INCR total, SADD unique identifier
-      const pipeline = redis.pipeline();
-      pipeline.incr(KEY_TOTAL_VISITORS);
-      pipeline.sadd(KEY_UNIQUE_SET, vid);
-      await pipeline.exec();
+    const ownHost = String(req.headers.host || '').split(':')[0].replace(/^www\./, '').toLowerCase();
+
+    const pipeline = redis.pipeline();
+    pipeline.incr(KEYS.total);
+    pipeline.sadd(KEYS.unique, vid);
+    pipeline.hincrby(dayKey, 'visits', 1);                                        // result index 2
+    pipeline.hincrby(dayKey, `dev:${deviceOf(userAgent)}`, 1);
+    pipeline.hincrby(dayKey, `src:${sourceOf(body, userAgent, ownHost)}`, 1);
+    if (path) pipeline.hincrby(dayKey, `pv:${path}`, 1);
+    pipeline.pfadd(KEYS.dayUnique(day), vid);
+    const results = await pipeline.exec();
+
+    // the first visit of a day creates the day's keys: tell Redis to delete them after KEEP_DAYS
+    if (Number(results[2]) === 1) {
+      const ttl = KEEP_DAYS * 86400;
+      await redis.pipeline().expire(dayKey, ttl).expire(KEYS.dayUnique(day), ttl).exec();
     }
 
     // Never return counts to public visitors
