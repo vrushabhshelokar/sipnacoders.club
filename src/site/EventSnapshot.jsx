@@ -26,7 +26,7 @@ const SNAPSHOT_ITEMS = [
     id: 'mode',
     label: 'EVENT MODE',
     value: 'HYBRID',
-    sub: 'Online R1 ➔ In-Person R2',
+    sub: 'Online R1➔Offline R2',
     icon: 'Terminal',
     accent: '#4c8dff',
     accentRgb: '76, 141, 255',
