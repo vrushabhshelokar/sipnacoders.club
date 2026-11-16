@@ -92,12 +92,22 @@ export const upcomingEvents = [];
    ===================================================================== */
 export const pastEvents = [
   {
-    id: 'next-event',
-    title: '',       
-    category: '',    
-    date: '',         
-    description: '',
-    images: [],       
+    id: 'vibe-a-thon',
+    title: 'Vibe-A-Thon',
+    category: 'Hackathon',
+    date: '26–27 DEC 2026',
+    sortDate: '2026-12-26',
+    description: 'Our 18-hour AI build-a-thon, with an online round and an on-campus finale.',
+    images: [],
+  },
+  {
+    id: 'code-clash',
+    title: 'Code Clash',
+    category: 'Online Contest',
+    date: '21 NOV 2026',
+    sortDate: '2026-11-21',
+    description: 'An online coding competition in collaboration with HackerRank and Sipna Coders Club.',
+    images: [],
   },
   {
     id: 'gemini-build-night',
