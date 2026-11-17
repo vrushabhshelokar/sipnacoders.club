@@ -7,6 +7,7 @@ import Upcoming from './pages/Upcoming';
 import Team from './pages/Team';
 import Connect from './pages/Connect';
 import NotFound from './pages/NotFound';
+import { PageLoader } from './site/TeaserLoader';
 
 // Register (Lottie player) and the admin dashboard are only needed on their own pages, so they are downloaded when opened.
 // If a page file cannot be fetched (an old tab left open across a new deploy, or no network), the site reloads once to get the
@@ -48,7 +49,7 @@ function App() {
   return (
     <Router>
       <Layout>
-        <Suspense fallback={null}>
+        <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/upcoming" element={<Upcoming />} />
