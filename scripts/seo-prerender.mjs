@@ -72,6 +72,7 @@ const nice = (d) => str(d).replace(/\b([A-Z])([A-Z]{2})\b/g, (_, a, b) => a + b.
 const longDate = (iso) => new Date(iso + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 
 function todayIST() {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(process.env.SEO_TODAY || '')) return process.env.SEO_TODAY; // for testing only
   return new Date(Date.now() + 5.5 * 3600 * 1000).toISOString().slice(0, 10);
 }
 
@@ -274,8 +275,8 @@ function buildPages(d, today) {
     ];
     b.push(...safe('upcoming', () => upcomingBlocks(2)));
 
-    const vib = ahead.find((e) => e.id === 'vibe-a-thon') || all.find((e) => e.id === 'vibe-a-thon');
-    if (!vib && !arr(vibe.EVENT_SCHEDULE).length) return b;
+    const vib = ahead.find((e) => e.id === 'vibe-a-thon'); // the full details disappear once the event is over
+    if (!vib) return b;
 
     b.push(['h2', 'Vibe-A-Thon: full details']);
     b.push(['p', 'Vibe-A-Thon is the 18-hour AI build-a-thon by Sipna Coders Club, with an online qualifier and an on-campus finale at Sipna COET, Amravati. Stop making pitch decks. Start deploying.']);
@@ -406,14 +407,85 @@ function buildPages(d, today) {
   };
 
   const footer = [...contactBlocks(), ...pagesList()];
-  return [
-    { route: '/', title: 'Sipna Coders Club | Coding club of Sipna COET, Amravati', description: null, blocks: home(), footer },
-    { route: '/upcoming', title: 'Upcoming events | Sipna Coders Club', description: upcoming.length ? `Upcoming events of Sipna Coders Club, Amravati: ${upcoming.map((e) => `${e.title} (${e.date})`).join(' and ')}. Dates, rules, prizes and registration.` : 'Upcoming events of Sipna Coders Club, Amravati. New events are announced first on Instagram and LinkedIn.', blocks: upcomingPage(), footer },
-    { route: '/events', title: 'Events | Sipna Coders Club', description: 'Workshops, hackathons, seminars and build nights by Sipna Coders Club, Amravati. Every event so far, with dates and what happened.', blocks: eventsPage(), footer },
-    { route: '/team', title: 'Team | Sipna Coders Club', description: 'Meet the core team of Sipna Coders Club, the coding community of Sipna College of Engineering & Technology, Amravati.', blocks: teamPage(), footer },
-    { route: '/connect', title: 'Connect | Sipna Coders Club', description: 'Contact Sipna Coders Club: email, Instagram and LinkedIn. We usually reply within 24 hours.', blocks: connectPage(), footer: pagesList() },
-    { route: '/register', title: 'Register | Sipna Coders Club', description: 'Register for Vibe-A-Thon, the 18-hour AI build-a-thon by Sipna Coders Club. Team size 1 to 4, Round 1 is online.', blocks: registerPage(), footer },
+
+  /* ---- Schema.org (JSON-LD), generated from the same data. Events that are over drop out by themselves. ---- */
+  const ORG = { '@type': 'Organization', name: 'Sipna Coders Club', url: SITE + '/' };
+  const IMG = SITE + '/og-image.jpg';
+  const PLACE = {
+    '@type': 'Place', name: 'Sipna College of Engineering & Technology',
+    address: { '@type': 'PostalAddress', addressLocality: 'Amravati', addressRegion: 'Maharashtra', addressCountry: 'IN' },
+  };
+  const fin = vibe.FINALE_EVENT_INFO || {};
+  const eventSchema = (ev) => {
+    if (ev.id === 'code-clash') {
+      return {
+        '@type': 'Event', name: 'Code Clash',
+        description: 'Online coding competition on HackerRank for all engineering students. Two rounds, any programming language, solo entry. Under HackerRank Campus Crew, in association with Sipna Coders Club. Every participant gets a certificate.',
+        startDate: '2026-11-21T14:00:00+05:30', endDate: '2026-11-21T16:00:00+05:30',
+        eventStatus: 'https://schema.org/EventScheduled', eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
+        location: { '@type': 'VirtualLocation', url: SITE + '/#code-clash' }, url: SITE + '/#code-clash', image: IMG, isAccessibleForFree: false,
+        offers: { '@type': 'Offer', price: '49', priceCurrency: 'INR', url: clashForm || SITE + '/#code-clash' }, organizer: ORG,
+      };
+    }
+    if (ev.id === 'vibe-a-thon') {
+      const prize = (vibe.PRIZE_DATA || {}).totalPool;
+      return {
+        '@type': 'Event', name: 'Vibe-A-Thon',
+        description: `${str(ev.description)} Round 1 is an online qualifier; the top 75 teams play an 18-hour offline finale at Sipna COET, Amravati.${prize ? ` Prize pool ${prize}.` : ''}`,
+        startDate: '2026-12-26T10:00:00+05:30', endDate: '2026-12-27',
+        eventStatus: 'https://schema.org/EventScheduled', eventAttendanceMode: 'https://schema.org/MixedEventAttendanceMode',
+        location: [PLACE, { '@type': 'VirtualLocation', url: SITE + '/upcoming' }], url: SITE + '/upcoming', image: IMG, isAccessibleForFree: false,
+        offers: { '@type': 'Offer', price: '200', priceCurrency: 'INR', url: SITE + '/register', validThrough: '2026-12-12T23:59:00+05:30', description: 'Round 1 registration fee per team. Teams that reach Round 2 pay 500 INR more.' },
+        organizer: ORG,
+      };
+    }
+    const iso = /^\d{4}-\d{2}-\d{2}/.test(str(ev.date)) ? str(ev.date).replace(' ', 'T') : '';
+    return {
+      '@type': 'Event', name: ev.title, description: str(ev.description) || undefined,
+      startDate: iso ? (iso.length > 10 ? iso + ':00+05:30' : iso) : undefined,
+      eventStatus: 'https://schema.org/EventScheduled', location: ev.venue ? { ...PLACE, name: ev.venue } : PLACE,
+      url: SITE + '/upcoming', image: IMG, organizer: ORG,
+      offers: ev.registerLink ? { '@type': 'Offer', url: ev.registerLink } : undefined,
+    };
+  };
+  const events = upcoming.map(eventSchema);
+  const WEBSITE = { '@type': 'WebSite', '@id': SITE + '/#website', name: 'Sipna Coders Club', url: SITE + '/', inLanguage: 'en', publisher: ORG };
+  const crumbs = (name, route) => ({
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE + '/' },
+      { '@type': 'ListItem', position: 2, name, item: SITE + route },
+    ],
+  });
+  const ld = (route, type, name, description, extra = []) => [
+    WEBSITE,
+    { '@type': type, '@id': SITE + (route === '/' ? '/' : route) + '#webpage', url: SITE + (route === '/' ? '/' : route), name, description, inLanguage: 'en', isPartOf: { '@id': SITE + '/#website' } },
+    ...(route === '/' ? [] : [crumbs(name.replace(/ \| Sipna Coders Club$/, ''), route)]),
+    ...extra,
   ];
+  const faq = arr(site.FAQ).length ? [{
+    '@type': 'FAQPage',
+    mainEntity: arr(site.FAQ).map((f) => ({ '@type': 'Question', name: str(f.q), acceptedAnswer: { '@type': 'Answer', text: str(f.a) } })),
+  }] : [];
+  const homeDesc = 'Sipna Coders Club is the coding community of Sipna College of Engineering & Technology, Amravati. Workshops, hackathons, seminars and build nights in web development, DSA, AI, cloud and app development.';
+  const orgContact = { ...ORG, email, contactPoint: { '@type': 'ContactPoint', email, contactType: 'customer support' } };
+
+  /* ---- the "Upcoming events" lines of llms.txt, from the same list ---- */
+  const llmsEvents = upcoming.map((ev) => {
+    if (ev.id === 'code-clash') return `- [Code Clash](${SITE}/#code-clash): online coding competition on HackerRank, 21 November 2026, 2 PM to 4 PM IST. Two rounds, any programming language, solo entry, open to all engineering students, registration fee ₹49. Under HackerRank Campus Crew, in association with Sipna Coders Club.${clashForm ? ` Register: ${clashForm}` : ''}`;
+    if (ev.id === 'vibe-a-thon') return `- [Vibe-A-Thon](${SITE}/upcoming): hackathon by Sipna Coders Club. Online Round 1 qualifier, then an 18-hour on-campus final round at Sipna COET, Amravati, on ${fin.dates || '26 and 27 December 2026'}. Teams of 1 to 4, prize pool ${(vibe.PRIZE_DATA || {}).totalPool || ''}. Register: ${SITE}/register`;
+    return `- [${ev.title}](${SITE}/upcoming): ${ev.date}. ${str(ev.description)}${ev.registerLink ? ` Register: ${ev.registerLink}` : ''}`;
+  });
+
+  const pages = [
+    { route: '/', title: 'Sipna Coders Club | Coding club of Sipna COET, Amravati', description: null, blocks: home(), footer, jsonld: ld('/', 'WebPage', 'Sipna Coders Club', homeDesc, [...events, ...faq]) },
+    { route: '/upcoming', title: 'Upcoming events | Sipna Coders Club', description: upcoming.length ? `Upcoming events of Sipna Coders Club, Amravati: ${upcoming.map((e) => `${e.title} (${e.date})`).join(' and ')}. Dates, rules, prizes and registration.` : 'Upcoming events of Sipna Coders Club, Amravati. New events are announced first on Instagram and LinkedIn.', blocks: upcomingPage(), footer, jsonld: ld('/upcoming', 'WebPage', 'Upcoming events | Sipna Coders Club', 'Upcoming events of Sipna Coders Club: dates, rules, prizes and registration.', events) },
+    { route: '/events', title: 'Events | Sipna Coders Club', description: 'Workshops, hackathons, seminars and build nights by Sipna Coders Club, Amravati. Every event so far, with dates and what happened.', blocks: eventsPage(), footer, jsonld: ld('/events', 'CollectionPage', 'Events | Sipna Coders Club', 'Workshops, hackathons, seminars and build nights by Sipna Coders Club.', events) },
+    { route: '/team', title: 'Team | Sipna Coders Club', description: 'Meet the core team of Sipna Coders Club, the coding community of Sipna College of Engineering & Technology, Amravati.', blocks: teamPage(), footer, jsonld: ld('/team', 'AboutPage', 'Team | Sipna Coders Club', 'The core team of Sipna Coders Club.') },
+    { route: '/connect', title: 'Connect | Sipna Coders Club', description: 'Contact Sipna Coders Club: email, Instagram and LinkedIn. We usually reply within 24 hours.', blocks: connectPage(), footer: pagesList(), jsonld: ld('/connect', 'ContactPage', 'Connect | Sipna Coders Club', 'Contact Sipna Coders Club: email, Instagram and LinkedIn.', [orgContact]) },
+    { route: '/register', title: 'Register | Sipna Coders Club', description: 'Register for Vibe-A-Thon, the 18-hour AI build-a-thon by Sipna Coders Club. Team size 1 to 4, Round 1 is online.', blocks: registerPage(), footer, jsonld: ld('/register', 'WebPage', 'Register | Sipna Coders Club', 'Register for Vibe-A-Thon, the 18-hour AI build-a-thon by Sipna Coders Club.', events.filter((e) => e.name === 'Vibe-A-Thon')) },
+  ];
+  return { pages, llmsEvents };
 }
 
 /* ------------------------------------------------------------------ renderers */
@@ -443,8 +515,19 @@ function setMeta(html, attr, name, content) {
   return re.test(html) ? html.replace(re, (_, a, b) => `${a}${esc(content)}${b}`) : html;
 }
 
+function dropOldEventLd(html) {
+  html = html.replace(/<!--\s*Upcoming events for Google and AI assistants[\s\S]*?-->\s*/, '');
+  return html.replace(/<script type="application\/ld\+json">([\s\S]*?)<\/script>\s*/g, (m, json) => {
+    try {
+      const d = JSON.parse(json);
+      if ((d['@graph'] || [d]).some((x) => x && x['@type'] === 'Event')) return '';
+    } catch { /* not ours, keep it */ }
+    return m;
+  });
+}
+
 function makeHtml(base, page) {
-  let html = base;
+  let html = dropOldEventLd(base);
   const url = SITE + (page.route === '/' ? '/' : page.route);
   html = html.replace(/<title>[\s\S]*?<\/title>/, `<title>${esc(page.title)}</title>`);
   html = html.replace(/(<link rel="canonical" href=")[^"]*(")/, (_, a, b) => `${a}${url}${b}`);
@@ -458,7 +541,8 @@ function makeHtml(base, page) {
   }
   // the old short <noscript> summary is replaced by the full text below
   html = html.replace(/<noscript>\s*<main[\s\S]*?<\/main>\s*<\/noscript>\s*/, '');
-  const head = `<style id="seo-static-css">${HIDE_CSS}</style>\n    <noscript><style>${SHOW_CSS}</style></noscript>\n    <link rel="alternate" type="text/plain" href="/llms-full.txt" title="The whole website as plain text" />\n  `;
+  const ldJson = JSON.stringify({ '@context': 'https://schema.org', '@graph': arr(page.jsonld) }).replace(/</g, '\\u003c');
+  const head = `<script type="application/ld+json" id="seo-jsonld">${ldJson}</script>\n    <style id="seo-static-css">${HIDE_CSS}</style>\n    <noscript><style>${SHOW_CSS}</style></noscript>\n    <link rel="alternate" type="text/plain" href="/llms-full.txt" title="The whole website as plain text" />\n  `;
   html = html.replace('</head>', head + '</head>');
   const block = `${MARK_START}<div class="seo-static">\n${renderHtml([...page.blocks, ...arr(page.footer)])}\n</div>${MARK_END}`;
   html = html.replace(/<div id="root"\s*>\s*<\/div>/, `<div id="root">${block}</div>`);
@@ -472,6 +556,13 @@ function check(html, label) {
   if (html.length > 400000) throw new Error(`${label}: too large`);
 }
 
+function rewriteLlmsEvents(text, lines, today) {
+  const re = /\n## Upcoming events\n([\s\S]*?)(?=\n## )/;
+  if (!re.test(text)) return text;
+  const body = lines.length ? lines.join('\n') : `- No event is announced right now (checked on ${longDate(today)}). New events are announced first on Instagram and LinkedIn.`;
+  return text.replace(re, () => `\n## Upcoming events\n\n${body}\n`);
+}
+
 async function main() {
   const indexPath = path.join(DIST, 'index.html');
   if (!fs.existsSync(indexPath)) { warn('dist/index.html not found. Run "npm run build" first. Skipping.'); return; }
@@ -481,7 +572,7 @@ async function main() {
 
   const data = await loadData();
   const today = todayIST();
-  const pages = buildPages(data, today);
+  const { pages, llmsEvents } = buildPages(data, today);
 
   // 1) build everything in memory and check it
   const outputs = pages.map((p) => {
@@ -506,8 +597,10 @@ async function main() {
   fs.writeFileSync(path.join(DIST, 'llms-full.txt'), full);
   const llms = path.join(DIST, 'llms.txt');
   if (fs.existsSync(llms)) {
-    const t = fs.readFileSync(llms, 'utf8');
-    if (!t.includes('llms-full.txt')) fs.writeFileSync(llms, t.replace(/\s*$/, '\n') + `\n## Full text\n\n- [The whole website as plain text](${SITE}/llms-full.txt): every page in one file\n`);
+    let t = fs.readFileSync(llms, 'utf8');
+    t = rewriteLlmsEvents(t, llmsEvents, today);
+    if (!t.includes('llms-full.txt')) t = t.replace(/\s*$/, '\n') + `\n## Full text\n\n- [The whole website as plain text](${SITE}/llms-full.txt): every page in one file\n`;
+    fs.writeFileSync(llms, t);
   }
   fs.writeFileSync(indexPath, outputs.find((o) => o.page.route === '/').html);
 
