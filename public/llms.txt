@@ -1,0 +1,30 @@
+# Sipna Coders Club
+
+> The coding community of Sipna College of Engineering & Technology (Sipna COET), Amravati, Maharashtra, India. We run workshops, hackathons, seminars and build nights in web development, DSA, AI, cloud and app development.
+
+The website is a JavaScript app, so its pages only show their full content in a browser that runs JavaScript. Everything an assistant needs is summarised here.
+
+## Upcoming events
+
+- [Code Clash](https://sipnacoders.club/#code-clash): online coding competition on HackerRank, 21 November 2026, 2 PM to 4 PM IST. Two rounds, any programming language, solo entry, open to all engineering students, registration fee Rs 49. Under HackerRank Campus Crew, in association with Sipna Coders Club. Every participant gets a certificate. Register: https://forms.gle/b1sEdP7bd2VGTysDA
+- [Vibe-A-Thon](https://sipnacoders.club/upcoming): hackathon by Sipna Coders Club. The final round is on campus at Sipna COET, Amravati, on 26 and 27 December 2026. Register: https://sipnacoders.club/register
+
+## Pages
+
+- [Home](https://sipnacoders.club/): what the club does, numbers, upcoming events, membership
+- [Events](https://sipnacoders.club/events): past workshops, hackathons, seminars and build nights, with photos
+- [Upcoming](https://sipnacoders.club/upcoming): what the club is planning next
+- [Team](https://sipnacoders.club/team): the current core team and the founding crew
+- [Connect](https://sipnacoders.club/connect): get in touch or collaborate; the club usually replies within 24 hours
+- [Register](https://sipnacoders.club/register): registration for Vibe-A-Thon
+
+## Facts
+
+- 600+ participants, 9+ events conducted, 4 workshops, 12 core members.
+- Membership form: https://forms.gle/JJd8cno31C1ExZMh8
+
+## Contact
+
+- Email: team@sipnacoders.club
+- Instagram: https://www.instagram.com/sipnacoders.club/
+- LinkedIn: https://www.linkedin.com/company/sipna-coders-club/

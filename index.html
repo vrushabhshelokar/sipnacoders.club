@@ -61,9 +61,71 @@
         }
       }
     </script>
+    <!-- Upcoming events for Google and AI assistants. After an event is over, delete its block here and its line in public/llms.txt. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Event",
+            "name": "Code Clash",
+            "description": "Online coding competition on HackerRank for all engineering students. Two rounds, any programming language, solo entry. Under HackerRank Campus Crew, in association with Sipna Coders Club. Every participant gets a certificate.",
+            "startDate": "2026-11-21T14:00:00+05:30",
+            "endDate": "2026-11-21T16:00:00+05:30",
+            "eventStatus": "https://schema.org/EventScheduled",
+            "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
+            "location": { "@type": "VirtualLocation", "url": "https://sipnacoders.club/#code-clash" },
+            "image": "https://sipnacoders.club/og-image.jpg",
+            "isAccessibleForFree": false,
+            "offers": { "@type": "Offer", "price": "49", "priceCurrency": "INR", "url": "https://forms.gle/b1sEdP7bd2VGTysDA", "availability": "https://schema.org/InStock" },
+            "organizer": { "@type": "Organization", "name": "Sipna Coders Club", "url": "https://sipnacoders.club/" }
+          },
+          {
+            "@type": "Event",
+            "name": "Vibe-A-Thon",
+            "description": "Hackathon by Sipna Coders Club. The final round is on campus at Sipna College of Engineering & Technology, Amravati.",
+            "startDate": "2026-12-26",
+            "endDate": "2026-12-27",
+            "eventStatus": "https://schema.org/EventScheduled",
+            "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+            "location": {
+              "@type": "Place",
+              "name": "Sipna College of Engineering & Technology",
+              "address": { "@type": "PostalAddress", "addressLocality": "Amravati", "addressRegion": "Maharashtra", "addressCountry": "IN" }
+            },
+            "url": "https://sipnacoders.club/upcoming",
+            "image": "https://sipnacoders.club/og-image.jpg",
+            "organizer": { "@type": "Organization", "name": "Sipna Coders Club", "url": "https://sipnacoders.club/" }
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
-    <noscript>Sipna Coders Club: please turn on JavaScript to view this website.</noscript>
+    <!-- bot-fallback: what bots and AI assistants that do not run JavaScript can read. Keep it short and true. -->
+    <noscript>
+      <main style="max-width:720px;margin:0 auto;padding:40px 20px;font:16px/1.6 system-ui,sans-serif;color:#e8eaf0;background:#06070a">
+        <h1>Sipna Coders Club</h1>
+        <p>The coding community of Sipna College of Engineering &amp; Technology (Sipna COET), Amravati, Maharashtra, India. We run workshops, hackathons, seminars and build nights in web development, DSA, AI, cloud and app development. 600+ participants, 9+ events conducted, 12 core members.</p>
+        <h2>Upcoming events</h2>
+        <ul>
+          <li><strong>Code Clash</strong>: online coding competition on HackerRank, 21 November 2026, 2 PM to 4 PM IST. Two rounds, any programming language, solo entry, open to all engineering students, registration fee Rs 49. Under HackerRank Campus Crew, in association with Sipna Coders Club. <a href="https://forms.gle/b1sEdP7bd2VGTysDA">Register for Code Clash</a></li>
+          <li><strong>Vibe-A-Thon</strong>: hackathon by Sipna Coders Club. The final round is on campus at Sipna COET, Amravati, on 26 and 27 December 2026. <a href="https://sipnacoders.club/register">Register for Vibe-A-Thon</a></li>
+        </ul>
+        <h2>Pages</h2>
+        <ul>
+          <li><a href="https://sipnacoders.club/">Home</a></li>
+          <li><a href="https://sipnacoders.club/events">Events</a>: past workshops, hackathons, seminars and build nights</li>
+          <li><a href="https://sipnacoders.club/upcoming">Upcoming events</a></li>
+          <li><a href="https://sipnacoders.club/team">Team</a></li>
+          <li><a href="https://sipnacoders.club/connect">Connect</a></li>
+          <li><a href="https://sipnacoders.club/register">Register</a></li>
+        </ul>
+        <h2>Contact</h2>
+        <p><a href="mailto:team@sipnacoders.club">team@sipnacoders.club</a> · <a href="https://www.instagram.com/sipnacoders.club/">Instagram</a> · <a href="https://www.linkedin.com/company/sipna-coders-club/">LinkedIn</a></p>
+        <p>Turn on JavaScript to see the full website.</p>
+      </main>
+    </noscript>
     <div id="root"></div>
     <script src="/intro/intro.js"></script>
     <script type="module" src="/src/main.jsx"></script>
