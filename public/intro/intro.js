@@ -32,6 +32,7 @@
   var SEEN_KEY = 'scc-intro-seen';        // change this name (e.g. 'scc-intro-seen-2') if you make a new intro and want everybody to see it once more
   var LOGO_SRC = '/coders_club_logo.webp'; // the logo in /public
   var MAX_WAIT = 7000;                    // ms - never hide the site longer than this
+  var TAP_TO_START = false;               // false = the laptop animation starts by itself (silent, with a "tap for sound" button); true = the closed laptop waits for a tap ("tap to power on") so the music can start from the first second
 
   /* ---------------- play only once per visitor ---------------- */
   // The "seen" mark is saved in the visitor's browser (localStorage), so it is remembered for good:
@@ -782,7 +783,8 @@
       else {
         try { snd = makeSound(new AC()); } catch (e) { snd = null; }
         if (snd && snd.ctx.state === 'running') { engage(); sfx('arrive'); } // sound allowed: no need to wait
-        else { gated = true; root.classList.add('scc-gate'); }
+        else if (TAP_TO_START) { gated = true; root.classList.add('scc-gate'); }
+        else { sndBtn.classList.add('show'); } // no waiting: the animation starts now, and "tap for sound" is there if they want music
       }
       root.addEventListener('click', onGateTap);
       window.addEventListener('keydown', onGateKey, true);

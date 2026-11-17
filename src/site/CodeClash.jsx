@@ -19,7 +19,7 @@ export default function CodeClash() {
   const regOpen = useSwitch('codeClashRegistration', true);
   if (!sectionOn) return null;
   return (
-    <section id={CODE_CLASH_ID} className="s-section cc-section">
+    <section id={`${CODE_CLASH_ID}-details`} className="s-section cc-section">
       <div className="s-container">
         <Reveal className="s-join cc-join">
           <div className="s-join-poster cc-poster">

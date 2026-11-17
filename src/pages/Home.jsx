@@ -5,6 +5,7 @@ import HeroArt from '../site/HeroArt';
 import { PastBento } from '../site/events';
 import { ToolStrip, Wins, Voices, Faq, Ambassadors } from '../site/Sections';
 import CodeClash from '../site/CodeClash';
+import LiveEvent from '../site/LiveEvent';
 import { CountBubble, FoundMessage, upcomingLabel, useUpcomingCount } from '../site/UpcomingFound';
 import { LINKS, STATS, TRACKS, JOIN_STEPS, membershipPoster, groupPhoto } from '../data/site';
 
@@ -12,6 +13,8 @@ export default function Home() {
   return (
     <>
       <Hero />
+
+      <LiveEvent />
 
       <Ambassadors />
 
