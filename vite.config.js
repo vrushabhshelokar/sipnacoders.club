@@ -46,6 +46,26 @@ export default defineConfig(({ mode }) => {
                 console.error('Local dev Admin API error:', err);
                 next();
               }
+            } else if (url === '/api/people' || url.startsWith('/api/people?')) {
+              try {
+                const { default: handler } = await import('./api/people.js');
+                const [pathname, search] = url.split('?');
+                req.query = Object.fromEntries(new URLSearchParams(search || ''));
+                return handler(req, res);
+              } catch (err) {
+                console.error('Local dev People API error:', err);
+                next();
+              }
+            } else if (url === '/api/admin/people' || url.startsWith('/api/admin/people?')) {
+              try {
+                const { default: handler } = await import('./api/admin/people.js');
+                const [pathname, search] = url.split('?');
+                req.query = Object.fromEntries(new URLSearchParams(search || ''));
+                return handler(req, res);
+              } catch (err) {
+                console.error('Local dev Admin People API error:', err);
+                next();
+              }
             } else {
               next();
             }

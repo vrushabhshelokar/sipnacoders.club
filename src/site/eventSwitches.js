@@ -40,5 +40,5 @@ export const CODE_CLASH_POPUP_TEXT = {
    ------------------------------------------------------------------------------------- */
 export const CODE_CLASH_ID = 'code-clash';                              // the block's id: sipnacoders.club/#code-clash
 export const CODE_CLASH_SEEN_KEY = 'scc-clash-popup-1';                 // change the number (…-2) to show the popup again to people who closed it
-export const CODE_CLASH_SKIP_ON = ['/register', '/upcoming'];           // pages where the Code Clash popup never appears
+export const CODE_CLASH_SKIP_ON = ['/register', '/upcoming', '/admin/visitor-analytics'];           // pages where the Code Clash popup never appears
 // Preview the Code Clash popup any time (ignores "already seen" and the switches): add ?popup=clash to the address.

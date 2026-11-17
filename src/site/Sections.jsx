@@ -1,10 +1,11 @@
 // Extra home-page sections: tools strip, wins & projects, member voices and FAQ.
 // All content comes from src/data/site.js. Voices and wins stay hidden until real entries are added there.
-import { Fragment, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon } from './Icons';
 import { Reveal, SectionHead } from './ui';
-import { TOOLS, FAQ, VOICES, WINS, LINKS, PROGRAMS, AMBASSADORS } from '../data/site';
+import { TOOLS, FAQ, VOICES, WINS, LINKS, PROGRAMS } from '../data/site';
+import { useAmbassadors } from './peopleStore';
 import './Ambassadors.css';
 
 const DOTS = ['#4285f4', '#34a853', '#fbbc05', '#ea4335'];
@@ -144,13 +145,15 @@ const isPast = (a) => {
   }
   return PAST_WORDS.includes(s);
 };
-const SORTED = (() => {
-  const all = AMBASSADORS.map((a) => ({ a, past: isPast(a) }));
+const sortAmbassadors = (list) => {
+  const all = list.map((a) => ({ a, past: isPast(a) }));
   return [...all.filter((x) => !x.past), ...all.filter((x) => x.past)];
-})();
+};
 
 export function Ambassadors() {
-  if (!AMBASSADORS.length) return null;
+  const list = useAmbassadors();
+  const SORTED = useMemo(() => sortAmbassadors(list), [list]);
+  if (!list.length) return null;
   const both = SORTED.some((x) => x.past) && SORTED.some((x) => !x.past);   // the two group titles show only when both groups exist
   return (
     <section id="ambassadors" className="s-section s-section-tint">
@@ -166,7 +169,7 @@ export function Ambassadors() {
             const c1 = progs[0] ? progs[0].color : '#4c8dff', c2 = progs[1] ? progs[1].color : c1;
             const firstOfGroup = both && (i === 0 || SORTED[i - 1].past !== past);
             return (
-              <Fragment key={a.name}>
+              <Fragment key={a.id || a.name}>
               {firstOfGroup && <p className="s-ambs-group" aria-hidden="true">{past ? 'Past ambassadors' : 'Present ambassadors'}</p>}
               <Reveal as="article" className={`s-amb ${past ? 'is-past' : 'is-present'}`} delay={(i % 2) * 90} style={{ '--c1': c1, '--c2': c2 }}>
                 <div className="s-amb-top">

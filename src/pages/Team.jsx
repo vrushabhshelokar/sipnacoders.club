@@ -1,8 +1,10 @@
 import { Icon } from '../site/Icons';
 import { PageHead, Reveal } from '../site/ui';
-import { LINKS, TEAM, groupPhoto } from '../data/site';
+import { LINKS, groupPhoto } from '../data/site';
+import { useTeam } from '../site/peopleStore';
 
 export default function Team() {
+  const team = useTeam();
   const toTeam = (e) => {
     e.preventDefault();
     const el = document.getElementById('current-team');
@@ -32,7 +34,7 @@ export default function Team() {
       <section id="current-team" className="s-section s-team-current">
         <div className="s-container">
           <div className="s-team">
-            {TEAM.map((m, i) => <Member key={m.name} m={m} i={i} />)}
+            {team.map((m, i) => <Member key={m.id || m.name} m={m} i={i} />)}
           </div>
         </div>
       </section>

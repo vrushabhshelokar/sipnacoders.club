@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './AdminAnalytics.css';
 import { CODE_CLASH_POPUP, VIBEATHON_POPUP, CODE_CLASH_SECTION } from '../site/eventSwitches';
 import * as C from '../site/upcomingConfig';
+import PeopleManager from './AdminPeople';
 
 /* ---------------------------------------------------------------------------------------------
    Private admin dashboard (/admin/visitor-analytics)
@@ -615,6 +616,8 @@ export default function AdminAnalytics() {
               <span className="ad-savemsg" role="status" data-type={saveMsg.type}>{saveMsg.text}{dirty && !saveMsg.text ? 'You have unsaved changes.' : ''}</span>
             </div>
           </section>
+
+          <PeopleManager />
         </div>
       )}
     </div>

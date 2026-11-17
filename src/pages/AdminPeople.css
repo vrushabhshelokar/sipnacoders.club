@@ -1,0 +1,61 @@
+/* Admin dashboard: the "Team and ambassadors" panel. Builds on the .ad-* styles of AdminAnalytics.css. */
+.ap .ad-sub { max-width: 70ch; }
+
+.ap-tabs { display: inline-flex; gap: 4px; padding: 4px; margin: 4px 0 18px; background: rgba(255, 255, 255, .03); border: 1px solid var(--border); border-radius: 12px; }
+.ap-tabs button { padding: 8px 16px; border-radius: 9px; font: 600 13.5px var(--sans); color: var(--text-2); transition: background .15s, color .15s; }
+.ap-tabs button:hover { background: rgba(255, 255, 255, .06); }
+.ap-tabs button.is-on { background: rgba(76, 141, 255, .16); color: #fff; }
+.ap-tabs button:focus-visible, .ap-btn:focus-visible, .ap-file:focus-within, .ap-check:focus-within { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+.ap-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+.ap-count { font: 600 13px var(--sans); color: var(--muted); }
+.ap-top-acts { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 14px; }
+.ap-note { margin: 0 0 14px; }
+
+.ap-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.ap-row { border: 1px solid var(--border); border-radius: 14px; background: rgba(255, 255, 255, .02); min-width: 0; }
+.ap-row.is-open { border-color: rgba(76, 141, 255, .45); background: rgba(76, 141, 255, .04); }
+.ap-main { display: flex; align-items: center; gap: 14px; padding: 10px 12px; }
+.ap-pos { flex: none; width: 24px; text-align: center; font: 700 12px var(--mono); color: var(--muted); }
+.ap-thumb { flex: none; width: 48px; height: 56px; border-radius: 10px; object-fit: cover; object-position: top; background: #0d1016; }
+.ap-sum { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.ap-sum b { color: #fff; font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ap-sum > span { font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ap-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; white-space: normal; }
+.ap-chips em { font: 600 11px var(--sans); font-style: normal; color: var(--text-2); background: rgba(255, 255, 255, .07); padding: 2px 8px; border-radius: 999px; }
+.ap-chips em.is-present { color: var(--green); background: rgba(61, 220, 132, .12); }
+.ap-chips em.is-past { color: var(--muted); }
+
+.ap-acts { flex: none; display: flex; align-items: center; gap: 6px; }
+.ap-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 40px; height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--border); color: var(--text-2); font: 600 13px var(--sans); background: transparent; cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
+.ap-btn:hover:not(:disabled) { background: rgba(255, 255, 255, .07); color: #fff; }
+.ap-btn:disabled { opacity: .35; cursor: default; }
+.ap-btn.is-danger:hover:not(:disabled) { border-color: rgba(234, 67, 53, .5); color: #ff8a80; }
+.ap-btn.is-danger.is-armed { background: rgba(234, 67, 53, .16); border-color: rgba(234, 67, 53, .6); color: #ff8a80; }
+.ap-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+.ap-edit { display: grid; gap: 18px; padding: 16px 14px 18px; border-top: 1px solid var(--border); }
+.ap-fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
+.ap-photo { display: flex; align-items: flex-start; gap: 16px; }
+.ap-photo img { flex: none; width: 72px; height: 84px; border-radius: 12px; object-fit: cover; object-position: top; background: #0d1016; border: 1px solid var(--border); }
+.ap-photo-ctl { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.ap-photo-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.ap-file { position: relative; }
+.ap-programs { margin: 0; padding: 0; border: 0; min-width: 0; }
+.ap-programs legend { padding: 0; margin-bottom: 8px; font-size: 13px; color: var(--text-2); }
+.ap-checks { display: flex; flex-wrap: wrap; gap: 8px; }
+.ap-check { position: relative; display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; border: 1px solid var(--border); border-radius: 999px; font-size: 13.5px; color: var(--text-2); cursor: pointer; transition: background .15s, border-color .15s, color .15s; }
+.ap-check input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.ap-check.is-on { background: rgba(76, 141, 255, .16); border-color: rgba(76, 141, 255, .55); color: #fff; }
+
+
+@media (max-width: 640px) {
+  .ap-main { flex-wrap: wrap; row-gap: 10px; }
+  .ap-sum { flex-basis: calc(100% - 100px); }
+  .ap-acts { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
+  .ap-photo { flex-direction: column; }
+  .ap-top-acts { width: 100%; justify-content: space-between; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ap-tabs button, .ap-btn, .ap-check { transition: none; }
+}

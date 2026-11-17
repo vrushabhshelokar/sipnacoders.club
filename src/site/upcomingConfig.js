@@ -135,5 +135,5 @@ export const POPUP_TEXT = {
 export const POPUP_SHOW_NAME = true;
 export const POPUP_DELAY = 2000;          // milliseconds to wait after the opening animation (2000 = 2 seconds)
 export const POPUP_SEEN_KEY = 'scc-hack-popup-1';   // change the number (…-2) to show the popup again to people who already closed it
-export const POPUP_SKIP_ON = ['/register', '/upcoming'];   // pages where the popup never appears
+export const POPUP_SKIP_ON = ['/register', '/upcoming', '/admin/visitor-analytics'];   // pages where the popup never appears
 export const TYPE_MS = 45;                // "Try to decrypt" typing speed (milliseconds per letter)
