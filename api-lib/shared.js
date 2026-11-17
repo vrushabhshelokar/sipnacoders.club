@@ -76,7 +76,7 @@ export async function readBody(req) {
     let data = '';
     const timer = setTimeout(() => resolve({}), 2000);
     const finish = (value) => { clearTimeout(timer); resolve(value); };
-    req.on('data', (chunk) => { data += chunk; });
+    req.on('data', (chunk) => { if (data.length < 20000) data += chunk; });   // nothing we accept is bigger than a few hundred bytes
     req.on('end', () => {
       try { finish(data ? JSON.parse(data) : {}); } catch { finish({}); }
     });

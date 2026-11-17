@@ -10,6 +10,7 @@ import { CountBubble, NewTag, upcomingLabel, useUpcomingCount } from './Upcoming
 import VisitorTracker from './VisitorTracker';
 import './NavFix.css';
 import './UpcomingPage.css';
+import '../styles/a11y.css';
 import { LINKS, logo } from '../data/site';
 
 const NAV = [
@@ -68,6 +69,13 @@ export default function Layout({ children }) {
     <>
       <Background />
       <ScrollProgress />
+      <a
+        className="s-skip"
+        href="#main-content"
+        onClick={(e) => { const m = document.getElementById('main-content'); if (m) { e.preventDefault(); m.focus(); m.scrollIntoView(); } }}
+      >
+        Skip to main content
+      </a>
       <header className={`s-nav ${scrolled ? 'is-solid' : ''}`}>
         <div className="s-container s-nav-in">
           <Link to="/" className="s-brand" aria-label="Sipna Coders Club home" onClick={logoTap}>
@@ -85,7 +93,7 @@ export default function Layout({ children }) {
         </div>
       </header>
 
-      <main className="s-main s-page" key={pathname}>{children}</main>
+      <main id="main-content" tabIndex={-1} className="s-main s-page" key={pathname}>{children}</main>
 
       <footer className="s-footer">
         <div className="s-container">

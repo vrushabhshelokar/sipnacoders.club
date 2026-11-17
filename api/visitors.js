@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import {
   KEYS, KEEP_DAYS, getRedisClient, parseCookies, readBody, sendResponse, istDay,
 } from '../api-lib/shared.js';
+import { clientIp, memoryHit } from '../api-lib/ratelimit.js';
 
 // First-party cookie configuration
 const COOKIE_NAME = 'scc_vid';
@@ -41,6 +42,22 @@ const SOURCE_BY_HOST = [
   [/google\./, 'google'],
   [/bing\.|duckduckgo|yahoo|ecosia/, 'search'],
 ];
+
+// Real browsers send an Origin header on a POST. If it names another website, the request did not come from our pages.
+// (No Origin at all is allowed: some privacy modes and old cached copies of the site leave it out.)
+function sameOrigin(req) {
+  const origin = req.headers['origin'];
+  if (!origin) return true;
+  try {
+    const from = new URL(origin).hostname.replace(/^www\./, '').toLowerCase();
+    const own = String(req.headers.host || '').split(':')[0].replace(/^www\./, '').toLowerCase();
+    return !own || from === own;
+  } catch { return true; }
+}
+
+// One address may send this many counting requests per minute to one Vercel instance. A whole class on one college
+// Wi-Fi opening the link together stays far below it; a script that floods the counters does not.
+const MAX_PER_MINUTE = 240;
 
 function cleanPath(p) {
   if (typeof p !== 'string') return null;
@@ -92,6 +109,15 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return sendResponse(res, 405, { error: 'Method Not Allowed' });
+  }
+
+  // Checked before Redis is touched, so a flood from outside costs no Redis commands
+  if (!sameOrigin(req)) {
+    return sendResponse(res, 403, { ok: false });
+  }
+  const hit = memoryHit(`visit:${clientIp(req)}`, MAX_PER_MINUTE, 60_000);
+  if (hit.limited) {
+    return sendResponse(res, 429, { ok: false }, { 'Retry-After': String(hit.retryAfter) });
   }
 
   const redis = getRedisClient();

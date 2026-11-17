@@ -1,0 +1,28 @@
+/* Accessibility helpers (added by audit-fix.mjs). Nothing here changes how the site looks to a mouse user. */
+
+/* "Skip to main content": hidden until a keyboard user tabs to it */
+.s-skip {
+  position: fixed; left: 12px; top: 8px; z-index: 10000;
+  transform: translateY(-220%);
+  padding: 10px 16px; border-radius: 10px;
+  background: #fff; color: #0b1020;
+  font: 600 14px var(--sans, system-ui, sans-serif);
+  text-decoration: none;
+  transition: transform .15s ease;
+}
+.s-skip:focus, .s-skip:focus-visible { transform: translateY(0); outline: 2px solid #8fb4ff; outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .s-skip { transition: none; } }
+
+/* <main> only receives focus from the skip link, it is not a control, so no ring around the whole page */
+.s-main:focus { outline: none; }
+
+/* text links were only 16-20px tall: an invisible 4px extension above and below makes the clickable area 24px (nothing moves) */
+.s-link { position: relative; }
+.s-link::after { content: ''; position: absolute; left: 0; right: 0; top: -4px; bottom: -4px; }
+
+/* the thin progress bars of the rule book: 8px tall to look at, 24px tall to click */
+.rb-seg-cell { position: relative; }
+.rb-seg-cell::after { content: ''; position: absolute; left: 0; right: 0; top: -8px; bottom: -8px; }
+
+/* the contact form title is an h2 now (it was an h3): same look as before */
+.s-form h2 { font: 700 26px var(--display); color: #fff; letter-spacing: -.02em; margin: 0 0 4px; }

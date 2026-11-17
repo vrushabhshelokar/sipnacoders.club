@@ -57,7 +57,7 @@ export default function Connect() {
 
           <Reveal delay={120}>
             <form className="s-form" onSubmit={send}>
-              <h3>Send us a message</h3>
+              <h2>Send us a message</h2>
               <label>
                 <span>Your name</span>
                 <input required value={form.name} onChange={set('name')} placeholder="Full name" autoComplete="name" />

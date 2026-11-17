@@ -1,7 +1,16 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon } from '../site/Icons';
 
 export default function NotFound() {
+  // the server answers 200 for every address, so tell search engines this one is not a real page
+  useEffect(() => {
+    const m = document.createElement('meta');
+    m.name = 'robots';
+    m.content = 'noindex';
+    document.head.appendChild(m);
+    return () => m.remove();
+  }, []);
   return (
     <section className="s-404">
       <div className="s-container">
