@@ -49,3 +49,49 @@
    Google saw the main text of the page 6 to 11 seconds late. It is drawn at once now, behind the opening animation, and still slides up into
    place when the animation ends. Nothing changes for the visitor except that the text no longer fades in. */
 .s-hero-copy > *, .s-hero-visual { opacity: 1; }
+
+/* 8. Speed (Google's "Avoid non-composited animations" and the main thread). The glows and rings below used to animate box-shadow, which makes the
+   browser repaint every frame on the main thread. They now fade / scale a ring instead (same look), which the graphics chip does by itself.
+   The moving colours of the hero word and the moving dashes of the hero art need the main thread, so they start with the first touch of the page
+   (html gets "s-touched", see site/interaction.js) and not while the page is still loading. ("html" in front of each selector only makes these rules
+   win over the same rules in lazily loaded files.) */
+html .s-pill i, html .s-flag i, html .s-live i, html .s-soon-tag i, html .s-bt-latest i, html .le-dot { position: relative; animation: none; }
+html .s-pill i::after, html .s-flag i::after, html .s-live i::after, html .s-soon-tag i::after, html .s-bt-latest i::after, html .le-dot::after {
+  content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--green); opacity: 0; pointer-events: none;
+  animation: s-ping-ring 2s infinite;
+}
+html .s-live i::after { animation-duration: 1.6s; }
+html .le-dot { box-shadow: 0 0 10px 2px rgba(6, 200, 111, .7); }
+html .le-dot::after { background: var(--cc); animation: s-ping-ring 1.8s ease-out infinite; }
+@keyframes s-ping-ring { 0% { transform: scale(1); opacity: .6; } 70%, 100% { transform: scale(3.2); opacity: 0; } }
+
+html .s-hero .s-btn.has-found { position: relative; animation: none; }
+html .s-uf-cc { animation: none; }
+html .s-hero .s-btn.has-found::after, html .s-uf-cc::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; opacity: 0; pointer-events: none;
+  box-shadow: 0 0 0 5px rgba(199, 146, 234, .12), 0 10px 36px -12px rgba(199, 146, 234, .9);
+  animation: s-uf-glow-fade 2.6s ease-in-out infinite;
+}
+html .s-uf-cc::after { box-shadow: 0 0 0 5px rgba(6, 200, 111, .13), 0 10px 34px -12px rgba(6, 200, 111, .9); }
+@keyframes s-uf-glow-fade { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+
+html .cc-glow { overflow: visible; animation: none; }
+html .cc-glow::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; opacity: 0; pointer-events: none;
+  box-shadow: 0 0 0 9px rgba(6, 200, 111, .55);
+  animation: cc-ring-t 2.1s ease-out infinite;
+}
+@keyframes cc-ring-t { 0% { opacity: 0; transform: scale(1); } 15% { opacity: .7; } 70%, 100% { opacity: 0; transform: scale(1.14, 1.55); } }
+html .cc-glow::after { left: 0; opacity: 0; animation: cc-sweep-t 3.4s ease-in-out infinite; }
+@keyframes cc-sweep-t { 0%, 55% { opacity: 0; transform: translateX(0) skewX(-18deg); } 66%, 92% { opacity: 1; } 100% { opacity: 0; transform: translateX(122%) skewX(-18deg); } }
+
+html .s-ann-card::before, html .cc-pop::before { left: 0; right: auto; width: 60%; background-size: 100% 100%; animation: s-ann-scan-t 3.2s ease-in-out infinite; }
+@keyframes s-ann-scan-t { 0% { transform: translateX(-53.3%); } 100% { transform: translateX(120%); } }
+
+html:not(.s-touched) .s-grad { animation: none; }
+html:not(.s-touched) .art-beam { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  html .s-pill i::after, html .s-flag i::after, html .s-live i::after, html .s-soon-tag i::after, html .s-bt-latest i::after, html .le-dot::after,
+  html .s-hero .s-btn.has-found::after, html .s-uf-cc::after, html .cc-glow::before, html .cc-glow::after, html .s-ann-card::before, html .cc-pop::before { animation: none; }
+}

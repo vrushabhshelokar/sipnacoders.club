@@ -132,7 +132,7 @@ const DIGITS20 = '01234567890123456789'.split('');
 export function Odometer({ value, play, suffix = '' }) {
   const digits = String(value).split('');
   return (
-    <span className="odo" aria-label={`${value}${suffix}`}>
+    <span className="odo" role="img" aria-label={`${value}${suffix}`}>
       <span className="odo-in" aria-hidden="true">
         {digits.map((d, i) => (
           <span className="odo-col" key={i}>

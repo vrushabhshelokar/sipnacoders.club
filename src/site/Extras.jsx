@@ -6,18 +6,20 @@ export function ScrollProgress() {
   const ref = useRef(null);
   useEffect(() => {
     let raf = 0;
+    const compute = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const p = max > 0 ? Math.min(1, window.scrollY / max) : 0;
+      if (ref.current) ref.current.style.transform = `scaleX(${p})`;
+    };
     const update = () => {
       cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        const max = document.documentElement.scrollHeight - window.innerHeight;
-        const p = max > 0 ? Math.min(1, window.scrollY / max) : 0;
-        if (ref.current) ref.current.style.transform = `scaleX(${p})`;
-      });
+      raf = requestAnimationFrame(compute);
     };
-    update();
+    // no first update() here: the ResizeObserver below reports once right after the first layout, when reading the page height costs nothing
+    // (reading it earlier made the browser lay out the whole page inside our code = Google's "forced reflow")
     window.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
-    const ro = new ResizeObserver(update);
+    const ro = new ResizeObserver(compute);
     ro.observe(document.body);
     return () => { cancelAnimationFrame(raf); ro.disconnect(); window.removeEventListener('scroll', update); window.removeEventListener('resize', update); };
   }, []);

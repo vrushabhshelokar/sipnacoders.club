@@ -11,6 +11,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useIntroDone } from './ui';
+import { useTouched } from './interaction';
 import { useUpcoming } from './events';
 import { EVENT_NAME, HAS_DETAILS, getDesign, isTeaserLive } from './teaserCore';
 import {
@@ -48,6 +49,7 @@ const markSeen = (key) => {
 
 export default function AnnouncePopup() {
   const introDone = useIntroDone();
+  const touched = useTouched();   // the popup waits for the first touch / scroll / key, so it never competes with the page while it loads
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const upcoming = useUpcoming();
@@ -77,7 +79,7 @@ export default function AnnouncePopup() {
 
   // open it once the opening animation is over (the design is loaded first, so nothing flashes)
   useEffect(() => {
-    if (!introDone || skip || !active || (!preview && wasSeen(seenKey))) return undefined;
+    if (!introDone || skip || !active || (!preview && (!touched || wasSeen(seenKey)))) return undefined;
     let dead = false;
     let id = 0;
     const load = clash ? import('./CodeClashPopup') : (NEW_POPUPS.includes(name) ? import('./PopupStylesNew') : import('./PopupStyles'));
@@ -92,7 +94,7 @@ export default function AnnouncePopup() {
       }, POPUP_DELAY);
     }).catch(() => { /* the design could not load (offline): just skip the popup */ });
     return () => { dead = true; clearTimeout(id); };
-  }, [introDone, skip, active, preview, name, clash, seenKey]);
+  }, [introDone, touched, skip, active, preview, name, clash, seenKey]);
 
   const close = useCallback(() => {
     setClosing(true);

@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import { getDesign, isTeaserLive } from './site/teaserCore';
 import NotFound from './pages/NotFound';
 import { PageLoader } from './site/TeaserLoader';
+import { onFirstInteraction } from './site/interaction';
 
 // Register (Lottie player) and the admin dashboard are only needed on their own pages, so they are downloaded when opened.
 // If a page file cannot be fetched (an old tab left open across a new deploy, or no network), the site reloads once to get the
@@ -63,21 +64,16 @@ if (typeof window !== 'undefined') {
   // (not on Data Saver or a 2G line)
   // /upcoming is the page the club shares most: its download starts now, before React has drawn anything
   if (/^\/upcoming\/?$/.test(window.location.pathname)) PAGE_LOADERS['/upcoming']();
-  // everywhere else the other pages are fetched quietly once someone starts using the page (touch, scroll, key), or after 12 seconds
+  // everywhere else the other pages are fetched quietly once someone starts using the page (touch, scroll, key), or after 60 seconds
   // (not on Data Saver or a 2G line). The first picture of the page never has to wait for them.
   const net = navigator.connection;
   const saving = net && (net.saveData || /(^|-)2g$/.test(net.effectiveType || ''));
   if (!saving) {
     const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 1500));
-    let warmed = false;
-    const warmAll = () => {
-      if (warmed) return;
-      warmed = true;
-      ['pointerdown', 'touchstart', 'keydown', 'scroll', 'wheel'].forEach((ev) => window.removeEventListener(ev, warmAll));
+    // after the first touch / key / scroll (or 60 s, see site/interaction.js). Never while the page is still loading: Google's speed test counts that.
+    onFirstInteraction(() => {
       idle(() => Object.values(PAGE_LOADERS).forEach((f) => { try { const r = f(); if (r && r.catch) r.catch(() => {}); } catch { /* ignore */ } }), { timeout: 4000 });
-    };
-    ['pointerdown', 'touchstart', 'keydown', 'scroll', 'wheel'].forEach((ev) => window.addEventListener(ev, warmAll, { passive: true }));
-    window.addEventListener('load', () => setTimeout(warmAll, 12000), { once: true });
+    });
   }
   if (/^\/upcoming\/?$/.test(window.location.pathname) && !saving) {
     const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 3000));

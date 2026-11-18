@@ -32,8 +32,14 @@ const FOOTER_LINKS = [...NAV, { to: '/upcoming', label: 'Upcoming' }];
 
 
 
+// true when the page was just opened by a link / the address bar (not a reload or the back button): it is at the top already
+const isFreshNavigation = () => {
+  try { const n = performance.getEntriesByType('navigation')[0]; return !!n && n.type === 'navigate'; } catch { return false; }
+};
+
 export default function Layout({ children }) {
   const { pathname, hash } = useLocation();
+  const firstLoad = useRef(true);
   const [scrolled, setScrolled] = useState(false);
   const taps = useRef([]);
   const upcoming = useUpcomingCount();
@@ -53,9 +59,10 @@ export default function Layout({ children }) {
     if (hash) {
       const id = hash.slice(1);
       setTimeout(() => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 80);
-    } else {
+    } else if (!firstLoad.current || !isFreshNavigation()) {
       window.scrollTo(0, 0);
     }
+    firstLoad.current = false;
   }, [pathname, hash]);
 
   // tapping the logo 5 times quickly also triggers the easter egg (for phones)
