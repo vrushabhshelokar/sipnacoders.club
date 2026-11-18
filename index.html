@@ -16,7 +16,8 @@
          (They used to be asked for later, from Cyber.css and from Layout.jsx.) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Chakra+Petch:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Chakra+Petch:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Chakra+Petch:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" /></noscript>
 
     <!-- Icons + "Add to Home Screen" -->
     <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
@@ -127,7 +128,16 @@
       </main>
     </noscript>
     <div id="root"></div>
-    <script src="/intro/intro.js"></script>
+    <script>
+      /* The intro plays once per visitor, so only a first-time visitor (or ?intro in the address) downloads its 74 KB script.
+         Same rule as inside intro.js; document.write keeps the old behaviour of running before the app starts. */
+      (function () {
+        var seen = false;
+        try { seen = !!window.localStorage.getItem('scc-intro-seen'); } catch (e) { /* storage blocked */ }
+        try { seen = seen || !!window.sessionStorage.getItem('scc-intro-seen'); } catch (e) { /* storage blocked */ }
+        if (!seen || /[?&]intro(=|&|$)/.test(window.location.search)) document.write('<script src="/intro/intro.js"><\/script>');
+      })();
+    </script>
     <script type="module" src="/src/main.jsx"></script>
 
     <!-- Visitor stats (Vercel Web Analytics). Turn it on once in the Vercel dashboard:

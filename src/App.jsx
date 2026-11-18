@@ -43,6 +43,13 @@ if (typeof window !== 'undefined') {
     if (t && t.closest && t.closest('a[href="/register"]')) loadRegister().catch(() => {});
   };
   ['pointerover', 'touchstart', 'focusin'].forEach((ev) => window.addEventListener(ev, warm, { passive: true, capture: true }));
+  // the Register button is on /upcoming, so while someone reads that page the sign-up page is fetched quietly in the background
+  // (not on Data Saver or a 2G line)
+  const net = navigator.connection;
+  if (/^\/upcoming\/?$/.test(window.location.pathname) && !(net && (net.saveData || /(^|-)2g$/.test(net.effectiveType || '')))) {
+    const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 3000));
+    window.addEventListener('load', () => idle(() => loadRegister().catch(() => {}), { timeout: 8000 }), { once: true });
+  }
 }
 
 function App() {

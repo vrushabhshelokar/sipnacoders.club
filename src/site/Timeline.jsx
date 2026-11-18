@@ -163,7 +163,7 @@ function Item({ ev, side, fill, onOpen }) {
       <Reveal className="s-tl-card">
         <div className="s-tl-card-in" role="button" tabIndex={0} onClick={onOpen} onKeyDown={key} aria-label={`Open photos of ${ev.title}`}>
           <div className="s-tl-media">
-            <img src={imgs[0]} alt="" loading="lazy" decoding="async" />
+            <img src={imgs[0]} alt={`Photo from ${ev.title}`} loading="lazy" decoding="async" />
             {ev.date && <span className="s-tl-date"><Icon.Calendar size={13} /> {ev.date}</span>}
             {imgs.length > 1 && <span className="s-past-count"><Icon.Image size={13} /> {imgs.length}</span>}
           </div>

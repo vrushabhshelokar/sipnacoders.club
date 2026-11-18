@@ -179,7 +179,7 @@ export const pastEvents = [
     date: '27 SEP 2025',
     sortDate: '2025-09-27',
     description: 'A focused session on AI and prompt engineering techniques, where 40+ students participated and learned how to effectively interact with modern AI tools.',
-    images: ['https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1920&auto=format&fit=crop'],
+    images: ['https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=900&auto=format&fit=crop'],
   },
   {
     id: 'flutter-flow',

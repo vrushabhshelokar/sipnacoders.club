@@ -165,7 +165,7 @@ export function PastCard({ ev, i, onOpen }) {
     <Reveal className="s-past" delay={(i % 3) * 90} style={{ '--c': catColor(ev.category) }}>
       <div className="s-past-in" role="button" tabIndex={0} onClick={onOpen} onKeyDown={key} aria-label={`Open photos of ${ev.title}`}>
         <div className="s-past-media">
-          {imgs[0] && <img src={imgs[0]} alt="" loading="lazy" decoding="async" />}
+          {imgs[0] && <img src={imgs[0]} alt={`Photo from ${ev.title}`} loading="lazy" decoding="async" />}
           {imgs.length > 1 && <span className="s-past-count"><Icon.Image size={13} /> {imgs.length}</span>}
         </div>
         <div className="s-past-body">
@@ -240,7 +240,7 @@ function BentoTile({ ev, area, big = false, delay, onOpen }) {
         className="s-bt-in" role="button" tabIndex={0} onClick={onOpen} onKeyDown={key}
         onPointerMove={tiltMove} onPointerLeave={tiltLeave} aria-label={`Open photos of ${ev.title}`}
       >
-        {imgs[0] && <img className="s-bt-img" src={imgs[0]} alt="" loading="lazy" decoding="async" />}
+        {imgs[0] && <img className="s-bt-img" src={imgs[0]} alt={`Photo from ${ev.title}`} loading="lazy" decoding="async" />}
         <span className="s-bt-shade" aria-hidden="true" />
         <span className="s-bt-glare" aria-hidden="true" />
         {big && <span className="s-bt-latest"><i /> Latest event</span>}

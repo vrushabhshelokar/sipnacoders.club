@@ -43,7 +43,8 @@ export default function Background() {
     const c = ref.current;
     if (!c) return undefined;
     const g = c.getContext('2d');
-    const reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    const reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+      || !!(navigator.connection && navigator.connection.saveData); // Data Saver: one still picture
     const GLOWS = PAL.map(glowSprite);
 
     let W = 0, H = 0, dpr = 1, small = false, cell = 46, cols = 0, rows = 0, ox = 0, oy = 0, R = 230;
@@ -78,7 +79,7 @@ export default function Background() {
     const size = () => {
       W = window.innerWidth;
       H = window.innerHeight;
-      dpr = Math.min(2, window.devicePixelRatio || 1);
+      dpr = Math.min(window.innerWidth < 700 ? 1.5 : 2, window.devicePixelRatio || 1); // a soft glow does not need more on a phone
       c.width = Math.round(W * dpr);
       c.height = Math.round(H * dpr);
       g.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -111,7 +112,14 @@ export default function Background() {
       rings = [];
     };
 
+    // The board is a soft glow, so it does not need 60 frames a second. Phones and computers with 4 cores or fewer draw about 30 a second,
+    // and a device that finds a frame slow (a weak phone) automatically waits longer between frames, so the background never takes more
+    // than about a quarter of the processor and scrolling and tapping stay quick. A fast computer is not affected.
+    const capped = window.innerWidth < 700 || (navigator.hardwareConcurrency || 8) <= 4;
+    let cost = 0; // how long a frame takes on this device (milliseconds, smoothed)
     const frame = (now) => {
+      if (!reduce && now - last < Math.max(capped ? 30 : 0, cost * 3)) { raf = requestAnimationFrame(frame); return; }
+      const began = performance.now();
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       t += dt;
@@ -238,6 +246,7 @@ export default function Background() {
       }
       g.globalCompositeOperation = 'source-over';
 
+      cost = cost * 0.7 + (performance.now() - began) * 0.3;
       if (!reduce) raf = requestAnimationFrame(frame);
     };
 

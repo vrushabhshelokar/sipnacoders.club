@@ -107,9 +107,45 @@ async function loadData() {
   }
 }
 
+/* ------------------------------------------------------------------ the team list saved on the admin page */
+// The team and ambassadors can be edited on the admin page (they are saved in the database, not in the code). The build asks the live
+// website for that list, so the text written for search engines and AI assistants matches what visitors see. If the website cannot be
+// reached, the lists in src/data/site.js are used. (SEO_NO_FETCH=1 switches this off; SEO_PEOPLE_URL=... is for testing.)
+async function fetchPeople() {
+  if (process.env.SEO_NO_FETCH) return null;
+  const url = process.env.SEO_PEOPLE_URL || SITE + '/api/people';
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(7000), headers: { accept: 'application/json' } });
+    if (!res.ok) return null;
+    const j = await res.json();
+    return {
+      team: Array.isArray(j.team) && j.team.length ? j.team : null,
+      ambassadors: Array.isArray(j.ambassadors) && j.ambassadors.length ? j.ambassadors : null,
+    };
+  } catch (e) {
+    warn('could not read the saved team list, using src/data/site.js instead:', e.message);
+    return null;
+  }
+}
+
+function withPeople(site, people) {
+  if (!people) return site;
+  const out = { ...site };
+  if (people.team) {
+    out.TEAM = people.team.map((p) => ({ name: str(p.name), role: str(p.role), status: str(p.year) || '—' })).filter((p) => p.name);
+  }
+  if (people.ambassadors) {
+    out.AMBASSADORS = people.ambassadors.map((p) => ({
+      name: str(p.name), role: [p.role, p.year].map(str).filter(Boolean).join(' · '), programs: arr(p.programs),
+      status: p.status === 'past' ? 'past' : 'present', years: str(p.years),
+    })).filter((p) => p.name);
+  }
+  return out;
+}
+
 /* ------------------------------------------------------------------ the text of every page */
 function buildPages(d, today) {
-  const site = d.site || {};
+  const site = withPeople(d.site || {}, d.people);
   const vibe = d.vibe || {};
   const up = d.up || {};
   const sw = d.sw || {};
@@ -236,7 +272,9 @@ function buildPages(d, today) {
     return [
       ['h2', 'Campus ambassadors in the club'],
       ['p', 'Club members who represent these programs on campus: ' + Object.values(progs).map((p) => p.name).join(', ') + '.'],
-      ['ul', amb.map((m) => `${m.name} (${m.role}): ${arr(m.programs).map((k) => (progs[k] || {}).name).filter(Boolean).join(', ')}`)],
+      ['ul', amb.map((m) => `${m.name} (${m.role})${m.status === 'past' ? `, past ambassador${m.years ? ` ${m.years}` : ''}` : ''}: ${arr(m.programs).map((k) => (progs[k] || {}).name).filter(Boolean).join(', ')}`)],
+      ['h3', 'What an ambassador does in each program'],
+      ['ul', Object.values(progs).map((p) => `${p.name}${p.link ? ` (${A('about the program', p.link)})` : ''}: ${arr(p.duties).join('; ')}.`)],
     ];
   });
 
@@ -570,7 +608,7 @@ async function main() {
   if (base.includes(MARK_START)) { log('already done for this build. Nothing to do.'); return; }
   if (!/<div id="root"\s*>\s*<\/div>/.test(base)) { warn('could not find <div id="root"></div> in dist/index.html. Skipping.'); return; }
 
-  const data = await loadData();
+  const data = { ...(await loadData()), people: await fetchPeople() };
   const today = todayIST();
   const { pages, llmsEvents } = buildPages(data, today);
 
@@ -601,6 +639,11 @@ async function main() {
     t = rewriteLlmsEvents(t, llmsEvents, today);
     if (!t.includes('llms-full.txt')) t = t.replace(/\s*$/, '\n') + `\n## Full text\n\n- [The whole website as plain text](${SITE}/llms-full.txt): every page in one file\n`;
     fs.writeFileSync(llms, t);
+  }
+  const sitemap = path.join(DIST, 'sitemap.xml');
+  if (fs.existsSync(sitemap)) {
+    const x = fs.readFileSync(sitemap, 'utf8');
+    if (!x.includes('<lastmod>')) fs.writeFileSync(sitemap, x.replace(/<\/loc>/g, `</loc><lastmod>${today}</lastmod>`));
   }
   fs.writeFileSync(indexPath, outputs.find((o) => o.page.route === '/').html);
 

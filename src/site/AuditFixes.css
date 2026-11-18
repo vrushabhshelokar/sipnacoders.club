@@ -1,0 +1,37 @@
+/* =====================================================================================
+   src/site/AuditFixes.css
+   Small accessibility and speed fixes. It is loaded LAST (see src/main.jsx), so it wins over the older CSS files.
+   Every block says what it fixes, so a block can be deleted on its own if it is ever not wanted.
+   ===================================================================================== */
+
+/* 1. Grey helper text (dates, roles, notes) was 4.1:1 against the dark background. Readable text needs 4.5:1 (WCAG AA). Now about 6:1. */
+:root { --muted: #8791a4; }
+
+/* 2. Small labels that were white at 35-40% opacity (about 3:1). Now about 7:1. */
+.es-time { color: rgba(255, 255, 255, .62) !important; }
+.es-date-badge { color: rgba(var(--ra-rgb), .92) !important; }
+.rb-meta-key { color: rgba(255, 255, 255, .6) !important; }
+.pp-cost-unit, .pp-tb-tag, .pp-cs-scope { color: rgba(255, 255, 255, .62) !important; }
+
+/* 3. Text links such as "Full details" and "Become a member" were only 16-19px tall, too small for a thumb. src/styles/a11y.css already gives
+      them an invisible 4px extra tap area; on touch screens it grows to 12px above and below. It is invisible and takes no room, so nothing moves. */
+@media (pointer: coarse) {
+  .s-link::after { top: -12px !important; bottom: -12px !important; }
+}
+
+/* 4. People who asked their phone for less motion: the endless pinging dots and blinking cursors stop. */
+@media (prefers-reduced-motion: reduce) {
+  .s-pill i, .s-flag i, .s-live i, .s-soon-tag i, .s-bt-latest i, .s-mys-flag i, .snap-led, .s-caret, .s-caret-bar { animation: none !important; }
+}
+
+/* 5. The shine that sweeps over the number cards moved with `left`, which makes the browser work out the page layout again on
+      every frame. The same sweep with `transform` is smooth and cheap. (Starts at left:-60% and ends at left:130% = 475% of its own width.) */
+@keyframes s-shine {
+  0%, 60% { transform: translateX(0) skewX(-18deg); }
+  100% { transform: translateX(475%) skewX(-18deg); }
+}
+
+/* 6. Register page: message while the form is still loading */
+.s-form-wait { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 140px; margin: 0; padding: 20px; text-align: center; font: 500 15px/1.5 var(--sans); color: var(--text-2); }
+.s-form-wait a { color: #8fb4ff; text-decoration: underline; text-underline-offset: 3px; }
+.s-form-wait .tl-spin { flex: none; width: 20px; height: 20px; }

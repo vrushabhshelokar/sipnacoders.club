@@ -72,6 +72,7 @@ export default function RuleBook() {
                 key={i}
                 className={`rb-seg-cell${i <= activeIdx ? ' on' : ''}${i === activeIdx ? ' current' : ''}`}
                 onClick={() => goTo(i)}
+                tabIndex={-1}
                 aria-label={`Jump to category ${i + 1}`}
               />
             ))}

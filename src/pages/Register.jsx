@@ -1,16 +1,30 @@
 
-import { useEffect } from 'react';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { useEffect, useState } from 'react';
+import { DotLottieReact, setWasmUrl } from '@lottiefiles/dotlottie-react';
 import { Reveal } from '../site/ui';
 import { useSwitch } from '../site/liveSettings';
 import RegistrationClosed from '../site/RegistrationClosed';
 import formAnimation from '../assets/form.lottie';
 import formAnimation1 from '../assets/form1.lottie';
+// The animation player needs a 500 KB engine file. By default it comes from a public CDN (a third party, and slow on some phones);
+// this makes it come from our own site and be cached like the other files.
+import wasmUrl from '@lottiefiles/dotlottie-web/dist/dotlottie-player.wasm?url';
 
 const TALLY_FORM_ID = 'VpQzav';
+setWasmUrl(wasmUrl);
+
+// the animation only starts after the form (or after a few seconds), so the form gets the bandwidth first
+const Anim = ({ on, src }) => (on ? <DotLottieReact src={src} autoplay loop /> : null);
 
 export default function Register() {
   const open = useSwitch('vibeRegistration', true);   // dashboard -> Site controls
+  const [formReady, setFormReady] = useState(false);   // true when the form has appeared
+  const [slow, setSlow] = useState(false);              // true when it is taking long
+  useEffect(() => {
+    const t = setTimeout(() => setSlow(true), 7000);
+    return () => clearTimeout(t);
+  }, []);
+  const animOn = formReady || slow;
 
   useEffect(() => {
     if (!open) return;
@@ -58,7 +72,18 @@ export default function Register() {
         <div className="s-container">
           <div className="s-register">
 
+            {!formReady && (
+              <p className="s-form-wait" role="status">
+                <span className="tl-spin" aria-hidden="true" />
+                <span>
+                  {slow
+                    ? <>The form is taking a while. <a href={`https://tally.so/r/${TALLY_FORM_ID}`} target="_blank" rel="noopener noreferrer">Open the registration form in a new tab</a>.</>
+                    : 'Loading the registration form…'}
+                </span>
+              </p>
+            )}
             <iframe
+              onLoad={() => setFormReady(true)}
               data-tally-src={`https://tally.so/embed/VpQzav?hideTitle=1&transparentBackground=1&dynamicHeight=1`}
               width="100%"
               height="0"
@@ -71,19 +96,11 @@ export default function Register() {
 
             {/* Bottom Lottie Overlay */}
             <div className="s-form-animation hidden sm:block">
-              <DotLottieReact
-                src={formAnimation1}
-                autoplay
-                loop
-              />
+              <Anim on={animOn} src={formAnimation1} />
             </div>
 
             <div className="s-form-animation block sm:hidden">
-              <DotLottieReact
-                src={formAnimation}
-                autoplay
-                loop
-              />
+              <Anim on={animOn} src={formAnimation} />
             </div>
 
           </div>

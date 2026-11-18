@@ -18,7 +18,7 @@ export default function Team() {
       <section className="s-section s-section-first s-team-founders">
         <div className="s-container">
           <Reveal className="s-banner">
-            <img src={groupPhoto} alt="The members who started Sipna Coders Club" loading="lazy" decoding="async" />
+            <img src={groupPhoto} alt="The members who started Sipna Coders Club" loading="eager" fetchPriority="high" decoding="async" />
             <div className="s-banner-body">
               <span className="s-eyebrow">Where it started</span>
               <h2 className="s-h2">The founding crew</h2>
