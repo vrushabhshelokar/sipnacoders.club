@@ -2,10 +2,7 @@ import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './site/Layout';
 import Home from './pages/Home';
-import Event from './pages/Event';
-import Upcoming from './pages/Upcoming';
-import Team from './pages/Team';
-import Connect from './pages/Connect';
+import { getDesign, isTeaserLive } from './site/teaserCore';
 import NotFound from './pages/NotFound';
 import { PageLoader } from './site/TeaserLoader';
 
@@ -36,17 +33,53 @@ const safeImport = (load) => () => load().then((m) => {
 // Register starts loading as soon as someone points at, touches or tabs to a link to it, so the click feels instant.
 const loadRegister = () => import('./pages/Register');
 const Register = lazy(safeImport(loadRegister));
+// The other pages are downloaded when they are opened (the home page does not carry them). Each starts downloading as soon as someone
+// points at, touches or tabs to its link, so the click still feels instant. The Vibe-A-Thon page also starts its big card early.
+const loadUpcoming = () => import('./pages/Upcoming');
+const loadEvent = () => import('./pages/Event');
+const loadTeam = () => import('./pages/Team');
+const loadConnect = () => import('./pages/Connect');
+const Upcoming = lazy(safeImport(loadUpcoming));
+const Event = lazy(safeImport(loadEvent));
+const Team = lazy(safeImport(loadTeam));
+const Connect = lazy(safeImport(loadConnect));
+const startCards = () => {
+  if (!isTeaserLive()) return; // the card is switched off: nothing to download
+  (getDesign().card <= 5 ? import('./site/TeaserCards') : import('./site/TeaserCardsNew')).catch(() => { /* the page shows its own Reload message */ });
+};
+const PAGE_LOADERS = { '/upcoming': () => { loadUpcoming().catch(() => {}); startCards(); }, '/events': loadEvent, '/team': loadTeam, '/connect': loadConnect };
 const AdminAnalytics = lazy(safeImport(() => import('./pages/AdminAnalytics')));
 if (typeof window !== 'undefined') {
   const warm = (e) => {
     const t = e.target;
-    if (t && t.closest && t.closest('a[href="/register"]')) loadRegister().catch(() => {});
+    const a = t && t.closest && t.closest('a[href]');
+    if (!a) return;
+    const href = a.getAttribute('href');
+    if (href === '/register') loadRegister().catch(() => {});
+    else if (PAGE_LOADERS[href]) { const r = PAGE_LOADERS[href](); if (r && r.catch) r.catch(() => {}); }
   };
   ['pointerover', 'touchstart', 'focusin'].forEach((ev) => window.addEventListener(ev, warm, { passive: true, capture: true }));
   // the Register button is on /upcoming, so while someone reads that page the sign-up page is fetched quietly in the background
   // (not on Data Saver or a 2G line)
+  // /upcoming is the page the club shares most: its download starts now, before React has drawn anything
+  if (/^\/upcoming\/?$/.test(window.location.pathname)) PAGE_LOADERS['/upcoming']();
+  // everywhere else the other pages are fetched quietly once someone starts using the page (touch, scroll, key), or after 12 seconds
+  // (not on Data Saver or a 2G line). The first picture of the page never has to wait for them.
   const net = navigator.connection;
-  if (/^\/upcoming\/?$/.test(window.location.pathname) && !(net && (net.saveData || /(^|-)2g$/.test(net.effectiveType || '')))) {
+  const saving = net && (net.saveData || /(^|-)2g$/.test(net.effectiveType || ''));
+  if (!saving) {
+    const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 1500));
+    let warmed = false;
+    const warmAll = () => {
+      if (warmed) return;
+      warmed = true;
+      ['pointerdown', 'touchstart', 'keydown', 'scroll', 'wheel'].forEach((ev) => window.removeEventListener(ev, warmAll));
+      idle(() => Object.values(PAGE_LOADERS).forEach((f) => { try { const r = f(); if (r && r.catch) r.catch(() => {}); } catch { /* ignore */ } }), { timeout: 4000 });
+    };
+    ['pointerdown', 'touchstart', 'keydown', 'scroll', 'wheel'].forEach((ev) => window.addEventListener(ev, warmAll, { passive: true }));
+    window.addEventListener('load', () => setTimeout(warmAll, 12000), { once: true });
+  }
+  if (/^\/upcoming\/?$/.test(window.location.pathname) && !saving) {
     const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 3000));
     window.addEventListener('load', () => idle(() => loadRegister().catch(() => {}), { timeout: 8000 }), { once: true });
   }

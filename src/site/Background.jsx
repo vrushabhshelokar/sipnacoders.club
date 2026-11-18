@@ -79,7 +79,7 @@ export default function Background() {
     const size = () => {
       W = window.innerWidth;
       H = window.innerHeight;
-      dpr = Math.min(window.innerWidth < 700 ? 1.5 : 2, window.devicePixelRatio || 1); // a soft glow does not need more on a phone
+      dpr = Math.min(window.innerWidth < 700 ? 1 : 2, window.devicePixelRatio || 1); // a soft glow does not need more on a phone
       c.width = Math.round(W * dpr);
       c.height = Math.round(H * dpr);
       g.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -117,8 +117,35 @@ export default function Background() {
     // than about a quarter of the processor and scrolling and tapping stay quick. A fast computer is not affected.
     const capped = window.innerWidth < 700 || (navigator.hardwareConcurrency || 8) <= 4;
     let cost = 0; // how long a frame takes on this device (milliseconds, smoothed)
+    // The first picture is drawn at once. The movement starts when the page has finished loading and the opening animation (which
+    // covers the whole screen) is over, so the background never competes with the page while it is appearing.
+    // If the device cannot keep up (several slow frames in a row) the background first slows down, then stands still.
+    let live = false, calm = 0, slowAt = [], poll = 0, watcher = null;
+    const gapFor = () => Math.max(capped ? 33 : 0, calm === 1 ? 100 : 0, cost * 3);
+    const goLive = () => {
+      if (live || reduce) return;
+      if (document.readyState !== 'complete' || document.getElementById('scc-intro')) { poll = setTimeout(goLive, 300); return; }
+      live = true;
+      last = performance.now();
+      raf = requestAnimationFrame(frame);
+      if (typeof PerformanceObserver !== 'undefined') {
+        try {
+          watcher = new PerformanceObserver((list) => {
+            const now = performance.now();
+            list.getEntries().forEach((e) => { if (e.duration >= 50 && e.duration < 700) slowAt.push(now); });
+            slowAt = slowAt.filter((x) => now - x < 1800);
+            if (slowAt.length >= 3 && calm < 2) {
+              calm += 1; slowAt = [];
+              if (calm >= 2) { cancelAnimationFrame(raf); raf = 0; if (watcher) watcher.disconnect(); }
+            }
+          });
+          watcher.observe({ type: 'longtask' });
+        } catch { watcher = null; }
+      }
+    };
     const frame = (now) => {
-      if (!reduce && now - last < Math.max(capped ? 30 : 0, cost * 3)) { raf = requestAnimationFrame(frame); return; }
+      if (live && calm >= 2) return;
+      if (!reduce && live && now - last < gapFor()) { raf = requestAnimationFrame(frame); return; }
       const began = performance.now();
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
@@ -247,7 +274,7 @@ export default function Background() {
       g.globalCompositeOperation = 'source-over';
 
       cost = cost * 0.7 + (performance.now() - began) * 0.3;
-      if (!reduce) raf = requestAnimationFrame(frame);
+      if (!reduce && live) raf = requestAnimationFrame(frame);
     };
 
     // mouse
@@ -281,9 +308,13 @@ export default function Background() {
       window.addEventListener('touchmove', onTouch, { passive: true });
     }
     raf = requestAnimationFrame(frame);
+    if (document.readyState === 'complete') goLive(); else window.addEventListener('load', goLive, { once: true });
 
     return () => {
       cancelAnimationFrame(raf);
+      clearTimeout(poll);
+      if (watcher) watcher.disconnect();
+      window.removeEventListener('load', goLive);
       window.removeEventListener('resize', onResize);
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerdown', onDown);

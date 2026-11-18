@@ -601,7 +601,26 @@ function rewriteLlmsEvents(text, lines, today) {
   return text.replace(re, () => `\n## Upcoming events\n\n${body}\n`);
 }
 
+// Speed: dist/intro/intro.js is the opening animation. It is loaded before the page can be drawn, so every KB counts. The readable file
+// in public/intro/ is not touched; only the copy that goes live is made smaller (about 40% less). If anything goes wrong it is left as it is.
+async function minifyIntro() {
+  try {
+    const f = path.join(DIST, 'intro', 'intro.js');
+    if (!fs.existsSync(f)) return;
+    const src = fs.readFileSync(f, 'utf8');
+    if (src.startsWith('/*! min */')) return;
+    const esbuild = await import('esbuild'); // comes with Vite
+    const out = await esbuild.transform(src, { minify: true, target: 'es2018', legalComments: 'none' });
+    if (!out.code || out.code.length > src.length * 0.9) return;
+    fs.writeFileSync(f, '/*! min */' + out.code);
+    log(`intro.js made smaller: ${(src.length / 1024).toFixed(1)} KB -> ${(out.code.length / 1024).toFixed(1)} KB`);
+  } catch (e) {
+    warn('intro.js left as it is. Reason:', e && e.message ? e.message : e);
+  }
+}
+
 async function main() {
+  await minifyIntro();
   const indexPath = path.join(DIST, 'index.html');
   if (!fs.existsSync(indexPath)) { warn('dist/index.html not found. Run "npm run build" first. Skipping.'); return; }
   const base = fs.readFileSync(indexPath, 'utf8');

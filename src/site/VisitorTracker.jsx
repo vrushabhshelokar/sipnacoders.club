@@ -9,7 +9,37 @@ import { CODE_CLASH_FORM } from './eventSwitches';
 // - on a register button:   one click
 let lastPath = null;
 
+// Speed: the statistics calls wait until the page has finished loading and the browser is idle (or until the visitor leaves the page), so
+// they never compete with the first draw of the page. Nothing is lost: they are only sent a moment later.
+let queue = [];
+let ready = false;
+
+function flush() {
+  ready = true;
+  const q = queue;
+  queue = [];
+  q.forEach(post);
+}
+
+if (typeof window !== 'undefined') {
+  const go = () => {
+    if ('requestIdleCallback' in window) window.requestIdleCallback(flush, { timeout: 3000 });
+    else setTimeout(flush, 1500);
+  };
+  if (document.readyState === 'complete') go();
+  else window.addEventListener('load', go, { once: true });
+  window.addEventListener('pagehide', flush);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flush();
+  });
+}
+
 function send(body) {
+  if (ready) post(body);
+  else queue.push(body);
+}
+
+function post(body) {
   try {
     fetch('/api/visitors', {
       method: 'POST',

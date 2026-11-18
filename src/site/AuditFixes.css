@@ -35,3 +35,17 @@
 .s-form-wait { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 140px; margin: 0; padding: 20px; text-align: center; font: 500 15px/1.5 var(--sans); color: var(--text-2); }
 .s-form-wait a { color: #8fb4ff; text-decoration: underline; text-underline-offset: 3px; }
 .s-form-wait .tl-spin { flex: none; width: 20px; height: 20px; }
+
+/* 6. Speed: everything below the first screen is drawn only when it comes near the screen (the browser skips its layout and painting until
+   then). "auto 600px" is only the guess for its height until it has been drawn once. Skipped for browsers without support. */
+@supports (content-visibility: auto) {
+  .s-main > section:not(.s-hero), .s-main > .s-container, .s-footer {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 600px;
+  }
+}
+
+/* 7. Speed (Google's "Largest Contentful Paint"): the hero text used to be invisible (opacity 0) until the opening animation had finished, so
+   Google saw the main text of the page 6 to 11 seconds late. It is drawn at once now, behind the opening animation, and still slides up into
+   place when the animation ends. Nothing changes for the visitor except that the text no longer fades in. */
+.s-hero-copy > *, .s-hero-visual { opacity: 1; }

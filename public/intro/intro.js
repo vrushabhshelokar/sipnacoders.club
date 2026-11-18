@@ -32,6 +32,7 @@
   var SEEN_KEY = 'scc-intro-seen';        // change this name (e.g. 'scc-intro-seen-2') if you make a new intro and want everybody to see it once more
   var LOGO_SRC = '/coders_club_logo.webp'; // the logo in /public
   var MAX_WAIT = 7000;                    // ms - never hide the site longer than this
+  var SKIP_ON_SLOW = true;                // true = on a phone or computer that cannot keep the animation moving (it stutters), the animation fades out after a moment so the site is not held back; false = always play it in full
   var TAP_TO_START = false;               // false = the laptop animation starts by itself (silent, with a "tap for sound" button); true = the closed laptop waits for a tap ("tap to power on") so the music can start from the first second
 
   /* ---------------- play only once per visitor ---------------- */
@@ -865,7 +866,7 @@
 
     function layout() {
       fitRoot();
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      dpr = Math.min(window.devicePixelRatio || 1, COARSE ? 1.5 : 2);
       canvas.width = Math.round(W * dpr);
       canvas.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -989,6 +990,29 @@
     var mx = 0, my = 0, mouseOn = false, rx = 0, ry = 0;
     root.addEventListener('pointermove', function (e) { var b = root.getBoundingClientRect(); mx = e.clientX - b.left; my = e.clientY - b.top; mouseOn = true; });
     root.addEventListener('pointerleave', function () { mouseOn = false; });
+    /* ----- weak device guard ----- */
+    // Several slow frames (50 ms or more) in a short time mean this device cannot play the animation smoothly. Then it fades out
+    // quickly instead of making the visitor wait seconds for a slideshow. Devices that keep up never trigger it.
+    if (SKIP_ON_SLOW && window.PerformanceObserver && !REDUCED) {
+      var slowFrames = [], guard = null;
+      try {
+        guard = new PerformanceObserver(function (list) {
+          if (finished || exiting) return;
+          var now = performance.now();
+          list.getEntries().forEach(function (e) { if (e.duration >= 50 && e.duration < 700) slowFrames.push(now); });
+          slowFrames = slowFrames.filter(function (x) { return now - x < 1500; });
+          if (slowFrames.length >= 3) {
+            guard.disconnect();
+            exiting = true;
+            cancelAnimationFrame(raf);
+            root.style.transition = 'opacity .35s ease';
+            root.style.opacity = '0';
+            setTimeout(finish, 380);
+          }
+        });
+        guard.observe({ type: 'longtask' });
+      } catch (err) { guard = null; }
+    }
     function onSkip() { if (t > SKIP_AFTER) startExit(); }
     root.addEventListener('pointerdown', onSkip);
     window.addEventListener('keydown', onSkip, true);

@@ -1,5 +1,5 @@
 // Event components: featured "next up" card, countdown, event cards, past-event cards + photo viewer.
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { Icon } from './Icons';
@@ -8,7 +8,10 @@ import { LINKS, upcomingEvents, pastEvents } from '../data/site';
 import {
   getUpcoming, getPast, useCountdown, fmtDay, fmtMon, fmtFull, fmtTime, durLabel, relative, gcalLink, normCat, catColor, hasPhotos,
 } from './time';
-import HackathonTeaser, { isTeaserLive } from './HackathonTeaser';
+import { isTeaserLive } from './teaserCore';
+import { TeaserLoader } from './TeaserLoader';
+
+const HackathonTeaser = lazy(() => import('./HackathonTeaser'));
 
 export function useUpcoming() {
   const [now] = useState(() => Date.now());
@@ -125,7 +128,7 @@ function EventCard({ ev, i }) {
 /* featured + the rest, or a friendly empty state */
 export function UpcomingBlock() {
   const list = useUpcoming();
-  if (!list.length && isTeaserLive()) return <HackathonTeaser />;
+  if (!list.length && isTeaserLive()) return <Suspense fallback={<TeaserLoader />}><HackathonTeaser /></Suspense>;
   if (!list.length) {
     return (
       <Reveal className="s-soon">
@@ -146,7 +149,7 @@ export function UpcomingBlock() {
   const [first, ...rest] = list;
   return (
     <div className="s-upcoming">
-      <HackathonTeaser />
+      <Suspense fallback={<TeaserLoader />}><HackathonTeaser /></Suspense>
       <Reveal><FeaturedEvent ev={first} /></Reveal>
       {rest.length > 0 && (
         <div className="s-ev-grid">
