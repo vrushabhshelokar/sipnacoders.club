@@ -11,6 +11,7 @@ import { Actions, FieldValue, Guard, getDesign, isTeaserLive, useTeaser } from '
 import EventSnapshot from './EventSnapshot';
 import StickyNav from './StickyNav';
 import WhyParticipate from './WhyParticipate';
+import ProblemStatement from './ProblemStatement';
 import EventJourney from './EventJourney';
 import RuleBook from './RuleBook';
 import PrizePool from './PrizePool';
@@ -144,6 +145,7 @@ export default function HackathonTeaser() {
       </Reveal>
       <EventSnapshot />
       <StickyNav />
+      <ProblemStatement />
       <WhyParticipate />
       <EventJourney />
       <RuleBook />

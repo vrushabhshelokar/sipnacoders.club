@@ -8,6 +8,7 @@ import './StickyNav.css';
 
 const NAV_ITEMS = [
   { id: 'upcoming', label: 'Overview' },
+  { id: 'problem-statement', label: 'PS Release' },
   { id: 'why-participate', label: 'Why Join' },
   { id: 'event-journey', label: 'Journey' },
   { id: 'rules', label: 'Rules' },
@@ -148,9 +149,10 @@ export default function StickyNav() {
                   key={item.id}
                   type="button"
                   className={`st-dropdown-item ${isActive ? 'is-active' : ''}`}
-                  onClick={(e) => {
-                    scrollTo(e, item.id);
+                  onClick={() => {
+                    // the menu is closed first, then we scroll: while it was open it pushed the page down, so the jump went too far
                     setMenuOpen(false);
+                    requestAnimationFrame(() => requestAnimationFrame(() => scrollTo({ preventDefault() {} }, item.id)));
                   }}
                   role="menuitem"
                 >
