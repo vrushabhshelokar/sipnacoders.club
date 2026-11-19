@@ -6,7 +6,7 @@ import { useId, useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { FieldValue, Actions } from './teaserCore';
 import PosterStage from './PosterStage';
-import { Actions as PopupActions, Desc, Shell } from './popupParts';
+import { Actions as PopupActions, Desc, Logo, Shell } from './popupParts';
 import { useInView } from './ui';
 import './Cyber.css';
 
@@ -274,6 +274,7 @@ export function CyberPopup({ text, ...p }) {
         <PosterStage kind="popup"><SlashDeck /></PosterStage>
       </div>
       <div className="pp-body">
+        <Logo text={text} />
         <span className="cy-flag"><Stripes />{text.flag}</span>
         <CyTitle as="h2" id="s-ann-t" text={title} className="cy-pp-title" />
         <Desc text={text} />

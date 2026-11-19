@@ -8,6 +8,8 @@ import { Reveal } from './ui';
 import PosterStage from './PosterStage';
 import { CardTitle } from './NameReveal';
 import { Actions, FieldValue, Guard, getDesign, isTeaserLive, useTeaser } from './teaserCore';
+import { eventType } from './eventLive';
+import EventPoints from './EventPoints';
 import EventSnapshot from './EventSnapshot';
 import StickyNav from './StickyNav';
 import WhyParticipate from './WhyParticipate';
@@ -130,6 +132,7 @@ export default function HackathonTeaser() {
   const t = useTeaser();
   if (!t.visible) return null;
   const STYLE = getDesign().card;
+  const hack = eventType() === 'hackathon';   // problem statements, rules, prize pool ... are hackathon things (Upcoming event tab)
   return (
     <>
       <Reveal>
@@ -143,16 +146,21 @@ export default function HackathonTeaser() {
           </Guard>
         )}
       </Reveal>
-      <EventSnapshot />
-      <StickyNav />
-      <ProblemStatement />
-      <WhyParticipate />
-      <EventJourney />
-      <RuleBook />
-      <PrizePool />
-      <EventSchedule />
-      <EventFlow />
-      <FinaleSchedule />
+      <EventPoints />
+      {hack && (
+        <>
+          <EventSnapshot />
+          <StickyNav />
+          <ProblemStatement />
+          <WhyParticipate />
+          <EventJourney />
+          <RuleBook />
+          <PrizePool />
+          <EventSchedule />
+          <EventFlow />
+          <FinaleSchedule />
+        </>
+      )}
     </>
   );
 }

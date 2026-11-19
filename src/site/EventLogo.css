@@ -1,0 +1,5 @@
+/* The small logo on the popup (set in the Upcoming event tab of the admin dashboard). */
+.pp-logo { display: block; width: auto; height: auto; max-width: 140px; max-height: 42px; margin: 0 0 12px; object-fit: contain; object-position: left center; }
+/* popups whose words are centred: the logo sits in the middle too */
+.pp-neon .pp-logo, .pp-slot .pp-logo, .pp-clapper .pp-logo { margin-left: auto; margin-right: auto; object-position: center; }
+@media (max-width: 480px) { .pp-logo { max-width: 120px; max-height: 36px; margin-bottom: 10px; } }

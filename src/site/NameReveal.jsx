@@ -128,7 +128,7 @@ export default function NameReveal({ as = 'h2', text, rest = '', effect = 'radar
 /* the title of an Upcoming card: the plain words, or the animated name once EVENT_NAME is written.
    It uses the effect of the popup that goes with the current design. */
 export function CardTitle({ t, className, as = 'h3' }) {
-  const fx = useMemo(() => getDesign().popup, []);
+  const fx = getDesign().popup;   // not remembered: the design number can change from the dashboard
   return t.name
     ? <NameReveal as={as} className={className} text={t.name} effect={fx} />
     : createElement(as, { className }, t.title);

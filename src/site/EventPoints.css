@@ -1,0 +1,17 @@
+/* "What to expect" block under the Upcoming card (site/EventPoints.jsx). It borrows the Membership step list (.s-steps) from site.css. */
+.ep { max-width: 880px; margin: 56px auto 0; }
+.ep > section {
+  padding: 34px 36px 38px; border-radius: 26px; border: 1px solid var(--border);
+  background: radial-gradient(640px circle at 100% 0%, rgba(76, 141, 255, .12), transparent 60%), var(--card);
+}
+.ep .s-h2 { margin: 14px 0 0; font-size: clamp(26px, 4.4vw, 38px); line-height: 1.12; overflow-wrap: anywhere; }
+.ep-list { margin-top: 26px; gap: 20px; }
+.ep-list li { min-width: 0; }
+.ep-list b { overflow-wrap: anywhere; }
+.ep-list p { overflow-wrap: anywhere; }
+.ep-tick { color: #3ddc84; border-color: rgba(61, 220, 132, .45); background: rgba(61, 220, 132, .09); }
+@media (max-width: 640px) {
+  .ep { margin-top: 36px; }
+  .ep > section { padding: 24px 20px 28px; border-radius: 22px; }
+  .ep-list { gap: 16px; }
+}

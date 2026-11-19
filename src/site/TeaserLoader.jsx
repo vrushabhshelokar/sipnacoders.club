@@ -4,7 +4,7 @@
 //   PageLoader    a whole page that is downloaded when opened (Register, the admin dashboard).
 // Nothing here needs editing. The look is in TeaserLoader.css.
 import { useEffect, useState } from 'react';
-import { EVENT_NAME } from './teaserCore';
+import { eventName } from './eventLive';
 import './TeaserLoader.css';
 
 // 0 = just started, 1 = taking a while, 2 = taking far too long
@@ -22,7 +22,7 @@ const reload = () => window.location.reload();
 
 export function TeaserLoader() {
   const stage = useWaitStage();
-  const what = EVENT_NAME || 'the event details';
+  const what = eventName() || 'the event details';
   const text = stage === 0
     ? `Loading ${what}...`
     : stage === 1
@@ -52,7 +52,7 @@ export function TeaserFailed() {
     <div className="tl-wait tl-failed" role="alert">
       <div className="tl-msg">
         <span className="tl-txt">
-          {EVENT_NAME ? `${EVENT_NAME} could not be loaded.` : 'This section could not be loaded.'} Check your internet connection and reload.
+          {eventName() ? `${eventName()} could not be loaded.` : 'This section could not be loaded.'} Check your internet connection and reload.
         </span>
         <button type="button" className="tl-btn" onClick={reload}>Reload</button>
       </div>

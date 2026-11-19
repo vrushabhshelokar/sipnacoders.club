@@ -16,6 +16,10 @@ export const LISTS = { team: 't-', ambassadors: 'a-' };
 export const MAX_PEOPLE = 60;
 export const MAX_PHOTO_BYTES = 250 * 1024;
 export const ID_RE = /^[a-z0-9][a-z0-9_-]{1,38}$/;
+// the pictures of the upcoming event (Upcoming event tab) live in the same store: four banner places and one popup logo
+export const EVENT_MEDIA_IDS = ['e-b1', 'e-b2', 'e-b3', 'e-b4', 'e-logo'];
+export const MAX_BANNER_BYTES = 420 * 1024;
+export const MAX_LOGO_BYTES = 120 * 1024;
 
 const clean = (v, max) => (typeof v === 'string'
   ? v.replace(/[\u0000-\u001f\u007f<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, max)
@@ -116,12 +120,12 @@ export function sniffImage(buf) {
 }
 
 /** 'data:image/webp;base64,....'  ->  { mime, b64 } or { error } */
-export function parseDataUrl(s) {
-  if (typeof s !== 'string' || s.length > MAX_PHOTO_BYTES * 1.4 + 100) return { error: 'The photo is too large. Choose a smaller one.' };
+export function parseDataUrl(s, maxBytes = MAX_PHOTO_BYTES) {
+  if (typeof s !== 'string' || s.length > maxBytes * 1.4 + 100) return { error: 'The photo is too large. Choose a smaller one.' };
   const m = /^data:(image\/(?:webp|jpeg|png));base64,([A-Za-z0-9+/]+={0,2})$/.exec(s);
   if (!m) return { error: 'The photo must be a JPG, PNG or WebP image.' };
   const buf = Buffer.from(m[2], 'base64');
-  if (buf.length > MAX_PHOTO_BYTES) return { error: 'The photo is too large. Choose a smaller one.' };
+  if (buf.length > maxBytes) return { error: 'The photo is too large. Choose a smaller one.' };
   if (sniffImage(buf) !== m[1]) return { error: 'That file is not a real image.' };
   return { mime: m[1], b64: m[2] };
 }

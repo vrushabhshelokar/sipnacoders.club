@@ -1,4 +1,4 @@
-// Events tab, "page content" part: the Timeline rows of the Vibe-A-Thon page and the detail boxes of the Upcoming card.
+// Events tab, "page content" part: the Timeline rows of the Vibe-A-Thon page. (The detail boxes of the Upcoming card are in the Upcoming event tab.)
 import { Fold } from './kit';
 
 export const PS_ROW = 'Problem Statements Released';   // this row follows the PDF release time while that is changed in the dashboard
@@ -90,8 +90,6 @@ function TimelineEditor({ rows, onChange, psFollows, psWords, canEdit }) {
 export default function AdminEventContent({ view, edit, overrides, changed, fileDefaults, psFollows, psWords, isAdmin }) {
   const mark = (k) => (changed.includes(k) ? 'unsaved changes' : k in overrides ? 'edited here' : '');
   const tlEdited = mark('timeline');
-  const dtEdited = mark('details');
-  const keys = Object.keys(fileDefaults.details);
   return (
     <div className="ac-content-blocks">
       <Fold title="Timeline and deadlines" badge={tlEdited} hint="The Milestone Schedule on the Vibe-A-Thon page: registration, deadlines, results, finale.">
@@ -99,23 +97,6 @@ export default function AdminEventContent({ view, edit, overrides, changed, file
         {isAdmin && (
           <div className="ac-row-tools">
             <button type="button" className="ad-link" onClick={() => edit('timeline', fileDefaults.timeline)}>Put back the rows from the code file</button>
-          </div>
-        )}
-      </Fold>
-
-      <Fold title="Detail boxes of the Upcoming card" badge={dtEdited} hint="Format, rounds, team size, theme and prizes that open when a visitor presses Try to decrypt.">
-        <p className="ad-row-hint ad-hint-block">A box you leave empty stays "Will be revealed soon". As soon as at least one box has words, the card and the popup tell visitors that new details are unlocked.</p>
-        <div className="ad-fields">
-          {keys.map((k) => (
-            <div className="ad-field" key={k}>
-              <label htmlFor={`dt-${k}`}>{k} <span className="ac-count">{(view.details[k] || '').length}/80</span></label>
-              <input id={`dt-${k}`} type="text" maxLength={80} autoComplete="off" disabled={!isAdmin} value={view.details[k] || ''} onChange={(e) => edit('details', { ...view.details, [k]: e.target.value })} />
-            </div>
-          ))}
-        </div>
-        {isAdmin && (
-          <div className="ac-row-tools">
-            <button type="button" className="ad-link" onClick={() => edit('details', fileDefaults.details)}>Put back the words from the code file</button>
           </div>
         )}
       </Fold>

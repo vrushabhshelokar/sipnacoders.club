@@ -5,7 +5,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Icon } from './Icons';
 import { useIntroDone } from './ui';
 import { useUpcoming } from './events';
-import { EVENT_NAME, hasDetailsNow, isTeaserLive } from './teaserCore';
+import { hasDetailsNow, isTeaserLive } from './teaserCore';
+import { eventName } from './eventLive';
 import { CODE_CLASH_SECTION, CODE_CLASH_ID } from './eventSwitches';
 import { useSwitch } from './liveSettings';
 import './UpcomingFound.css';
@@ -21,7 +22,8 @@ export function useUpcomingCount() {
 /* the words on the Upcoming button. While the hackathon card is the ONLY upcoming event and EVENT_NAME is written
    (site/upcomingConfig.js), the button shows the event name. Otherwise it keeps the plain words. The link stays /upcoming. */
 export function upcomingLabel(n, plain = 'Upcoming events') {
-  return EVENT_NAME && isTeaserLive() && n === 1 ? EVENT_NAME : plain;
+  const name = eventName();
+  return name && isTeaserLive() && n === 1 ? name : plain;
 }
 
 /* true while the mystery card is on AND you have filled in some details (site/upcomingConfig.js -> DETAILS) */

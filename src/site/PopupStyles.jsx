@@ -7,7 +7,7 @@ import { useEffect, useRef } from 'react';
 import { Icon } from './Icons';
 import PosterStage from './PosterStage';
 import NameReveal from './NameReveal';
-import { Actions, Desc, Shell, Title, reduced } from './popupParts';
+import { Actions, Desc, Shell, Title, Logo, reduced } from './popupParts';
 import './PopupStyles.css';
 
 /* ---------- 1. radar (the original look) ---------- */
@@ -29,6 +29,7 @@ function Radar({ text, ...p }) {
       </PosterStage>
       <div className="s-ann-body">
         <span className="s-ann-flag"><i /> {text.flag || 'New signal detected'}</span>
+        <Logo text={text} />
         {text.name
           ? <NameReveal as="h2" id="s-ann-t" className="s-ann-title" text={text.name} rest={text.rest} effect="radar" />
           : <h2 id="s-ann-t" className="s-ann-title">{m ? <><span>{m[1]}</span>{m[2]}</> : <span>{text.title}</span>}</h2>}
@@ -224,6 +225,7 @@ function Neon({ text, ...p }) {
         <PosterStage kind="popup">
           <span className="pp-nx-ring" aria-hidden="true"><b>?</b></span>
         </PosterStage>
+        <Logo text={text} />
         {text.name
           ? <NameReveal as="h2" id="s-ann-t" className="pp-title" text={text.name} rest={text.rest} effect="neon" all />
           : (

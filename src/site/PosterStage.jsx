@@ -11,16 +11,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from './Icons';
-import { POSTERS, HAS_POSTERS } from './posters';
+import { currentPosters, usePosters } from './posters';
 import { getFx } from './teaserCore';
 import './PosterStage.css';
 
-export { HAS_POSTERS };
+export const hasPosters = () => currentPosters().length > 0;
 
 const HOLD = 2000;     // how long the mystery picture stays before the poster is revealed (ms)
 const REVEAL = 1700;   // the reveal itself (ms)
 const SLIDE = 4600;    // time for each poster when there are several (ms)
-const L = POSTERS.length;
+let POSTERS = currentPosters();   // the banners of the dashboard, else the files in src/assets/upcoming. PosterStage() below refreshes both lines.
+let L = POSTERS.length;
 
 const reduced = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 const RATIO = new Map();   // width / height of every poster that has loaded (each one is shown in its own true shape)
@@ -348,6 +349,9 @@ function Stage({ children, kind, cap, className, frameW, frameH }) {
    frameW / frameH: room the design keeps around the picture (px): the poster is shown a little smaller, like a print
                     with a margin (--ps-pad in PosterStage.css is half of this) */
 export default function PosterStage({ children, kind = 'card', cap, className, onlyWithPoster = false, frameW = 28, frameH = 28 }) {
-  if (!HAS_POSTERS) return onlyWithPoster ? null : <>{children}</>;
-  return <Stage kind={kind} cap={cap} className={className} frameW={frameW} frameH={frameH}>{children}</Stage>;
+  const list = usePosters();
+  POSTERS = list;
+  L = list.length;
+  if (!L) return onlyWithPoster ? null : <>{children}</>;
+  return <Stage key={list.join('|')} kind={kind} cap={cap} className={className} frameW={frameW} frameH={frameH}>{children}</Stage>;
 }

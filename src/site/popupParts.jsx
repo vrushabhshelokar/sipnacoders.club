@@ -2,14 +2,22 @@
 // You never edit this file.
 import { Icon } from './Icons';
 import NameReveal from './NameReveal';
+import './EventLogo.css';
 
 export const Close = ({ onClose }) => (
   <button type="button" className="pp-x" onClick={onClose} aria-label="Close"><Icon.X size={18} /></button>
 );
 // once the event name is written (text.name) the heading is the animated NameReveal, with this design's own effect (fx)
-export const Title = ({ text, extra, fx }) => (text.name
-  ? <NameReveal as="h2" id="s-ann-t" className="pp-title" text={text.name} rest={text.rest} effect={fx} {...extra} />
-  : <h2 id="s-ann-t" className="pp-title" {...extra}>{text.title}</h2>);
+// the small logo of the popup (Upcoming event tab of the dashboard), above the title
+export const Logo = ({ text }) => (text.logo ? <img className="pp-logo" src={text.logo} alt="" decoding="async" /> : null);
+export const Title = ({ text, extra, fx }) => (
+  <>
+    <Logo text={text} />
+    {text.name
+      ? <NameReveal as="h2" id="s-ann-t" className="pp-title" text={text.name} rest={text.rest} effect={fx} {...extra} />
+      : <h2 id="s-ann-t" className="pp-title" {...extra}>{text.title}</h2>}
+  </>
+);
 export const Desc = ({ text }) => <p id="s-ann-d" className="pp-desc">{text.desc}</p>;
 export const Actions = ({ text, p }) => (
   <div className="pp-actions">

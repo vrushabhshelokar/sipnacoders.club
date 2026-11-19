@@ -8,6 +8,7 @@ import { dateFromText, getPast, toDate } from './time';
 import { liveValue, useLiveSettings } from './liveSettings';
 import * as C from './upcomingConfig';
 import { CARD_LOOKS, DESIGNS as DESIGN_LIST, POSTER_EFFECTS } from './designs';
+import { eventDetails, eventLink, eventName, eventType } from './eventLive';
 
 /* ---------- settings (read from upcomingConfig.js, with safe fallbacks) ---------- */
 export const TYPES = ['hackathon', 'workshop', 'online'];
@@ -16,7 +17,7 @@ export const EVENT_NAME = String(C.EVENT_NAME || '').trim();
 // has any detail been filled in for this kind of event? (then the card tells visitors to press "Try to decrypt")
 export const HAS_DETAILS = Object.values((C.DETAILS && C.DETAILS[TYPE]) || {}).some((v) => String(v || '').trim());
 // the detail boxes can also be written in the dashboard (Events tab). If they were, those win over upcomingConfig.js.
-const detailsNow = () => { const v = liveValue('details', null); return v && typeof v === 'object' && !Array.isArray(v) ? v : ((C.DETAILS && C.DETAILS[TYPE]) || {}); };
+const detailsNow = () => eventDetails();   // the dashboard (Upcoming event tab) wins over upcomingConfig.js, see site/eventLive.js
 export const hasDetailsNow = () => Object.values(detailsNow()).some((v) => String(v || '').trim());
 
 // the dashboard (Site controls) can change the event start, the round dates and the current round; the values in
@@ -47,7 +48,7 @@ const finishedSince = () => {
 export function getDesign() {
   let q = null;
   try { q = Number(new URLSearchParams(window.location.search).get('design')); } catch { /* no address bar: ignore */ }
-  const force = Math.round(Number(C.FORCE_DESIGN)) || 0;
+  const force = Math.round(Number(liveValue('popupTheme', C.FORCE_DESIGN))) || 0;
   let i;
   if (q >= 1 && q <= LIST.length) i = Math.round(q) - 1;          // ?design=4 preview
   else if (force >= 1 && force <= LIST.length) i = force - 1;     // locked in upcomingConfig.js
@@ -144,6 +145,8 @@ export function FieldValue({ f }) {
 export function useTeaser() {
   const now = useNow();
   useLiveSettings();            // re-render when the dashboard values arrive
+  const TYPE = eventType();     // the dashboard can change the kind of event and its name (Upcoming event tab)
+  const EVENT_NAME = eventName();
   const T = liveT();
   const ROUND = liveRound();
   // once the name is announced, the card must not say "the name will be announced soon"
@@ -246,6 +249,8 @@ export function useTeaser() {
 /* the buttons under every card: Get notified, Try to decrypt, Instagram.
    When you have filled in details, a hint appears and "Try to decrypt" glows until the visitor presses it. */
 export function Actions({ t, className = '' }) {
+  const goTo = eventLink();                       // Upcoming event tab: a form link, or empty = the site's own Register page
+  const external = /^https:\/\//.test(goTo);
   return (
     <>
       {t.ready && (
@@ -257,9 +262,15 @@ export function Actions({ t, className = '' }) {
         </p>
       )}
       <div className={`s-actions ${className}`}>
-        <Link className="s-btn s-btn-light" to="/register">
-          <Icon.ClipboardList size={16} /> Register Now
-        </Link>
+        {external ? (
+          <a className="s-btn s-btn-light" href={goTo} target="_blank" rel="noopener noreferrer">
+            <Icon.ClipboardList size={16} /> Register Now
+          </a>
+        ) : (
+          <Link className="s-btn s-btn-light" to={goTo || '/register'}>
+            <Icon.ClipboardList size={16} /> Register Now
+          </Link>
+        )}
         <button
           type="button"
           className={`s-btn s-btn-ghost s-mys-dec ${t.ready ? 'is-ready' : ''}`}

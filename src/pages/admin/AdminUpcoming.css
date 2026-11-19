@@ -1,0 +1,56 @@
+/* "Upcoming event" tab of the admin dashboard (AdminUpcoming.jsx). Builds on the classes of AdminAnalytics.css and AdminCenter.css. */
+.au-file { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.au .au-panel + .au-panel { margin-top: 18px; }
+.au-gap { margin-top: 18px; }
+.au-empty { margin: 0 0 4px; }
+
+/* kind of event */
+.au-types { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.au-type { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; text-align: left; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--border); background: rgba(255, 255, 255, .03); color: #fff; min-height: 48px; cursor: pointer; transition: border-color .15s, background .15s; }
+.au-type b { font: 600 15px var(--sans); }
+.au-type small { font: 400 12.5px/1.45 var(--sans); color: var(--text-2); }
+.au-type:hover { border-color: var(--border-2); }
+.au-type.is-on { border-color: var(--blue); background: rgba(76, 141, 255, .14); box-shadow: inset 0 0 0 1px var(--blue); }
+.au-type:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+/* banners */
+.au-banners { list-style: none; margin: 0 0 12px; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.au-banner { display: flex; flex-direction: column; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); background: rgba(0, 0, 0, .25); min-width: 0; }
+.au-banner img { display: block; width: 100%; height: 200px; object-fit: contain; background: #0d1016; }
+.au-banner-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 10px 12px; border-top: 1px solid var(--border); }
+.au-banner-n { flex: 1 1 100%; font: 600 12.5px var(--sans); color: var(--text-2); }
+
+/* description points */
+.au-points { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 12px; }
+.au-point { padding: 14px; border-radius: 14px; border: 1px solid var(--border); background: rgba(0, 0, 0, .2); }
+.au-point-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.au-point-n { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font: 600 13px var(--sans); color: var(--blue); border: 1px solid rgba(76, 141, 255, .45); background: rgba(76, 141, 255, .08); }
+.au-point-acts { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+
+/* popup design numbers */
+.au-themes { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 8px; margin: 14px 0 8px; }
+.au-theme { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 10px; border-radius: 12px; border: 1px solid var(--border); background: rgba(255, 255, 255, .03); color: var(--text-2); font: 500 13px var(--sans); text-align: left; cursor: pointer; transition: border-color .15s, background .15s, color .15s; }
+.au-theme b { flex: none; min-width: 22px; height: 22px; padding: 0 5px; border-radius: 7px; display: grid; place-items: center; font: 700 12px var(--mono); color: #fff; background: rgba(255, 255, 255, .08); }
+.au-theme span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.au-theme:hover { border-color: var(--border-2); color: #fff; }
+.au-theme.is-on { border-color: var(--blue); background: rgba(76, 141, 255, .16); color: #fff; }
+.au-theme.is-on b { background: var(--blue); color: #06070a; }
+.au-theme:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.au-prev { margin: 6px 0 0; font-size: 13.5px; color: var(--text-2); }
+
+/* popup logo */
+.au-logo { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; }
+.au-logo-box { display: grid; place-items: center; width: 160px; height: 64px; padding: 8px; border-radius: 12px; border: 1px dashed var(--border-2); background: repeating-conic-gradient(rgba(255, 255, 255, .05) 0% 25%, transparent 0% 50%) 0 0 / 16px 16px; }
+.au-logo-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.au-logo-box small { color: var(--muted); font: 500 12px var(--sans); }
+.au-logo-acts { display: inline-flex; gap: 8px; flex-wrap: wrap; }
+
+@media (max-width: 820px) {
+  .au-types { grid-template-columns: minmax(0, 1fr); }
+  .au-banners { grid-template-columns: minmax(0, 1fr); }
+  .au-banner img { height: 220px; }
+  .au-themes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .au-panel .ad-field input, .au-panel .ad-field select { font-size: 16px; }   /* a phone does not zoom into a 16px box */
+  /* seven tabs in three columns: the lonely last one takes the whole row */
+  .ad .ac-tabs .ac-tab-btn:last-child:nth-child(3n+1) { grid-column: 1 / -1; }
+}

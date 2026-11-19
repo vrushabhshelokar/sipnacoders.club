@@ -13,9 +13,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useIntroDone } from './ui';
 import { useTouched } from './interaction';
 import { useUpcoming } from './events';
-import { EVENT_NAME, getDesign, hasDetailsNow, isTeaserLive } from './teaserCore';
+import { getDesign, hasDetailsNow, isTeaserLive } from './teaserCore';
+import { eventName, logoUrl, popupDelayMs, popupDescLive } from './eventLive';
 import {
-  SHOW_UPCOMING, SHOW_POPUP, POPUP_TEXT, POPUP_SHOW_NAME, POPUP_DELAY, POPUP_SEEN_KEY, POPUP_SKIP_ON,
+  SHOW_UPCOMING, SHOW_POPUP, POPUP_TEXT, POPUP_SHOW_NAME, POPUP_SEEN_KEY, POPUP_SKIP_ON,
 } from './upcomingConfig';
 import { NEW_POPUPS, POPUP_NAMES } from './designs';
 import {
@@ -62,6 +63,9 @@ export default function AnnouncePopup() {
   const from = useRef(null);
 
   const design = getDesign();
+  const delay = popupDelayMs();   // Upcoming event tab: seconds after opening the site (default: POPUP_DELAY in upcomingConfig.js)
+  const introAt = useRef(0);      // the moment the opening animation ended
+  if (introDone && !introAt.current) introAt.current = Date.now();
   // the dashboard (Site controls) can change these without a deploy; the values in eventSwitches.js are the defaults
   const clashPopupOn = useSwitch('codeClashPopup', CODE_CLASH_POPUP);
   const clashSectionOn = useSwitch('codeClashSection', CODE_CLASH_SECTION);
@@ -83,6 +87,7 @@ export default function AnnouncePopup() {
     if (!introDone || skip || !active || (!preview && (!touched || wasSeen(seenKey)))) return undefined;
     let dead = false;
     let id = 0;
+    const wait = () => (preview ? Math.min(delay, 2000) : Math.max(0, delay - (Date.now() - introAt.current)));   // counted from the end of the opening animation
     const load = clash ? import('./CodeClashPopup') : (NEW_POPUPS.includes(name) ? import('./PopupStylesNew') : import('./PopupStyles'));
     load.then((m) => {
       if (dead) return;
@@ -92,10 +97,10 @@ export default function AnnouncePopup() {
         if (!preview) markSeen(seenKey);
         setView({ Design: m.default, name });
         setOpen(true);
-      }, POPUP_DELAY);
+      }, wait());
     }).catch(() => { /* the design could not load (offline): just skip the popup */ });
     return () => { dead = true; clearTimeout(id); };
-  }, [introDone, touched, skip, active, preview, name, clash, seenKey]);
+  }, [introDone, touched, skip, active, preview, name, clash, seenKey, delay]);
 
   const close = useCallback(() => {
     setClosing(true);
@@ -153,12 +158,15 @@ export default function AnnouncePopup() {
   if (!open || !view) return null;
 
   // once the event name is announced the popup can say it (turn it off with POPUP_SHOW_NAME = false)
+  const EVENT_NAME = eventName();
   const named = POPUP_SHOW_NAME && !!EVENT_NAME;
   // once you fill in details the popup says so too, so people know there is something new to unlock
   const news = hasDetailsNow() ? 'New details are unlocked. Tap below, then press Try to decrypt.' : null;
   const text = named
     ? { ...POPUP_TEXT, title: `${EVENT_NAME} is coming`, name: EVENT_NAME, rest: 'is coming', desc: news || 'Tap below to see all the details on the Upcoming events page.', flag: 'Now announced' }
     : { ...POPUP_TEXT, desc: news || POPUP_TEXT.desc, flag: hasDetailsNow() ? 'New details unlocked' : 'New signal detected' };
+  const custom = popupDescLive();   // own words written in the dashboard win over the usual line
+  const shownText = { ...text, logo: logoUrl(), ...(custom ? { desc: custom } : {}) };
   const { Design } = view;
 
   return (
@@ -167,7 +175,7 @@ export default function AnnouncePopup() {
       className={`s-ann is-${view.name} ${closing ? 'is-out' : ''}`}
       onMouseDown={(e) => { if (e.target === e.currentTarget) close(); }}
     >
-      <Design name={view.name} text={text} onGo={go} onClose={close} cardRef={card} ctaRef={cta} />
+      <Design name={view.name} text={shownText} onGo={go} onClose={close} cardRef={card} ctaRef={cta} />
     </div>
   );
 }

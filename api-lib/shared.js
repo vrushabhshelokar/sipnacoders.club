@@ -95,10 +95,12 @@ export const BOOL_KEYS = [
   'upcomingShow', 'flowShow', 'psShow', 'psUnlockNow',
 ];
 export const DATE_KEYS = ['eventStart', 'roundEnd1', 'roundEnd2', 'hideAfter', 'psReleaseAt'];   // 'YYYY-MM-DDTHH:MM', Indian time
-export const INT_KEYS = { psCount: [1, 99] };                                                    // whole number, [min, max]
-export const LINK_KEYS = ['psPdf'];                                                              // /file-in-public-folder.pdf or https://...
-export const OBJECT_KEYS = ['banner', 'timeline', 'details'];                                    // longer content (see the clean functions below)
-export const ALL_SETTING_KEYS = [...BOOL_KEYS, ...DATE_KEYS, ...Object.keys(INT_KEYS), ...LINK_KEYS, ...OBJECT_KEYS, 'currentRound'];
+export const INT_KEYS = { psCount: [1, 99], popupTheme: [0, 21], popupDelay: [0, 120] };                                                    // whole number, [min, max]
+export const LINK_KEYS = ['psPdf', 'eventLink'];                                                              // /file-in-public-folder.pdf or https://...
+export const OBJECT_KEYS = ['banner', 'timeline', 'details', 'eventDetails', 'eventPoints', 'eventBanners', 'popupLogo'];                                    // longer content (see the clean functions below)
+export const ENUM_KEYS = { eventType: ['hackathon', 'workshop', 'online'] };       // one of these words
+export const TEXT_KEYS = { eventName: 60, popupDesc: 120 };                         // one line of text, at most this long
+export const ALL_SETTING_KEYS = [...BOOL_KEYS, ...DATE_KEYS, ...Object.keys(INT_KEYS), ...LINK_KEYS, ...OBJECT_KEYS, ...Object.keys(ENUM_KEYS), ...Object.keys(TEXT_KEYS), 'currentRound'];
 
 const DATE_RE = /^\d{4}-\d\d-\d\dT\d\d:\d\d$/;
 const LINK_RE = /^(\/(?!\/)[^\s"'<>\\]+|https:\/\/[^\s"'<>\\]+)$/;
@@ -169,7 +171,56 @@ function cleanDetails(v) {
   }
   return out;
 }
-const OBJECT_CLEANERS = { banner: cleanBanner, timeline: cleanTimeline, details: cleanDetails };
+// the detail boxes of each kind of event: { hackathon: { Format: '...' }, workshop: { ... } }. A kind that is missing uses the code file.
+function cleanEventDetails(v) {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return null;
+  const out = {};
+  for (const t of Object.keys(v)) {
+    if (!ENUM_KEYS.eventType.includes(t)) return null;
+    const d = cleanDetails(v[t]);
+    if (d === null) return null;
+    out[t] = d;
+  }
+  return Object.keys(out).length ? out : null;
+}
+
+// the "what to expect" points under the Upcoming card: [{ t: 'bold line', d: 'one more line' }]
+function cleanEventPoints(v) {
+  if (!Array.isArray(v) || v.length < 1 || v.length > 8) return null;
+  const out = [];
+  for (const it of v) {
+    if (!it || typeof it !== 'object') return null;
+    const t = oneLine(it.t, 60, 1);
+    const d = oneLine(it.d ?? '', 160);
+    if (t === null || d === null) return null;
+    out.push({ t, d });
+  }
+  return out;
+}
+
+// the uploaded banners: [{ id: 'e-b1' .. 'e-b4', v: '<version of the picture>' }]. The pictures live in the photo store (api/admin/people.js).
+const MEDIA_VERSION = /^[a-z0-9]{1,16}$/;
+function cleanEventBanners(v) {
+  if (!Array.isArray(v) || v.length < 1 || v.length > 4) return null;
+  const seen = new Set();
+  const out = [];
+  for (const b of v) {
+    if (!b || typeof b !== 'object' || typeof b.id !== 'string' || !/^e-b[1-4]$/.test(b.id) || seen.has(b.id) || typeof b.v !== 'string' || !MEDIA_VERSION.test(b.v)) return null;
+    seen.add(b.id);
+    out.push({ id: b.id, v: b.v });
+  }
+  return out;
+}
+
+// the small logo of the popup: { v: '<version of the picture>' }
+function cleanPopupLogo(v) {
+  if (!v || typeof v !== 'object' || Array.isArray(v) || typeof v.v !== 'string' || !MEDIA_VERSION.test(v.v)) return null;
+  return { v: v.v };
+}
+const OBJECT_CLEANERS = {
+  banner: cleanBanner, timeline: cleanTimeline, details: cleanDetails,
+  eventDetails: cleanEventDetails, eventPoints: cleanEventPoints, eventBanners: cleanEventBanners, popupLogo: cleanPopupLogo,
+};
 
 // Keeps only known keys with valid values. Anything else is dropped.
 export function cleanSettings(input) {
@@ -192,6 +243,14 @@ export function cleanSettings(input) {
     const v = OBJECT_CLEANERS[k](input[k]);
     if (v !== null) out[k] = v;
   }
+  for (const [k, list] of Object.entries(ENUM_KEYS)) {
+    if (list.includes(input[k])) out[k] = input[k];
+  }
+  for (const [k, max] of Object.entries(TEXT_KEYS)) {
+    if (typeof input[k] !== 'string') continue;
+    const s = oneLine(input[k], max);
+    if (s !== null && (s || k === 'eventName')) out[k] = s;   // an empty event name is a real choice ("no name yet"), an empty popup line is not
+  }
   if (input.currentRound === 1 || input.currentRound === 2) out.currentRound = input.currentRound;
   return out;
 }
@@ -203,6 +262,7 @@ export function applyPatch(current, patch) {
   if (!patch || typeof patch !== 'object') return { next, rejected };
   for (const key of ALL_SETTING_KEYS) {
     if (!(key in patch)) continue;
+    if (key === 'eventName' && patch[key] === '') { next[key] = ''; continue; }   // an empty name is a real choice: no name yet
     if (patch[key] === null || patch[key] === '') { delete next[key]; continue; }
     const one = cleanSettings({ [key]: patch[key] });
     if (key in one) next[key] = one[key];

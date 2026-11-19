@@ -113,6 +113,8 @@ export const KEY_LABELS = {
   psShow: 'Problem Statement section', psUnlockNow: 'PDF buttons open now', psReleaseAt: 'PDF release time', psPdf: 'PDF link', psCount: 'Number of problem statements',
   codeClashRegistration: 'Code Clash registration', codeClashPopup: 'Code Clash popup', codeClashSection: 'Code Clash block on Home',
   banner: 'Announcement banner', timeline: 'Timeline rows', details: 'Detail boxes',
+  eventType: 'Kind of event', eventName: 'Event name', eventLink: 'Register button link', eventDetails: 'Event detail boxes', eventPoints: 'Description points',
+  eventBanners: 'Event banners', popupTheme: 'Popup design number', popupDelay: 'Popup delay (seconds)', popupLogo: 'Popup logo', popupDesc: 'Popup words',
 };
 
 /* one saved value in plain words */
@@ -124,5 +126,12 @@ export function describeValue(key, v) {
   if (key === 'details' && typeof v === 'object') { const n = Object.values(v).filter(Boolean).length; return `${n} filled box${n === 1 ? '' : 'es'}`; }
   if (/^\d{4}-\d\d-\d\dT\d\d:\d\d$/.test(String(v))) return stampWords(v);
   if (key === 'currentRound') return `Round ${v}`;
+  if (key === 'eventPoints' && Array.isArray(v)) return `${v.length} point${v.length === 1 ? '' : 's'}`;
+  if (key === 'eventBanners' && Array.isArray(v)) return `${v.length} banner${v.length === 1 ? '' : 's'}`;
+  if (key === 'eventDetails' && typeof v === 'object') return `boxes for ${Object.keys(v).length} kind(s) of event`;
+  if (key === 'popupLogo') return 'a logo';
+  if (key === 'popupTheme') return Number(v) === 0 ? 'automatic' : `design ${v}`;
+  if (key === 'popupDelay') return `${v} seconds`;
+  if (key === 'eventName' && v === '') return 'no name';
   return String(v).length > 50 ? `${String(v).slice(0, 50)}...` : String(v);
 }

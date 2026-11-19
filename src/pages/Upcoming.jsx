@@ -8,7 +8,8 @@ import { PageHead } from '../site/ui';
 import { UpcomingBlock, useUpcoming } from '../site/events';
 import { isTeaserLive } from '../site/HackathonTeaser';
 import UpcomingSoon from '../site/UpcomingSoon';
-import { getDesign, EVENT_NAME } from '../site/teaserCore';
+import { getDesign } from '../site/teaserCore';
+import { eventName } from '../site/eventLive';
 import '../site/Cyber.css';
 import '../site/UpcomingClean.css';   // the clean, minimal, phone-first look of the Vibe-A-Thon page (delete this line to get the old look back)
 import '../site/mobileSlider.js';   // phone only: Why Participate + Have Any Questions cards slide one by one with arrow buttons (delete this line to get stacked cards back)
@@ -18,7 +19,7 @@ export default function Upcoming() {
   const quiet = !list.length && !isTeaserLive();   // nothing announced and the mystery card is switched off
   const cyber = getDesign().card === 16;           // the Cyber design (21) gives the whole page its cyberpunk look
   // Cyber design + EVENT_NAME written: the page is all about that one event (no heading above the card)
-  const named = cyber && !quiet && !!EVENT_NAME;
+  const named = cyber && !quiet && !!eventName();
 
   return (
     <div className={cyber ? `up-cy${named ? ' up-cy-named' : ''}` : undefined}>

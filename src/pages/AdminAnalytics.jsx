@@ -11,12 +11,13 @@ import AdminRegistrations from './admin/AdminRegistrations';
 import AdminAutomation from './admin/AdminAutomation';
 import AdminContent from './admin/AdminContent';
 import AdminEventContent from './admin/AdminEventContent';
+import AdminUpcoming, { pruneDetails } from './admin/AdminUpcoming';
 import AdminAccess from './admin/AdminAccess';
 import { HoursChart, useSubmissions } from './admin/AdminOverviewExtra';
 
 /* ---------------------------------------------------------------------------------------------
    Private admin dashboard (/admin/visitor-analytics)
-   Six tabs: Overview, Registrations, Events, Site content, Automation, Access (src/pages/admin/*).
+   Seven tabs: Overview, Registrations, Upcoming event, Events, Site content, Automation, Access (src/pages/admin/*).
    Overview + Registrations are also open to the view-only login. Everything else is admin only.
    --------------------------------------------------------------------------------------------- */
 
@@ -66,16 +67,28 @@ const FILE_DEFAULTS = {
   banner: { on: false, text: '', link: '', linkText: '', until: '', tone: 'info' },
   timeline: TL_DEFAULT,
   details: DETAIL_DEFAULT,
+  // Upcoming event tab (eventStart, hideAfter, upcomingShow and vibePopup above also belong to it)
+  eventType: DETAIL_TYPE,
+  eventName: String(C.EVENT_NAME || '').trim(),
+  eventLink: '',
+  eventDetails: {},
+  eventPoints: [],
+  eventBanners: [],
+  popupTheme: Math.round(Number(C.FORCE_DESIGN)) || 0,
+  popupDelay: Math.round((Number(C.POPUP_DELAY) || 0) / 1000),
+  popupLogo: null,
+  popupDesc: '',
   // Code Clash
   codeClashRegistration: true,
   codeClashPopup: CODE_CLASH_POPUP,
   codeClashSection: CODE_CLASH_SECTION,
 };
 const SETTING_KEYS = Object.keys(FILE_DEFAULTS);
-const OBJECT_KEYS = ['banner', 'timeline', 'details'];   // saved as a whole; equal to the code file = "not changed"
+const OBJECT_KEYS = ['banner', 'timeline', 'details', 'eventDetails', 'eventPoints', 'eventBanners', 'popupLogo'];   // saved as a whole; equal to the code file = "not changed"
+const UPCOMING_KEYS = ['eventType', 'eventName', 'eventLink', 'eventStart', 'hideAfter', 'upcomingShow', 'vibePopup', 'eventDetails', 'details', 'eventPoints', 'eventBanners', 'popupTheme', 'popupDelay', 'popupLogo', 'popupDesc'];   // the Upcoming event tab
 const BANNER_KEYS = ['banner'];                           // these belong to the Site content tab, the rest of the settings to the Events tab
 
-const TABS = [['overview', 'Overview'], ['registrations', 'Registrations'], ['events', 'Events'], ['content', 'Site content'], ['automation', 'Automation'], ['access', 'Access']];
+const TABS = [['overview', 'Overview'], ['registrations', 'Registrations'], ['upcoming', 'Upcoming event'], ['events', 'Events'], ['content', 'Site content'], ['automation', 'Automation'], ['access', 'Access']];
 const VIEWER_TABS = ['overview'];
 const tabFromHash = () => {
   try { const h = window.location.hash.replace('#', ''); return TABS.some(([id]) => id === h) ? h : 'overview'; } catch { return 'overview'; }
@@ -99,20 +112,16 @@ const SECTIONS = [
         ],
       },
       {
-        title: 'Upcoming card and popup',
-        hint: 'What visitors see about the event before it starts. The Upcoming menu button and its number follow the first switch.',
+        title: 'Event flow',
+        hint: 'The card, popup, name, banner, date and on / off switches are in the Upcoming event tab. This block is the hackathon-only flow.',
         items: [
-          { key: 'upcomingShow', label: 'Upcoming card, menu number and popup', on: 'Live', off: 'Off', hint: 'Off: the Upcoming page shows the quiet "coming soon" panel and the Vibe-A-Thon popup stays away.' },
-          { key: 'vibePopup', label: 'Vibe-A-Thon popup', on: 'On', off: 'Off', hint: 'Only one popup shows per visit. If the Code Clash popup is also on, the Code Clash one wins.' },
           { key: 'flowShow', label: 'Two-Round Event Flow section', on: 'Shown', off: 'Hidden', hint: 'The "How it works" block under the Upcoming card.' },
-          { key: 'hideAfter', type: 'date', label: 'Hide the card and popup after', hint: 'Empty: they hide by themselves 2 days after the last round ends.' },
         ],
       },
       {
         title: 'Countdown and rounds (Indian time)',
-        hint: 'The card counts down to the event start. In the two-round design it counts down to the end of the current round instead. Leave a date empty to use the code file.',
+        hint: 'The two-round design counts down to the end of the current round. The event start itself is set in the Upcoming event tab. Leave a date empty to use the code file.',
         items: [
-          { key: 'eventStart', type: 'date', label: 'Event start' },
           { key: 'currentRound', type: 'select', label: 'Current round', options: [[1, 'Round 1'], [2, 'Round 2']] },
           { key: 'roundEnd1', type: 'date', label: 'Round 1 ends' },
           { key: 'roundEnd2', type: 'date', label: 'Round 2 ends' },
@@ -439,7 +448,7 @@ export default function AdminAnalytics() {
   const view = draft || effective;
   const changedKeys = draft ? SETTING_KEYS.filter((k) => !same(draft[k], effective[k])) : [];
   const dirty = changedKeys.length > 0;
-  const changedTabs = [...new Set(changedKeys.map((k) => (BANNER_KEYS.includes(k) ? 'content' : 'events')))];
+  const changedTabs = [...new Set(changedKeys.map((k) => (UPCOMING_KEYS.includes(k) ? 'upcoming' : BANNER_KEYS.includes(k) ? 'content' : 'events')))];
 
   const loadStats = useCallback(async () => {
     setRefreshing(true);
@@ -564,6 +573,9 @@ export default function AdminAnalytics() {
       if (same(draft[k], effective[k])) continue;
       let v = typeof draft[k] === 'string' ? draft[k].trim() : draft[k];
       if (k === 'banner') v = { ...v, text: v.text.trim(), link: v.link.trim(), linkText: v.linkText.trim() };
+      if (k === 'eventDetails') v = pruneDetails(v);
+      if (k === 'eventPoints') v = v.map((p) => ({ t: String(p.t || '').trim(), d: String(p.d || '').trim() })).filter((p) => p.t);
+      if (k === 'eventName') { patch[k] = v === FILE_DEFAULTS.eventName ? null : v; continue; }   // an emptied name is a real choice (no name yet)
       if (OBJECT_KEYS.includes(k)) patch[k] = same(v, FILE_DEFAULTS[k]) ? null : v;   // the same as the code file = go back to it
       else patch[k] = v === '' ? null : v;                                              // an emptied date or link goes back to the code file's value
     }
@@ -582,6 +594,13 @@ export default function AdminAnalytics() {
         else if (word(r.milestone).length > 80 || word(r.phase).length > 24 || word(r.time).length > 40 || word(r.date).length > 40 || word(r.desc).length > 260) problems.push(`Timeline row ${i + 1}: one of the texts is too long.`);
       });
     }
+    if (typeof patch.eventName === 'string' && patch.eventName.length > 60) problems.push('Event name: at most 60 letters.');
+    if (typeof patch.eventLink === 'string' && !PDF_LINK_OK(patch.eventLink)) problems.push('Register button link: start it with / (a page of this site) or https://, and use no spaces.');
+    if (typeof patch.popupDesc === 'string' && patch.popupDesc.length > 120) problems.push('Popup words: at most 120 letters.');
+    if (typeof patch.popupTheme === 'number' && !(Number.isInteger(patch.popupTheme) && patch.popupTheme >= 0 && patch.popupTheme <= 21)) problems.push('Popup design number: a whole number from 0 to 21.');
+    if (typeof patch.popupDelay === 'number' && !(Number.isInteger(patch.popupDelay) && patch.popupDelay >= 0 && patch.popupDelay <= 120)) problems.push('Popup delay: a whole number of seconds from 0 to 120.');
+    if (patch.eventDetails) Object.values(patch.eventDetails).forEach((d) => Object.entries(d).forEach(([k, val]) => { if (String(val || '').trim().length > 80) problems.push(`${k}: at most 80 letters.`); }));
+    if (patch.eventPoints) patch.eventPoints.forEach((p, i) => { if (p.t.length > 60 || p.d.length > 160) problems.push(`Description point ${i + 1}: the text is too long.`); });
     if (problems.length) { setSaveMsg({ type: 'err', text: problems.join(' ') }); return; }
     if (await postSettings(patch)) {
       setSaveMsg({ type: 'ok', text: 'Saved. The site picks it up within about a minute (people already on a page see it on their next page load).' });
@@ -820,6 +839,8 @@ export default function AdminAnalytics() {
 
             {active === 'registrations' && <AdminRegistrations isAdmin={role === 'admin'} />}
 
+            {active === 'upcoming' && role === 'admin' && <AdminUpcoming view={view} edit={edit} overrides={overrides} changed={changedKeys} />}
+
             {active === 'events' && role === 'admin' && (
               <section className="ad-panel ad-controls" aria-labelledby="ad-h-ctl">
                 <h2 id="ad-h-ctl">Events</h2>
@@ -879,7 +900,7 @@ export default function AdminAnalytics() {
                 ))}
 
                 <p className="ad-note ad-note-tight">
-                  Still in the code files (they rarely change): the event name, the card design, the Two-Round Event Flow words, the popup words, the Code Clash words, and fees or dates that are written inside other sections (prize pool, event snapshot, sticky bar). They live in <code>src/site/upcomingConfig.js</code>, <code>src/site/eventSwitches.js</code> and <code>src/data/vibeathonData.js</code>.
+                  The event name, banner, details and popup (design, delay, logo) are in the Upcoming event tab. Still in the code files (they rarely change): the Two-Round Event Flow words, the Code Clash words, and fees or dates that are written inside other sections (prize pool, event snapshot, sticky bar). They live in <code>src/site/upcomingConfig.js</code>, <code>src/site/eventSwitches.js</code> and <code>src/data/vibeathonData.js</code>.
                 </p>
 
                 <div className="ad-resetrow">
