@@ -1,4 +1,4 @@
-// Admin: the list of registrations (read: admin or view-only; delete / import: admin only).
+// Admin: the list of registrations. summary counts: admin or view-only (numbers only). The list itself, delete, import: admin only.
 //   GET  /api/admin/registrations?summary=1            counts per event and per day (for the Overview tab)
 //   GET  /api/admin/registrations?event=vibe-a-thon    every submission of one event + the webhook token (admin only)
 //   POST { action: 'delete', event, ids: [...] }
@@ -45,6 +45,7 @@ export default async function handler(req, res) {
         }
         return sendResponse(res, 200, { events });
       }
+      if (role !== 'admin') return sendResponse(res, 403, { ok: false, error: 'View-only access cannot open the list of names.' });
       const event = String(q.event || '');
       if (!REG_EVENTS[event]) return sendResponse(res, 400, { ok: false, error: 'Unknown event.' });
       const list = await readAll(redis, event);

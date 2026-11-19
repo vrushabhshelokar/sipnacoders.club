@@ -12,7 +12,7 @@ export default function AdminAccess({ role, viewerEnabled, onLogout }) {
       {isAdmin && (
         <section className="ad-panel">
           <h2>View-only login for coordinators</h2>
-          <p className="ad-sub">Give a teammate a second password that lets them see visitors and the registration list, but never change or delete anything. They log in on the same page.</p>
+          <p className="ad-sub">Give a teammate a second password that lets them see the visitor numbers on the Overview tab. They can never change anything, and they never see names, emails or phone numbers. They log in on the same page.</p>
           <div className={`ac-status ${viewerEnabled ? 'is-on' : ''}`}>
             <span className="ac-status-dot" aria-hidden="true" />
             <b>{viewerEnabled ? 'On: a view-only password is set.' : 'Off: no view-only password is set yet.'}</b>
@@ -22,7 +22,7 @@ export default function AdminAccess({ role, viewerEnabled, onLogout }) {
             <li>Add a variable named <code>ADMIN_VIEW_PASSWORD</code> with the password you want to share. It must be different from the admin password.</li>
             <li>Press <b>Redeploy</b> on the latest deployment. To switch it off later, delete the variable and redeploy.</li>
           </ol>
-          <p className="ad-note ad-note-tight">Viewers see the Overview and Registrations tabs only. Their contact details list is visible to them, so share the password only with people who may see it. Wrong passwords never lock anyone out.</p>
+          <p className="ad-note ad-note-tight">Viewers see the Overview tab only: visitor counts and how many people registered. The list of names is hidden from them, on the screen and on the server. Wrong passwords never lock anyone out.</p>
         </section>
       )}
 

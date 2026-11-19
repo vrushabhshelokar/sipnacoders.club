@@ -76,7 +76,7 @@ const OBJECT_KEYS = ['banner', 'timeline', 'details'];   // saved as a whole; eq
 const BANNER_KEYS = ['banner'];                           // these belong to the Site content tab, the rest of the settings to the Events tab
 
 const TABS = [['overview', 'Overview'], ['registrations', 'Registrations'], ['events', 'Events'], ['content', 'Site content'], ['automation', 'Automation'], ['access', 'Access']];
-const VIEWER_TABS = ['overview', 'registrations'];
+const VIEWER_TABS = ['overview'];
 const tabFromHash = () => {
   try { const h = window.location.hash.replace('#', ''); return TABS.some(([id]) => id === h) ? h : 'overview'; } catch { return 'overview'; }
 };
@@ -692,7 +692,7 @@ export default function AdminAnalytics() {
         <div>
           <div className="s-analytics-tag">PRIVATE DASHBOARD</div>
           <h1 className="s-analytics-title">ADMIN DASHBOARD</h1>
-          <p className="s-analytics-sub">{role === 'viewer' ? 'View-only access: you can look at everything on these two tabs, but nothing can be changed.' : 'Visitors, registrations and site controls in one place. Visitor counts are anonymous and stored in Upstash Redis.'}</p>
+          <p className="s-analytics-sub">{role === 'viewer' ? 'View-only access: you can look at the Overview (visitor numbers), but nothing can be changed and no names or contact details are shown.' : 'Visitors, registrations and site controls in one place. Visitor counts are anonymous and stored in Upstash Redis.'}</p>
         </div>
         <div className="ad-head-actions">
           <span className="ad-updated">Updated <b>{formatTimestamp(data && data.updatedAt)}</b></span>
