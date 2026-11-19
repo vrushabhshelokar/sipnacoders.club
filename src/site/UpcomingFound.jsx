@@ -5,7 +5,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Icon } from './Icons';
 import { useIntroDone } from './ui';
 import { useUpcoming } from './events';
-import { EVENT_NAME, HAS_DETAILS, isTeaserLive } from './teaserCore';
+import { EVENT_NAME, hasDetailsNow, isTeaserLive } from './teaserCore';
 import { CODE_CLASH_SECTION, CODE_CLASH_ID } from './eventSwitches';
 import { useSwitch } from './liveSettings';
 import './UpcomingFound.css';
@@ -25,7 +25,7 @@ export function upcomingLabel(n, plain = 'Upcoming events') {
 }
 
 /* true while the mystery card is on AND you have filled in some details (site/upcomingConfig.js -> DETAILS) */
-const hasFresh = () => HAS_DETAILS && isTeaserLive();
+const hasFresh = () => hasDetailsNow() && isTeaserLive();
 
 /* small glowing number that sits inside the button (turns green while there are new details to unlock) */
 export function CountBubble({ n }) {

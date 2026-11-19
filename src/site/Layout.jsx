@@ -6,6 +6,7 @@ import Background from './Background';
 import Dock from './Dock';
 import { MatrixEgg, ScrollProgress } from './Extras';
 import AnnouncePopup from './AnnouncePopup';
+import SiteBanner from './SiteBanner';
 import { CountBubble, NewTag, upcomingLabel, useUpcomingCount } from './UpcomingFound';
 import VisitorTracker from './VisitorTracker';
 import './NavFix.css';
@@ -131,6 +132,7 @@ export default function Layout({ children }) {
       <Dock />
       <MatrixEgg />
       <AnnouncePopup />
+      {!pathname.startsWith('/admin') && <SiteBanner />}
       <VisitorTracker />
     </>
   );

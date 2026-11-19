@@ -3,12 +3,21 @@ import './AdminAnalytics.css';
 import { CODE_CLASH_POPUP, VIBEATHON_POPUP, CODE_CLASH_SECTION } from '../site/eventSwitches';
 import * as C from '../site/upcomingConfig';
 import { PS } from '../data/problemStatement';
-import PeopleManager from './AdminPeople';
+import './admin/AdminCenter.css';
+import { EVENT_SCHEDULE } from '../data/vibeathonData';
+import { istWords } from '../site/psRelease';
+import { same } from './admin/kit';
+import AdminRegistrations from './admin/AdminRegistrations';
+import AdminAutomation from './admin/AdminAutomation';
+import AdminContent from './admin/AdminContent';
+import AdminEventContent from './admin/AdminEventContent';
+import AdminAccess from './admin/AdminAccess';
+import { HoursChart, useSubmissions } from './admin/AdminOverviewExtra';
 
 /* ---------------------------------------------------------------------------------------------
    Private admin dashboard (/admin/visitor-analytics)
-   1) Visitor analytics: daily graph, top pages, devices, where people came from, register clicks
-   2) Site controls: registration open/close, popups on/off, countdown dates (no deploy needed)
+   Six tabs: Overview, Registrations, Events, Site content, Automation, Access (src/pages/admin/*).
+   Overview + Registrations are also open to the view-only login. Everything else is admin only.
    --------------------------------------------------------------------------------------------- */
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -29,6 +38,12 @@ const CLICK_NAMES = {
 };
 
 // what the code files say today. The dashboard shows these until an admin changes something.
+const TL_DEFAULT = (Array.isArray(EVENT_SCHEDULE) ? EVENT_SCHEDULE : []).slice(0, 12).map((r) => ({
+  id: String(r.id), phase: r.phase || '', milestone: r.milestone || '', time: r.time || '', date: r.date || '', desc: r.desc || '',
+  ...(r.accent ? { accent: String(r.accent).toLowerCase() } : {}), ...(r.icon ? { icon: r.icon } : {}),
+}));
+const DETAIL_TYPE = ['hackathon', 'workshop', 'online'].includes(C.EVENT_TYPE) ? C.EVENT_TYPE : 'hackathon';
+const DETAIL_DEFAULT = Object.fromEntries(Object.entries((C.DETAILS && C.DETAILS[DETAIL_TYPE]) || {}).map(([k, v]) => [k, String(v || '')]));
 const PS_STAMP = /^\d{4}-\d\d-\d\dT\d\d:\d\d/.test(String(PS.releaseAt || '')) ? String(PS.releaseAt).slice(0, 16) : '';
 const FILE_DEFAULTS = {
   // Vibe-A-Thon
@@ -47,12 +62,24 @@ const FILE_DEFAULTS = {
   psReleaseAt: PS_STAMP,
   psPdf: PS.pdf || '',
   psCount: Number(PS.count) || 10,
+  // longer text (Events tab: timeline + detail boxes, Site content tab: banner)
+  banner: { on: false, text: '', link: '', linkText: '', until: '', tone: 'info' },
+  timeline: TL_DEFAULT,
+  details: DETAIL_DEFAULT,
   // Code Clash
   codeClashRegistration: true,
   codeClashPopup: CODE_CLASH_POPUP,
   codeClashSection: CODE_CLASH_SECTION,
 };
 const SETTING_KEYS = Object.keys(FILE_DEFAULTS);
+const OBJECT_KEYS = ['banner', 'timeline', 'details'];   // saved as a whole; equal to the code file = "not changed"
+const BANNER_KEYS = ['banner'];                           // these belong to the Site content tab, the rest of the settings to the Events tab
+
+const TABS = [['overview', 'Overview'], ['registrations', 'Registrations'], ['events', 'Events'], ['content', 'Site content'], ['automation', 'Automation'], ['access', 'Access']];
+const VIEWER_TABS = ['overview', 'registrations'];
+const tabFromHash = () => {
+  try { const h = window.location.hash.replace('#', ''); return TABS.some(([id]) => id === h) ? h : 'overview'; } catch { return 'overview'; }
+};
 
 // same rule as the server (api-lib/shared.js): a file in the public folder (/name.pdf) or a full https:// link
 const PDF_LINK_OK = (v) => /^(\/(?!\/)[^\s"'<>\\]+|https:\/\/[^\s"'<>\\]+)$/.test(v) && v.length <= 300 && !(v.startsWith('/') && v.includes('..'));
@@ -369,9 +396,10 @@ function DailyChart({ days }) {
 
 /* sum the daily objects for the chosen range */
 function aggregate(days) {
-  const sum = { visits: 0, pages: {}, devices: {}, sources: {}, clicks: {} };
+  const sum = { visits: 0, pages: {}, devices: {}, sources: {}, clicks: {}, hours: Array(24).fill(0) };
   for (const d of days) {
     sum.visits += d.visits;
+    for (const [h, v] of Object.entries(d.hours || {})) { const i = Number(h); if (i >= 0 && i < 24) sum.hours[i] += Number(v) || 0; }
     for (const bucket of ['pages', 'devices', 'sources', 'clicks']) {
       for (const [k, v] of Object.entries(d[bucket] || {})) sum[bucket][k] = (sum[bucket][k] || 0) + v;
     }
@@ -397,6 +425,9 @@ export default function AdminAnalytics() {
   const [refreshing, setRefreshing] = useState(false);
   const [statsError, setStatsError] = useState('');
   const [range, setRange] = useState(7);
+  const [role, setRole] = useState('admin');         // 'admin' | 'viewer' (view-only login)
+  const [viewerEnabled, setViewerEnabled] = useState(false);
+  const [tab, setTab] = useState(tabFromHash);
 
   const [overrides, setOverrides] = useState({});   // what the admin saved (missing key = the code file decides)
   const [draft, setDraft] = useState(null);         // unsaved edits
@@ -406,7 +437,9 @@ export default function AdminAnalytics() {
 
   const effective = useMemo(() => ({ ...FILE_DEFAULTS, ...overrides }), [overrides]);
   const view = draft || effective;
-  const dirty = !!draft && SETTING_KEYS.some((k) => draft[k] !== effective[k]);
+  const changedKeys = draft ? SETTING_KEYS.filter((k) => !same(draft[k], effective[k])) : [];
+  const dirty = changedKeys.length > 0;
+  const changedTabs = [...new Set(changedKeys.map((k) => (BANNER_KEYS.includes(k) ? 'content' : 'events')))];
 
   const loadStats = useCallback(async () => {
     setRefreshing(true);
@@ -421,6 +454,8 @@ export default function AdminAnalytics() {
       const json = await res.json();
       setData(json);
       setOverrides(json.settings || {});
+      setRole(json.role === 'viewer' ? 'viewer' : 'admin');
+      setViewerEnabled(json.viewerEnabled === true);
       setAuthenticated(true);
       return true;
     } catch {
@@ -526,14 +561,27 @@ export default function AdminAnalytics() {
     if (!draft) return;
     const patch = {};
     for (const k of SETTING_KEYS) {
-      if (draft[k] === effective[k]) continue;
-      const v = typeof draft[k] === 'string' ? draft[k].trim() : draft[k];
-      patch[k] = v === '' ? null : v;   // an emptied date or link goes back to the code file's value
+      if (same(draft[k], effective[k])) continue;
+      let v = typeof draft[k] === 'string' ? draft[k].trim() : draft[k];
+      if (k === 'banner') v = { ...v, text: v.text.trim(), link: v.link.trim(), linkText: v.linkText.trim() };
+      if (OBJECT_KEYS.includes(k)) patch[k] = same(v, FILE_DEFAULTS[k]) ? null : v;   // the same as the code file = go back to it
+      else patch[k] = v === '' ? null : v;                                              // an emptied date or link goes back to the code file's value
     }
     if (!Object.keys(patch).length) return;
     const problems = [];
     if (typeof patch.psPdf === 'string' && !PDF_LINK_OK(patch.psPdf)) problems.push('PDF link: start it with / (a file in the public folder) or https://, and use no spaces.');
     if (typeof patch.psCount === 'number' && !(Number.isInteger(patch.psCount) && patch.psCount >= 1 && patch.psCount <= 99)) problems.push('How many problem statements: a whole number from 1 to 99.');
+    if (patch.banner) {
+      if (patch.banner.on && !patch.banner.text) problems.push('Banner: write what it says, or switch it off.');
+      if (patch.banner.link && !PDF_LINK_OK(patch.banner.link)) problems.push('Banner link: start it with / (a page of this site) or https://, and use no spaces.');
+    }
+    if (patch.timeline) {
+      patch.timeline.forEach((r, i) => {
+        const word = (v) => String(v || '').trim();
+        if (!word(r.milestone)) problems.push(`Timeline row ${i + 1}: needs a milestone name.`);
+        else if (word(r.milestone).length > 80 || word(r.phase).length > 24 || word(r.time).length > 40 || word(r.date).length > 40 || word(r.desc).length > 260) problems.push(`Timeline row ${i + 1}: one of the texts is too long.`);
+      });
+    }
     if (problems.length) { setSaveMsg({ type: 'err', text: problems.join(' ') }); return; }
     if (await postSettings(patch)) {
       setSaveMsg({ type: 'ok', text: 'Saved. The site picks it up within about a minute (people already on a page see it on their next page load).' });
@@ -548,6 +596,39 @@ export default function AdminAnalytics() {
       setSaveMsg({ type: 'ok', text: 'Everything is back to the values written in the code files.' });
     }
   };
+
+  const shownTabs = role === 'admin' ? TABS : TABS.filter(([id]) => VIEWER_TABS.includes(id));
+  const active = shownTabs.some(([id]) => id === tab) ? tab : 'overview';
+  const subs = useSubmissions(range, authenticated && active === 'overview', data && data.updatedAt);   // real form submissions (funnel)
+  const selectTab = (id) => {
+    setTab(id);
+    try { window.history.replaceState(null, '', `#${id}`); } catch { /* the address bar stays as it is */ }
+  };
+  const onTabKey = (e) => {
+    const ids = shownTabs.map(([id]) => id);
+    const i = ids.indexOf(active);
+    const next = e.key === 'ArrowRight' ? ids[(i + 1) % ids.length] : e.key === 'ArrowLeft' ? ids[(i - 1 + ids.length) % ids.length] : e.key === 'Home' ? ids[0] : e.key === 'End' ? ids[ids.length - 1] : null;
+    if (!next) return;
+    e.preventDefault();
+    selectTab(next);
+    const el = document.getElementById(`ac-tab-${next}`);
+    if (el) el.focus();
+  };
+  useEffect(() => {
+    const on = () => setTab(tabFromHash());
+    window.addEventListener('hashchange', on);
+    return () => window.removeEventListener('hashchange', on);
+  }, []);
+  // "Saved." goes away by itself
+  useEffect(() => {
+    if (saveMsg.type !== 'ok') return undefined;
+    const id = setTimeout(() => setSaveMsg({ type: '', text: '' }), 9000);
+    return () => clearTimeout(id);
+  }, [saveMsg]);
+  const discard = () => { setDraft(null); setSaveMsg({ type: '', text: '' }); };
+  // the Problem Statement row of the Timeline shows the PDF release time once the dashboard changed it
+  const psFollows = 'psReleaseAt' in overrides || view.psReleaseAt !== FILE_DEFAULTS.psReleaseAt;
+  const psWords = istWords(view.psReleaseAt) || { date: '', time: '' };
 
   const days = useMemo(() => (data && data.days ? data.days.slice(-range) : []), [data, range]);
   const agg = useMemo(() => aggregate(days), [days]);
@@ -611,7 +692,7 @@ export default function AdminAnalytics() {
         <div>
           <div className="s-analytics-tag">PRIVATE DASHBOARD</div>
           <h1 className="s-analytics-title">ADMIN DASHBOARD</h1>
-          <p className="s-analytics-sub">Visitor analytics and site controls. Counts are anonymous and stored in Upstash Redis.</p>
+          <p className="s-analytics-sub">{role === 'viewer' ? 'View-only access: you can look at everything on these two tabs, but nothing can be changed.' : 'Visitors, registrations and site controls in one place. Visitor counts are anonymous and stored in Upstash Redis.'}</p>
         </div>
         <div className="ad-head-actions">
           <span className="ad-updated">Updated <b>{formatTimestamp(data && data.updatedAt)}</b></span>
@@ -631,125 +712,197 @@ export default function AdminAnalytics() {
 
       {configured && data && (
         <div className={refreshing ? 'ad-body is-loading' : 'ad-body'}>
-          <div className="ad-kpis">
-            <Kpi label="Today" value={data.today.visits} sub={`${fmt(data.today.unique)} unique visitors`} />
-            <Kpi label="Last 7 days" value={data.week.visits} sub={`${fmt(data.week.unique)} unique visitors`} />
-            <Kpi label="Last 30 days" value={data.month.visits} sub={`${fmt(data.month.unique)} unique visitors`} />
-            <Kpi label="All time" value={data.total} sub={`${fmt(data.unique)} unique visitors`} />
-          </div>
-          <p className="ad-note">A visit is one page load by one browser. Unique visitors are distinct browsers, so someone using two devices counts twice. Days follow Indian time. Daily numbers start from the day this update went live; the all-time numbers include everything before.</p>
-
-          <div className="ad-filter">
-            <RangeToggle value={range} onChange={setRange} />
-          </div>
-
-          <section className="ad-panel" aria-labelledby="ad-h-daily">
-            <h2 id="ad-h-daily">Visitors per day</h2>
-            <DailyChart days={days} />
-          </section>
-
-          <div className="ad-two">
-            <section className="ad-panel" aria-labelledby="ad-h-pages">
-              <h2 id="ad-h-pages">Top pages</h2>
-              <p className="ad-sub">Page views, every time a page is opened.</p>
-              <BarList rows={toRows(agg.pages, PAGE_NAMES)} total={pageTotal} />
-            </section>
-
-            <section className="ad-panel" aria-labelledby="ad-h-dev">
-              <h2 id="ad-h-dev">Phone or laptop</h2>
-              <p className="ad-sub">Share of visits by device.</p>
-              <BarList rows={toRows(agg.devices, DEVICE_NAMES)} total={deviceTotal} />
-            </section>
-
-            <section className="ad-panel" aria-labelledby="ad-h-src">
-              <h2 id="ad-h-src">Where visitors came from</h2>
-              <p className="ad-sub">Share of visits by source.</p>
-              <BarList rows={toRows(agg.sources, SOURCE_NAMES)} total={sourceTotal} />
-              <p className="ad-note ad-note-tight">
-                Instagram, WhatsApp and many apps hide where a click came from, and those show up as "Direct or unknown". To track one poster or link, add a tag to it:
-                {' '}<code>sipnacoders.club/?src=poster1</code> or <code>sipnacoders.club/?src=whatsapp-group</code>. The tag appears here by name.
-              </p>
-            </section>
-
-            <section className="ad-panel" aria-labelledby="ad-h-reg">
-              <h2 id="ad-h-reg">Registration interest</h2>
-              <p className="ad-sub">How many visitors reached a registration step.</p>
-              <BarList
-                scale={agg.visits}
-                total={agg.visits}
-                rows={[
-                  { label: 'Visits', value: agg.visits },
-                  { label: 'Register page views', value: registerViews },
-                  { label: 'Register button clicks', value: registerClicks },
-                ]}
-              />
-              <h3 className="ad-h3">Button clicks</h3>
-              <BarList rows={toRows(agg.clicks, CLICK_NAMES)} empty="No clicks counted in this range yet." />
-              <p className="ad-note ad-note-tight">These are clicks, not submitted forms. Tally and Google Forms do not report back yet, so the list of people who actually registered comes in the next step.</p>
-            </section>
-          </div>
-
-          <section className="ad-panel ad-controls" aria-labelledby="ad-h-ctl">
-            <h2 id="ad-h-ctl">Site controls</h2>
-            <p className="ad-sub">Change the live site without a deploy. Everything is grouped by event. Anything you do not change keeps the value written in the code files.</p>
-
-            <div className="ad-presets" role="group" aria-label="Quick switch between events">
-              <div className="ad-presets-text">
-                <strong>Quick switch</strong>
-                <span>Fills in the switches for you. Nothing goes live until you press Save changes.</span>
-              </div>
-              <div className="ad-presets-btns">
-                {PRESETS.map((p) => (
-                  <button key={p.id} type="button" className="ad-chip" title={p.hint} onClick={() => applyPreset(p)} disabled={saving}>{p.label}</button>
-                ))}
-              </div>
-            </div>
-
-            {SECTIONS.map((s) => (
-              <div className="ad-sec" key={s.id} role="group" aria-labelledby={`ad-sec-${s.id}`}>
-                <div className="ad-sec-head">
-                  <h3 id={`ad-sec-${s.id}`} className="ad-sec-title">{s.title}</h3>
-                  <span className="ad-sec-tag">{s.tag}</span>
-                  <a className="ad-link ad-sec-link" href={s.link.href} target="_blank" rel="noopener noreferrer">{s.link.text}</a>
-                </div>
-                {s.blocks.map((b) => {
-                  const switches = b.items.filter((it) => !it.type || it.type === 'switch');
-                  const fields = b.items.filter((it) => it.type && it.type !== 'switch');
-                  return (
-                    <div className="ad-group" key={b.title}>
-                      <h4 className="ad-h3">{b.title}</h4>
-                      {b.hint && <p className="ad-row-hint ad-hint-block">{b.hint}</p>}
-                      {switches.map((it) => <SwitchRow key={it.key} it={it} view={view} overrides={overrides} edit={edit} />)}
-                      {fields.length > 0 && (
-                        <div className="ad-fields">
-                          {fields.map((it) => <FieldInput key={it.key} it={it} view={view} overrides={overrides} edit={edit} />)}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+          <div className="ac-tabs" role="tablist" aria-label="Dashboard sections" onKeyDown={onTabKey}>
+            {shownTabs.map(([id, label]) => (
+              <button
+                key={id}
+                id={`ac-tab-${id}`}
+                type="button"
+                role="tab"
+                aria-selected={active === id}
+                aria-controls={`ac-panel-${id}`}
+                tabIndex={active === id ? 0 : -1}
+                className="ac-tab-btn"
+                onClick={() => selectTab(id)}
+              >
+                {label}
+                {changedTabs.includes(id) && <span className="ac-tab-dot" title="Unsaved changes" aria-label="unsaved changes" />}
+                {id === 'automation' && role === 'admin' && data.pending > 0 && <span className="ac-tab-badge" title="Changes waiting for their time" aria-label={`${data.pending} scheduled`}>{data.pending}</span>}
+              </button>
             ))}
+          </div>
 
-            <p className="ad-note ad-note-tight">
-              Still in the code files (they rarely change): the event name, the card design, the detail boxes (format, team size, prizes), the Two-Round Event Flow words and the popup words. They live in <code>src/site/upcomingConfig.js</code> and <code>src/site/eventSwitches.js</code>.
-            </p>
-
-            <div className="ad-savebar">
-              <button type="button" className="s-btn s-btn-light" onClick={save} disabled={!dirty || saving}>
-                {saving ? 'Saving...' : 'Save changes'}
-              </button>
-              <button type="button" className="s-btn s-btn-ghost" onClick={() => { setDraft(null); setSaveMsg({ type: '', text: '' }); }} disabled={!dirty || saving}>
-                Discard
-              </button>
-              <button type="button" className="ad-link" onClick={resetAll} disabled={saving || (!confirmReset && Object.keys(overrides).length === 0)}>
-                {confirmReset ? 'Click again to reset everything' : 'Reset all to the code files'}
-              </button>
-              <span className="ad-savemsg" role="status" data-type={saveMsg.type}>{saveMsg.text}{dirty && !saveMsg.text ? 'You have unsaved changes.' : ''}</span>
+          {(dirty || saveMsg.text) && (
+            <div className="ac-dirty" data-type={saveMsg.type} role="status">
+              <div className="ac-dirty-text">
+                {saveMsg.text || 'You have unsaved changes.'}
+                {dirty && <small>Changed in: {changedTabs.map((id) => (TABS.find((t) => t[0] === id) || [])[1]).join(', ')}. Nothing is live until you press Save changes.</small>}
+              </div>
+              <button type="button" className="s-btn s-btn-light" onClick={save} disabled={!dirty || saving}>{saving ? 'Saving...' : 'Save changes'}</button>
+              <button type="button" className="s-btn s-btn-ghost" onClick={discard} disabled={!dirty || saving}>Discard</button>
             </div>
-          </section>
+          )}
 
-          <PeopleManager />
+          <div role="tabpanel" id={`ac-panel-${active}`} aria-labelledby={`ac-tab-${active}`} className="ac-panelwrap">
+
+            {active === 'overview' && (
+              <>
+                <div className="ad-kpis">
+                  <Kpi label="Today" value={data.today.visits} sub={`${fmt(data.today.unique)} unique visitors`} />
+                  <Kpi label="Last 7 days" value={data.week.visits} sub={`${fmt(data.week.unique)} unique visitors`} />
+                  <Kpi label="Last 30 days" value={data.month.visits} sub={`${fmt(data.month.unique)} unique visitors`} />
+                  <Kpi label="All time" value={data.total} sub={`${fmt(data.unique)} unique visitors`} />
+                </div>
+                <p className="ad-note">A visit is one page load by one browser. Unique visitors are distinct browsers, so someone using two devices counts twice. Days follow Indian time. Daily numbers start from the day this update went live; the all-time numbers include everything before.</p>
+
+                <div className="ad-filter">
+                  <RangeToggle value={range} onChange={setRange} />
+                </div>
+
+                <section className="ad-panel" aria-labelledby="ad-h-daily">
+                  <h2 id="ad-h-daily">Visitors per day</h2>
+                  <DailyChart days={days} />
+                </section>
+
+                <div className="ad-two">
+                  <section className="ad-panel" aria-labelledby="ad-h-reg">
+                    <h2 id="ad-h-reg">Registration funnel</h2>
+                    <p className="ad-sub">From a visit to a real form submission.</p>
+                    <BarList
+                      scale={agg.visits}
+                      total={agg.visits}
+                      rows={[
+                        { label: 'Visits', value: agg.visits },
+                        { label: 'Register page views', value: registerViews },
+                        { label: 'Register button clicks', value: registerClicks },
+                        ...(subs.ready && subs.any ? [{ label: 'Form submissions', value: subs.count }] : []),
+                      ]}
+                    />
+                    <h3 className="ad-h3">Button clicks</h3>
+                    <BarList rows={toRows(agg.clicks, CLICK_NAMES)} empty="No clicks counted in this range yet." />
+                    <p className="ad-note ad-note-tight">
+                      {subs.ready && subs.any
+                        ? 'Form submissions are the people in the Registrations tab (Vibe-A-Thon and Code Clash). Clicks and submissions are counted separately, so they do not always match.'
+                        : 'These are clicks, not submitted forms. Connect your forms in the Registrations tab to see real submissions here.'}
+                    </p>
+                  </section>
+
+                  <section className="ad-panel" aria-labelledby="ad-h-hours">
+                    <h2 id="ad-h-hours">Busiest hours</h2>
+                    <p className="ad-sub">When people visit, by hour of the day (Indian time). A good time to post or announce.</p>
+                    <HoursChart hours={agg.hours} />
+                  </section>
+
+                  <section className="ad-panel" aria-labelledby="ad-h-pages">
+                    <h2 id="ad-h-pages">Top pages</h2>
+                    <p className="ad-sub">Page views, every time a page is opened.</p>
+                    <BarList rows={toRows(agg.pages, PAGE_NAMES)} total={pageTotal} />
+                  </section>
+
+                  <section className="ad-panel" aria-labelledby="ad-h-dev">
+                    <h2 id="ad-h-dev">Phone or laptop</h2>
+                    <p className="ad-sub">Share of visits by device.</p>
+                    <BarList rows={toRows(agg.devices, DEVICE_NAMES)} total={deviceTotal} />
+                  </section>
+
+                  <section className="ad-panel" aria-labelledby="ad-h-src">
+                    <h2 id="ad-h-src">Where visitors came from</h2>
+                    <p className="ad-sub">Share of visits by source.</p>
+                    <BarList rows={toRows(agg.sources, SOURCE_NAMES)} total={sourceTotal} />
+                    <p className="ad-note ad-note-tight">
+                      Instagram, WhatsApp and many apps hide where a click came from, and those show up as "Direct or unknown". To track one poster or link, add a tag to it:
+                      {' '}<code>sipnacoders.club/?src=poster1</code> or <code>sipnacoders.club/?src=whatsapp-group</code>. The tag appears here by name.
+                    </p>
+                  </section>
+                </div>
+              </>
+            )}
+
+            {active === 'registrations' && <AdminRegistrations isAdmin={role === 'admin'} />}
+
+            {active === 'events' && role === 'admin' && (
+              <section className="ad-panel ad-controls" aria-labelledby="ad-h-ctl">
+                <h2 id="ad-h-ctl">Events</h2>
+                <p className="ad-sub">Everything about Vibe-A-Thon and Code Clash, grouped by event. Change the live site without a deploy. Anything you do not change keeps the value written in the code files.</p>
+
+                <div className="ad-presets" role="group" aria-label="Quick switch between events">
+                  <div className="ad-presets-text">
+                    <strong>Quick switch</strong>
+                    <span>Fills in the switches for you. Nothing goes live until you press Save changes.</span>
+                  </div>
+                  <div className="ad-presets-btns">
+                    {PRESETS.map((p) => (
+                      <button key={p.id} type="button" className="ad-chip" title={p.hint} onClick={() => applyPreset(p)} disabled={saving}>{p.label}</button>
+                    ))}
+                  </div>
+                </div>
+
+                {SECTIONS.map((s) => (
+                  <div className="ad-sec" key={s.id} role="group" aria-labelledby={`ad-sec-${s.id}`}>
+                    <div className="ad-sec-head">
+                      <h3 id={`ad-sec-${s.id}`} className="ad-sec-title">{s.title}</h3>
+                      <span className="ad-sec-tag">{s.tag}</span>
+                      <a className="ad-link ad-sec-link" href={s.link.href} target="_blank" rel="noopener noreferrer">{s.link.text}</a>
+                    </div>
+                    {s.blocks.map((b) => {
+                      const switches = b.items.filter((it) => !it.type || it.type === 'switch');
+                      const fields = b.items.filter((it) => it.type && it.type !== 'switch');
+                      return (
+                        <div className="ad-group" key={b.title}>
+                          <h4 className="ad-h3">{b.title}</h4>
+                          {b.hint && <p className="ad-row-hint ad-hint-block">{b.hint}</p>}
+                          {switches.map((it) => <SwitchRow key={it.key} it={it} view={view} overrides={overrides} edit={edit} />)}
+                          {fields.length > 0 && (
+                            <div className="ad-fields">
+                              {fields.map((it) => <FieldInput key={it.key} it={it} view={view} overrides={overrides} edit={edit} />)}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                    {s.id === 'vibe' && (
+                      <div className="ad-group">
+                        <h4 className="ad-h3">Words on the Vibe-A-Thon pages</h4>
+                        <AdminEventContent
+                          view={view}
+                          edit={edit}
+                          overrides={overrides}
+                          changed={changedKeys}
+                          fileDefaults={FILE_DEFAULTS}
+                          psFollows={psFollows}
+                          psWords={psWords}
+                          isAdmin={role === 'admin'}
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                <p className="ad-note ad-note-tight">
+                  Still in the code files (they rarely change): the event name, the card design, the Two-Round Event Flow words, the popup words, the Code Clash words, and fees or dates that are written inside other sections (prize pool, event snapshot, sticky bar). They live in <code>src/site/upcomingConfig.js</code>, <code>src/site/eventSwitches.js</code> and <code>src/data/vibeathonData.js</code>.
+                </p>
+
+                <div className="ad-resetrow">
+                  <button type="button" className="ad-link" onClick={resetAll} disabled={saving || (!confirmReset && Object.keys(overrides).length === 0)}>
+                    {confirmReset ? 'Click again to reset everything' : 'Reset every switch and text to the code files'}
+                  </button>
+                </div>
+              </section>
+            )}
+
+            {active === 'content' && role === 'admin' && <AdminContent view={view} edit={edit} overrides={overrides} changed={changedKeys} isAdmin />}
+
+            {active === 'automation' && role === 'admin' && (
+              <AdminAutomation
+                presets={PRESETS}
+                banner={effective.banner}
+                locked={dirty}
+                onSettingsChanged={(s) => { setOverrides(s || {}); setDraft(null); }}
+              />
+            )}
+
+            {active === 'access' && <AdminAccess role={role} viewerEnabled={viewerEnabled} onLogout={handleLogout} />}
+          </div>
         </div>
       )}
     </div>

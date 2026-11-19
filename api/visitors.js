@@ -184,6 +184,7 @@ export default async function handler(req, res) {
     pipeline.hincrby(dayKey, `src:${sourceOf(body, userAgent, ownHost)}`, 1);
     if (path) pipeline.hincrby(dayKey, `pv:${path}`, 1);
     pipeline.pfadd(KEYS.dayUnique(day), vid);
+    pipeline.hincrby(dayKey, `hr:${String(new Date(Date.now() + 5.5 * 3600e3).getUTCHours()).padStart(2, '0')}`, 1);   // hour of the day, Indian time
     const results = await pipeline.exec();
 
     // the first visit of a day creates the day's keys: tell Redis to delete them after KEEP_DAYS

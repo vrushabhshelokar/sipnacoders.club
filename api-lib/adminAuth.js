@@ -39,3 +39,34 @@ export function isAdmin(req) {
   const token = parseCookies(req.headers.cookie)[SESSION_COOKIE_NAME];
   return Boolean(token && verifySessionToken(token, secret));
 }
+
+/* ---- view-only login (optional) ----
+   Set ADMIN_VIEW_PASSWORD in Vercel to give coordinators / faculty a second password. With it they can look at the
+   Overview and the Registrations, and nothing else: every save, delete and import is refused for them. */
+export function getViewerSecret() {
+  const v = process.env.ADMIN_VIEW_PASSWORD || null;
+  return v && v !== getAdminSecret() ? v : null;
+}
+
+export function createViewerToken(secret) {
+  const ts = String(Date.now());
+  return `v.${ts}.${crypto.createHmac('sha256', secret).update(`v.${ts}`).digest('hex')}`;
+}
+
+function verifyViewerToken(token, secret) {
+  if (typeof token !== 'string') return false;
+  const [tag, ts, sig] = token.split('.');
+  if (tag !== 'v' || !ts || !sig) return false;
+  const t = parseInt(ts, 10);
+  if (Number.isNaN(t) || Date.now() - t > SESSION_MAX_AGE_SECONDS * 1000 || t > Date.now() + 60000) return false;
+  return safeCompare(sig, crypto.createHmac('sha256', secret).update(`v.${ts}`).digest('hex'));
+}
+
+// 'admin' | 'viewer' | null
+export function getRole(req) {
+  if (isAdmin(req)) return 'admin';
+  const vs = getViewerSecret();
+  if (!vs) return null;
+  const token = parseCookies(req.headers.cookie)[SESSION_COOKIE_NAME];
+  return token && verifyViewerToken(token, vs) ? 'viewer' : null;
+}

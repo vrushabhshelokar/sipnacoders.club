@@ -3,10 +3,24 @@
 import { Reveal } from './ui';
 import { Icon } from './Icons';
 import { EVENT_SCHEDULE } from '../data/vibeathonData';
-import { useLiveSettings } from './liveSettings';
+import { liveValue, useLiveSettings } from './liveSettings';
 import { psRelease } from './psRelease';
 
 const PS_ROW = 'Problem Statements Released';   // this row shows the release time set in the dashboard (if it was changed)
+
+// The rows can be written in the dashboard (Events tab, Timeline and deadlines). If they were, those win; if not, the rows of
+// data/vibeathonData.js are used. Colour and icon fall back to the code file's row at the same place.
+const SPARE = ['#7cf2d4', '#4c8dff', '#ff5468', '#fbbc05'];
+const rgbOf = (hex) => { const n = parseInt(hex.slice(1), 16); return `${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}`; };
+function scheduleRows() {
+  const live = liveValue('timeline', null);
+  if (!Array.isArray(live) || !live.length) return EVENT_SCHEDULE;
+  return live.map((r, i) => {
+    const base = EVENT_SCHEDULE[i] || {};
+    const accent = /^#[0-9a-fA-F]{6}$/.test(r.accent || '') ? r.accent : base.accent || SPARE[i % SPARE.length];
+    return { ...r, id: String(i + 1).padStart(2, '0'), accent, accentRgb: rgbOf(accent), icon: r.icon || base.icon || 'Calendar' };
+  });
+}
 import './EventSchedule.css';
 
 function TimelineRow({ item, index }) {
@@ -67,7 +81,7 @@ export default function EventSchedule() {
         {/* Spine line behind all rows */}
         <div className="es-spine" aria-hidden="true" />
 
-        {EVENT_SCHEDULE.map((item, i) => (
+        {scheduleRows().map((item, i) => (
           <div key={item.id} role="listitem">
             <TimelineRow item={rel.custom && item.milestone === PS_ROW ? { ...item, date: rel.date, time: rel.time } : item} index={i} />
           </div>

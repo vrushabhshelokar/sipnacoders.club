@@ -1,6 +1,7 @@
 // Public, read-only: the switches the admin saved on the dashboard (registration open/close, popups, countdown dates).
 // The website reads this once per visit. Nothing private is in here, and nobody can change it without the admin login.
 import { KEYS, getRedisClient, parseStoredSettings } from '../api-lib/shared.js';
+import { materialize, parseSchedule } from '../api-lib/control.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -16,7 +17,9 @@ export default async function handler(req, res) {
   const redis = getRedisClient();
   if (redis) {
     try {
-      settings = parseStoredSettings(await redis.get(KEYS.settings));
+      const [saved, scheduled] = await Promise.all([redis.get(KEYS.settings), redis.get(KEYS.schedule)]);
+      // changes the admin scheduled for a time that has passed are applied here, so they happen on time even if nobody is logged in
+      settings = materialize(parseStoredSettings(saved), parseSchedule(scheduled)).settings;
     } catch (err) {
       console.error('Settings read error:', err.message);
     }

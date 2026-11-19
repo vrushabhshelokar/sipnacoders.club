@@ -15,6 +15,8 @@ export const KEYS = {
   total: 'scc:visitors:total',
   unique: 'scc:visitors:unique_set',
   settings: 'scc:settings',
+  schedule: 'scc:schedule',   // scheduled changes (JSON list)
+  history: 'scc:history',     // what the admin changed and when (JSON list, newest first)
   day: (d) => `scc:day:${d}`,
   dayUnique: (d) => `scc:day:${d}:u`,
 };
@@ -95,10 +97,21 @@ export const BOOL_KEYS = [
 export const DATE_KEYS = ['eventStart', 'roundEnd1', 'roundEnd2', 'hideAfter', 'psReleaseAt'];   // 'YYYY-MM-DDTHH:MM', Indian time
 export const INT_KEYS = { psCount: [1, 99] };                                                    // whole number, [min, max]
 export const LINK_KEYS = ['psPdf'];                                                              // /file-in-public-folder.pdf or https://...
-export const ALL_SETTING_KEYS = [...BOOL_KEYS, ...DATE_KEYS, ...Object.keys(INT_KEYS), ...LINK_KEYS, 'currentRound'];
+export const OBJECT_KEYS = ['banner', 'timeline', 'details'];                                    // longer content (see the clean functions below)
+export const ALL_SETTING_KEYS = [...BOOL_KEYS, ...DATE_KEYS, ...Object.keys(INT_KEYS), ...LINK_KEYS, ...OBJECT_KEYS, 'currentRound'];
 
 const DATE_RE = /^\d{4}-\d\d-\d\dT\d\d:\d\d$/;
 const LINK_RE = /^(\/(?!\/)[^\s"'<>\\]+|https:\/\/[^\s"'<>\\]+)$/;
+const CTRL = /[\u0000-\u001f\u007f]/g;
+
+export const validStamp = (v) => typeof v === 'string' && DATE_RE.test(v) && !Number.isNaN(Date.parse(`${v}:00+05:30`));
+
+// plain one-line text, or null when it is not text or too short / too long
+function oneLine(v, max, min = 0) {
+  if (typeof v !== 'string') return null;
+  const s = v.replace(CTRL, ' ').replace(/\s+/g, ' ').trim();
+  return s.length >= min && s.length <= max ? s : null;
+}
 
 function cleanLink(v) {
   if (typeof v !== 'string') return null;
@@ -108,14 +121,63 @@ function cleanLink(v) {
   return s;
 }
 
+// the announcement banner: { on, text, link, linkText, until, tone }
+function cleanBanner(v) {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return null;
+  const text = oneLine(v.text ?? '', 200);
+  const linkText = oneLine(v.linkText ?? '', 30);
+  const link = v.link === undefined || v.link === '' ? '' : cleanLink(v.link);
+  const until = v.until === undefined || v.until === '' ? '' : (validStamp(v.until) ? v.until : null);
+  if (text === null || linkText === null || link === null || until === null) return null;
+  return { on: v.on === true, text, link, linkText, until, tone: ['info', 'urgent', 'success'].includes(v.tone) ? v.tone : 'info' };
+}
+
+// the Timeline rows of the Vibe-A-Thon page: [{ id, phase, milestone, time, date, desc, accent?, icon? }]
+function cleanTimeline(v) {
+  if (!Array.isArray(v) || v.length < 1 || v.length > 12) return null;
+  const seen = new Set();
+  const out = [];
+  for (const it of v) {
+    if (!it || typeof it !== 'object') return null;
+    const id = typeof it.id === 'string' && /^[A-Za-z0-9_-]{1,12}$/.test(it.id) ? it.id : null;
+    const milestone = oneLine(it.milestone, 80, 1);
+    const phase = oneLine(it.phase ?? '', 24);
+    const time = oneLine(it.time ?? '', 40);
+    const date = oneLine(it.date ?? '', 40);
+    const desc = oneLine(it.desc ?? '', 260);
+    if (!id || seen.has(id) || milestone === null || phase === null || time === null || date === null || desc === null) return null;
+    seen.add(id);
+    const row = { id, phase, milestone, time, date, desc };
+    if (typeof it.accent === 'string' && /^#[0-9a-fA-F]{6}$/.test(it.accent)) row.accent = it.accent.toLowerCase();
+    if (typeof it.icon === 'string' && /^[A-Za-z]{1,24}$/.test(it.icon)) row.icon = it.icon;
+    out.push(row);
+  }
+  return out;
+}
+
+// the detail boxes of the Upcoming card: { Format: '18-hour build-a-thon', ... }  (a box left '' stays "Will be revealed soon")
+function cleanDetails(v) {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return null;
+  const keys = Object.keys(v);
+  if (keys.length < 1 || keys.length > 8) return null;
+  const out = {};
+  for (const k of keys) {
+    if (!/^[A-Za-z0-9][A-Za-z0-9 &/_-]{0,23}$/.test(k)) return null;
+    const val = oneLine(v[k] ?? '', 80);
+    if (val === null) return null;
+    out[k] = val;
+  }
+  return out;
+}
+const OBJECT_CLEANERS = { banner: cleanBanner, timeline: cleanTimeline, details: cleanDetails };
+
 // Keeps only known keys with valid values. Anything else is dropped.
 export function cleanSettings(input) {
   const out = {};
   if (!input || typeof input !== 'object') return out;
   for (const k of BOOL_KEYS) if (typeof input[k] === 'boolean') out[k] = input[k];
   for (const k of DATE_KEYS) {
-    const v = input[k];
-    if (typeof v === 'string' && DATE_RE.test(v) && !Number.isNaN(Date.parse(`${v}:00+05:30`))) out[k] = v;
+    if (validStamp(input[k])) out[k] = input[k];
   }
   for (const [k, [min, max]] of Object.entries(INT_KEYS)) {
     const v = input[k];
@@ -124,6 +186,11 @@ export function cleanSettings(input) {
   for (const k of LINK_KEYS) {
     const v = cleanLink(input[k]);
     if (v) out[k] = v;
+  }
+  for (const k of OBJECT_KEYS) {
+    if (input[k] === undefined || input[k] === null) continue;
+    const v = OBJECT_CLEANERS[k](input[k]);
+    if (v !== null) out[k] = v;
   }
   if (input.currentRound === 1 || input.currentRound === 2) out.currentRound = input.currentRound;
   return out;

@@ -15,6 +15,9 @@ export const TYPE = TYPES.includes(C.EVENT_TYPE) ? C.EVENT_TYPE : 'hackathon';
 export const EVENT_NAME = String(C.EVENT_NAME || '').trim();
 // has any detail been filled in for this kind of event? (then the card tells visitors to press "Try to decrypt")
 export const HAS_DETAILS = Object.values((C.DETAILS && C.DETAILS[TYPE]) || {}).some((v) => String(v || '').trim());
+// the detail boxes can also be written in the dashboard (Events tab). If they were, those win over upcomingConfig.js.
+const detailsNow = () => { const v = liveValue('details', null); return v && typeof v === 'object' && !Array.isArray(v) ? v : ((C.DETAILS && C.DETAILS[TYPE]) || {}); };
+export const hasDetailsNow = () => Object.values(detailsNow()).some((v) => String(v || '').trim());
 
 // the dashboard (Site controls) can change the event start, the round dates and the current round; the values in
 // upcomingConfig.js are the defaults
@@ -147,7 +150,7 @@ export function useTeaser() {
   const copy = EVENT_NAME && TYPE === 'hackathon'
     ? { ...COPY[TYPE], desc: COPY[TYPE].desc.replace('The name, dates,', 'The dates,') }
     : COPY[TYPE];
-  const details = (C.DETAILS && C.DETAILS[TYPE]) || {};
+  const details = detailsNow();
   const detailOf = (k) => String(details[k] || '').trim();
   const hasDetails = copy.boxes.some(([k]) => detailOf(k));
 
