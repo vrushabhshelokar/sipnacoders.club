@@ -18,7 +18,7 @@ export const HAS_DETAILS = Object.values((C.DETAILS && C.DETAILS[TYPE]) || {}).s
 
 // the dashboard (Site controls) can change the event start, the round dates and the current round; the values in
 // upcomingConfig.js are the defaults
-const liveT = () => ({ from: toDate(C.TEASER_FROM), start: toDate(liveValue('eventStart', C.EVENT_START)), end: toDate(C.HIDE_AFTER) });
+const liveT = () => ({ from: toDate(C.TEASER_FROM), start: toDate(liveValue('eventStart', C.EVENT_START)), end: toDate(liveValue('hideAfter', C.HIDE_AFTER)) });
 // when the card and the popup go away by themselves: HIDE_AFTER, else 2 days after EVENT_START, else never (the switch decides)
 // two rounds: CURRENT_ROUND (1 or 2) and ROUND_END in upcomingConfig.js. The card goes 2 days after the end of Round 2.
 const liveRound = () => (Math.round(Number(liveValue('currentRound', C.CURRENT_ROUND))) === 2 ? 2 : 1);
@@ -31,7 +31,7 @@ const stillOn = (now) => {
 };
 
 /* is the mystery card (and with it the popup) live right now? */
-export const isTeaserLive = () => !!C.SHOW_UPCOMING && stillOn(Date.now());
+export const isTeaserLive = () => !!liveValue('upcomingShow', C.SHOW_UPCOMING) && stillOn(Date.now());
 
 /* ---------- which design is it? (popup + matching card) ---------- */
 // the list of designs is in site/designs.js (old and new designs, mixed)

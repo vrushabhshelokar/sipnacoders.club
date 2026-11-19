@@ -66,6 +66,7 @@ export default function AnnouncePopup() {
   const clashPopupOn = useSwitch('codeClashPopup', CODE_CLASH_POPUP);
   const clashSectionOn = useSwitch('codeClashSection', CODE_CLASH_SECTION);
   const vibePopupOn = useSwitch('vibePopup', VIBEATHON_POPUP);
+  const upcomingOn = useSwitch('upcomingShow', SHOW_UPCOMING);
   const vibePreview = previewName() || (design.preview ? design.popup : null);   // ?popup=glitch or ?design=4 in the address
   // Code Clash popup: on while its switch and the block's switch are on (eventSwitches.js). It wins over the Vibe-A-Thon one.
   const clashPreview = !vibePreview && clashPreviewOn();
@@ -74,7 +75,7 @@ export default function AnnouncePopup() {
   const seenKey = clash ? CODE_CLASH_SEEN_KEY : POPUP_SEEN_KEY;
   const skip = !preview && (clash ? CODE_CLASH_SKIP_ON : POPUP_SKIP_ON).includes(pathname);
   // Vibe-A-Thon: is there an upcoming event that is not over yet?
-  const active = clash || !!preview || (vibePopupOn && SHOW_UPCOMING && SHOW_POPUP && (isTeaserLive() || upcoming.length > 0));
+  const active = clash || !!preview || (vibePopupOn && upcomingOn && SHOW_POPUP && (isTeaserLive() || upcoming.length > 0));
   const name = clash ? 'clash' : (preview || pick(design.popup) || 'radar');
 
   // open it once the opening animation is over (the design is loaded first, so nothing flashes)

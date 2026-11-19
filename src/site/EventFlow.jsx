@@ -4,6 +4,7 @@ import { Icon } from './Icons';
 import { Reveal, useInView } from './ui';
 import { TYPE } from './teaserCore';
 import { FLOW, SHOW_FLOW } from './upcomingConfig';
+import { useSwitch } from './liveSettings';
 import './EventFlow.css';
 
 // one colour for each phase of Round 2 (the same four colours as the stats on the home page)
@@ -107,7 +108,8 @@ function Round2({ r }) {
 }
 
 export default function EventFlow() {
-  if (!SHOW_FLOW || TYPE !== 'hackathon' || !FLOW || !FLOW.r1 || !FLOW.r2) return null;
+  const flowOn = useSwitch('flowShow', SHOW_FLOW);   // the dashboard can hide it
+  if (!flowOn || TYPE !== 'hackathon' || !FLOW || !FLOW.r1 || !FLOW.r2) return null;
   const { r1, r2, link } = FLOW;
   return (
     <section className="s-flow" aria-labelledby="s-flow-h">

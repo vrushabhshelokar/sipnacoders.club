@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './AdminAnalytics.css';
 import { CODE_CLASH_POPUP, VIBEATHON_POPUP, CODE_CLASH_SECTION } from '../site/eventSwitches';
 import * as C from '../site/upcomingConfig';
+import { PS } from '../data/problemStatement';
 import PeopleManager from './AdminPeople';
 
 /* ---------------------------------------------------------------------------------------------
@@ -28,36 +29,163 @@ const CLICK_NAMES = {
 };
 
 // what the code files say today. The dashboard shows these until an admin changes something.
+const PS_STAMP = /^\d{4}-\d\d-\d\dT\d\d:\d\d/.test(String(PS.releaseAt || '')) ? String(PS.releaseAt).slice(0, 16) : '';
 const FILE_DEFAULTS = {
+  // Vibe-A-Thon
   vibeRegistration: true,
-  codeClashRegistration: true,
-  codeClashPopup: CODE_CLASH_POPUP,
   vibePopup: VIBEATHON_POPUP,
-  codeClashSection: CODE_CLASH_SECTION,
+  upcomingShow: !!C.SHOW_UPCOMING,
+  flowShow: !!C.SHOW_FLOW,
+  hideAfter: C.HIDE_AFTER || '',
   eventStart: C.EVENT_START || '',
   currentRound: Math.round(Number(C.CURRENT_ROUND)) === 2 ? 2 : 1,
   roundEnd1: (C.ROUND_END && C.ROUND_END[1]) || '',
   roundEnd2: (C.ROUND_END && C.ROUND_END[2]) || '',
+  // Vibe-A-Thon: problem statements
+  psShow: true,
+  psUnlockNow: !!PS.unlockNow,
+  psReleaseAt: PS_STAMP,
+  psPdf: PS.pdf || '',
+  psCount: Number(PS.count) || 10,
+  // Code Clash
+  codeClashRegistration: true,
+  codeClashPopup: CODE_CLASH_POPUP,
+  codeClashSection: CODE_CLASH_SECTION,
 };
 const SETTING_KEYS = Object.keys(FILE_DEFAULTS);
 
-const SWITCH_GROUPS = [
+// same rule as the server (api-lib/shared.js): a file in the public folder (/name.pdf) or a full https:// link
+const PDF_LINK_OK = (v) => /^(\/(?!\/)[^\s"'<>\\]+|https:\/\/[^\s"'<>\\]+)$/.test(v) && v.length <= 300 && !(v.startsWith('/') && v.includes('..'));
+
+/* The controls, grouped by event. type: 'switch' (default) | 'date' | 'select' | 'text' | 'number' */
+const SECTIONS = [
   {
-    title: 'Registration',
-    items: [
-      { key: 'vibeRegistration', label: 'Vibe-A-Thon registration', on: 'Open', off: 'Closed', hint: 'Closed: the Register page shows "Registrations are closed" instead of the form.' },
-      { key: 'codeClashRegistration', label: 'Code Clash registration', on: 'Open', off: 'Closed', hint: 'Closed: the Register now button on the Home page becomes "Registration closed".' },
+    id: 'vibe',
+    title: 'Vibe-A-Thon',
+    tag: 'Upcoming event',
+    link: { href: '/upcoming', text: 'Open the Vibe-A-Thon page' },
+    blocks: [
+      {
+        title: 'Registration',
+        items: [
+          { key: 'vibeRegistration', label: 'Vibe-A-Thon registration', on: 'Open', off: 'Closed', hint: 'Closed: the Register page shows "Registrations are closed" instead of the form.' },
+        ],
+      },
+      {
+        title: 'Upcoming card and popup',
+        hint: 'What visitors see about the event before it starts. The Upcoming menu button and its number follow the first switch.',
+        items: [
+          { key: 'upcomingShow', label: 'Upcoming card, menu number and popup', on: 'Live', off: 'Off', hint: 'Off: the Upcoming page shows the quiet "coming soon" panel and the Vibe-A-Thon popup stays away.' },
+          { key: 'vibePopup', label: 'Vibe-A-Thon popup', on: 'On', off: 'Off', hint: 'Only one popup shows per visit. If the Code Clash popup is also on, the Code Clash one wins.' },
+          { key: 'flowShow', label: 'Two-Round Event Flow section', on: 'Shown', off: 'Hidden', hint: 'The "How it works" block under the Upcoming card.' },
+          { key: 'hideAfter', type: 'date', label: 'Hide the card and popup after', hint: 'Empty: they hide by themselves 2 days after the last round ends.' },
+        ],
+      },
+      {
+        title: 'Countdown and rounds (Indian time)',
+        hint: 'The card counts down to the event start. In the two-round design it counts down to the end of the current round instead. Leave a date empty to use the code file.',
+        items: [
+          { key: 'eventStart', type: 'date', label: 'Event start' },
+          { key: 'currentRound', type: 'select', label: 'Current round', options: [[1, 'Round 1'], [2, 'Round 2']] },
+          { key: 'roundEnd1', type: 'date', label: 'Round 1 ends' },
+          { key: 'roundEnd2', type: 'date', label: 'Round 2 ends' },
+        ],
+      },
+      {
+        title: 'Problem statements (Round 1 briefing)',
+        hint: 'The "Problem Statement Release" section with the View PS and Download buttons. The buttons open by themselves at the release time, once a PDF link is set.',
+        items: [
+          { key: 'psShow', label: 'Problem Statement Release section', on: 'Shown', off: 'Hidden', hint: 'Hides the whole section on the Vibe-A-Thon page.' },
+          { key: 'psUnlockNow', label: 'Open the PDF buttons right now', on: 'Open now', off: 'On schedule', hint: 'Opens View PS and Download at once, before the release time. Needs the PDF link below.' },
+          { key: 'psReleaseAt', type: 'date', label: 'PDF release time (Indian time)', hint: 'Before this moment the buttons are locked and show a countdown. The Timeline row on the page follows it.' },
+          { key: 'psPdf', type: 'text', label: 'PDF link', placeholder: '/Vibe-A-Thon-Problem-Statements.pdf or https://...', wide: true, hint: 'A file from the public folder (starts with /) or a full https:// link. A link to another website opens in a new tab, it cannot be saved with the Download button.' },
+          { key: 'psCount', type: 'number', label: 'How many problem statements', min: 1, max: 99 },
+        ],
+      },
     ],
   },
   {
-    title: 'Popups and blocks',
-    items: [
-      { key: 'codeClashPopup', label: 'Code Clash popup', on: 'On', off: 'Off', hint: 'Only one popup shows per visit. If both are on, the Code Clash one wins.' },
-      { key: 'vibePopup', label: 'Vibe-A-Thon popup', on: 'On', off: 'Off', hint: 'Needs the Upcoming card to be live (it is, while the event is announced).' },
-      { key: 'codeClashSection', label: 'Code Clash block on the Home page', on: 'Shown', off: 'Hidden', hint: 'Also controls the Code Clash button under the hero buttons and the Code Clash popup.' },
+    id: 'clash',
+    title: 'Code Clash',
+    tag: 'Home page event',
+    link: { href: '/#code-clash', text: 'Open the Code Clash block' },
+    blocks: [
+      {
+        title: 'Registration',
+        items: [
+          { key: 'codeClashRegistration', label: 'Code Clash registration', on: 'Open', off: 'Closed', hint: 'Closed: the Register now button on the Home page becomes "Registration closed".' },
+        ],
+      },
+      {
+        title: 'Popup and Home page block',
+        items: [
+          { key: 'codeClashPopup', label: 'Code Clash popup', on: 'On', off: 'Off', hint: 'Only one popup shows per visit. If both are on, the Code Clash one wins.' },
+          { key: 'codeClashSection', label: 'Code Clash block on the Home page', on: 'Shown', off: 'Hidden', hint: 'Also controls the Code Clash button under the hero buttons and the Code Clash popup.' },
+        ],
+      },
     ],
   },
 ];
+
+// one click fills in the switches (nothing goes live until "Save changes")
+const PRESETS = [
+  {
+    id: 'vibe',
+    label: 'Code Clash is over: show Vibe-A-Thon',
+    hint: 'Code Clash popup, Home page block and registration go off. Vibe-A-Thon popup and Upcoming card go on.',
+    values: { codeClashPopup: false, codeClashSection: false, codeClashRegistration: false, vibePopup: true, upcomingShow: true },
+  },
+  {
+    id: 'clash',
+    label: 'Back to Code Clash mode',
+    hint: 'Code Clash popup, Home page block and registration go on. The Vibe-A-Thon popup goes off.',
+    values: { codeClashPopup: true, codeClashSection: true, codeClashRegistration: true, vibePopup: false },
+  },
+];
+
+function SwitchRow({ it, view, overrides, edit }) {
+  const on = !!view[it.key];
+  const edited = it.key in overrides;
+  return (
+    <div className="ad-row">
+      <div className="ad-row-text">
+        <span id={`lbl-${it.key}`} className="ad-row-label">{it.label}{edited && <em>edited here</em>}</span>
+        {it.hint && <span className="ad-row-hint">{it.hint}</span>}
+      </div>
+      <div className="ad-row-ctl">
+        <span className={`ad-state ${on ? 'is-on' : ''}`}>{on ? it.on : it.off}</span>
+        <Toggle id={`sw-${it.key}`} labelledBy={`lbl-${it.key}`} checked={on} onChange={(v) => edit(it.key, v)} />
+      </div>
+    </div>
+  );
+}
+
+function FieldInput({ it, view, overrides, edit }) {
+  const edited = it.key in overrides;
+  const id = `fld-${it.key}`;
+  const value = view[it.key] === undefined || view[it.key] === null ? '' : view[it.key];
+  let input;
+  if (it.type === 'select') {
+    input = (
+      <select id={id} value={value} onChange={(e) => edit(it.key, Number(e.target.value))}>
+        {it.options.map(([v, text]) => <option key={v} value={v}>{text}</option>)}
+      </select>
+    );
+  } else if (it.type === 'date') {
+    input = <input id={id} type="datetime-local" value={value} onChange={(e) => edit(it.key, e.target.value)} />;
+  } else if (it.type === 'number') {
+    input = <input id={id} type="number" inputMode="numeric" min={it.min} max={it.max} step="1" value={value} onChange={(e) => edit(it.key, e.target.value === '' ? '' : Number(e.target.value))} />;
+  } else {
+    input = <input id={id} type="text" inputMode="url" autoComplete="off" spellCheck="false" placeholder={it.placeholder || ''} value={value} onChange={(e) => edit(it.key, e.target.value)} />;
+  }
+  return (
+    <div className={`ad-field ${it.wide ? 'ad-field-wide' : ''}`}>
+      <label htmlFor={id}>{it.label}{edited && <em>edited here</em>}</label>
+      {input}
+      {it.hint && <span className="ad-field-hint">{it.hint}</span>}
+    </div>
+  );
+}
 
 /* ------------------------------------------------ small pieces ------------------------------------------------ */
 
@@ -361,6 +489,13 @@ export default function AdminAnalytics() {
     setDraft((d) => ({ ...(d || effective), [key]: value }));
   };
 
+  // fills in the switches of a quick switch; nothing is saved until "Save changes"
+  const applyPreset = (preset) => {
+    setSaveMsg({ type: '', text: '' });
+    setConfirmReset(false);
+    setDraft((d) => ({ ...(d || effective), ...preset.values }));
+  };
+
   const postSettings = async (patch) => {
     setSaving(true);
     setSaveMsg({ type: '', text: '' });
@@ -392,9 +527,14 @@ export default function AdminAnalytics() {
     const patch = {};
     for (const k of SETTING_KEYS) {
       if (draft[k] === effective[k]) continue;
-      patch[k] = draft[k] === '' ? null : draft[k];   // an emptied date goes back to the code file's value
+      const v = typeof draft[k] === 'string' ? draft[k].trim() : draft[k];
+      patch[k] = v === '' ? null : v;   // an emptied date or link goes back to the code file's value
     }
     if (!Object.keys(patch).length) return;
+    const problems = [];
+    if (typeof patch.psPdf === 'string' && !PDF_LINK_OK(patch.psPdf)) problems.push('PDF link: start it with / (a file in the public folder) or https://, and use no spaces.');
+    if (typeof patch.psCount === 'number' && !(Number.isInteger(patch.psCount) && patch.psCount >= 1 && patch.psCount <= 99)) problems.push('How many problem statements: a whole number from 1 to 99.');
+    if (problems.length) { setSaveMsg({ type: 'err', text: problems.join(' ') }); return; }
     if (await postSettings(patch)) {
       setSaveMsg({ type: 'ok', text: 'Saved. The site picks it up within about a minute (people already on a page see it on their next page load).' });
     }
@@ -551,57 +691,49 @@ export default function AdminAnalytics() {
 
           <section className="ad-panel ad-controls" aria-labelledby="ad-h-ctl">
             <h2 id="ad-h-ctl">Site controls</h2>
-            <p className="ad-sub">Change the live site without a deploy. Anything you do not change keeps the value written in the code files.</p>
+            <p className="ad-sub">Change the live site without a deploy. Everything is grouped by event. Anything you do not change keeps the value written in the code files.</p>
 
-            {SWITCH_GROUPS.map((g) => (
-              <div className="ad-group" key={g.title}>
-                <h3 className="ad-h3">{g.title}</h3>
-                {g.items.map((it) => {
-                  const on = !!view[it.key];
-                  const edited = it.key in overrides;
+            <div className="ad-presets" role="group" aria-label="Quick switch between events">
+              <div className="ad-presets-text">
+                <strong>Quick switch</strong>
+                <span>Fills in the switches for you. Nothing goes live until you press Save changes.</span>
+              </div>
+              <div className="ad-presets-btns">
+                {PRESETS.map((p) => (
+                  <button key={p.id} type="button" className="ad-chip" title={p.hint} onClick={() => applyPreset(p)} disabled={saving}>{p.label}</button>
+                ))}
+              </div>
+            </div>
+
+            {SECTIONS.map((s) => (
+              <div className="ad-sec" key={s.id} role="group" aria-labelledby={`ad-sec-${s.id}`}>
+                <div className="ad-sec-head">
+                  <h3 id={`ad-sec-${s.id}`} className="ad-sec-title">{s.title}</h3>
+                  <span className="ad-sec-tag">{s.tag}</span>
+                  <a className="ad-link ad-sec-link" href={s.link.href} target="_blank" rel="noopener noreferrer">{s.link.text}</a>
+                </div>
+                {s.blocks.map((b) => {
+                  const switches = b.items.filter((it) => !it.type || it.type === 'switch');
+                  const fields = b.items.filter((it) => it.type && it.type !== 'switch');
                   return (
-                    <div className="ad-row" key={it.key}>
-                      <div className="ad-row-text">
-                        <span id={`lbl-${it.key}`} className="ad-row-label">{it.label}{edited && <em>edited here</em>}</span>
-                        <span className="ad-row-hint">{it.hint}</span>
-                      </div>
-                      <div className="ad-row-ctl">
-                        <span className={`ad-state ${on ? 'is-on' : ''}`}>{on ? it.on : it.off}</span>
-                        <Toggle id={`sw-${it.key}`} labelledBy={`lbl-${it.key}`} checked={on} onChange={(v) => edit(it.key, v)} />
-                      </div>
+                    <div className="ad-group" key={b.title}>
+                      <h4 className="ad-h3">{b.title}</h4>
+                      {b.hint && <p className="ad-row-hint ad-hint-block">{b.hint}</p>}
+                      {switches.map((it) => <SwitchRow key={it.key} it={it} view={view} overrides={overrides} edit={edit} />)}
+                      {fields.length > 0 && (
+                        <div className="ad-fields">
+                          {fields.map((it) => <FieldInput key={it.key} it={it} view={view} overrides={overrides} edit={edit} />)}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
               </div>
             ))}
 
-            <div className="ad-group">
-              <h3 className="ad-h3">Countdown (Indian time)</h3>
-              <p className="ad-row-hint ad-hint-block">
-                The Vibe-A-Thon card counts down to the event start. In the two-round design it counts down to the end of the current round instead. Leave a date empty to use the code file.
-              </p>
-              <div className="ad-fields">
-                <label className="ad-field">
-                  <span>Event start</span>
-                  <input type="datetime-local" value={view.eventStart} onChange={(e) => edit('eventStart', e.target.value)} />
-                </label>
-                <label className="ad-field">
-                  <span>Current round</span>
-                  <select value={view.currentRound} onChange={(e) => edit('currentRound', Number(e.target.value))}>
-                    <option value={1}>Round 1</option>
-                    <option value={2}>Round 2</option>
-                  </select>
-                </label>
-                <label className="ad-field">
-                  <span>Round 1 ends</span>
-                  <input type="datetime-local" value={view.roundEnd1} onChange={(e) => edit('roundEnd1', e.target.value)} />
-                </label>
-                <label className="ad-field">
-                  <span>Round 2 ends</span>
-                  <input type="datetime-local" value={view.roundEnd2} onChange={(e) => edit('roundEnd2', e.target.value)} />
-                </label>
-              </div>
-            </div>
+            <p className="ad-note ad-note-tight">
+              Still in the code files (they rarely change): the event name, the card design, the detail boxes (format, team size, prizes), the Two-Round Event Flow words and the popup words. They live in <code>src/site/upcomingConfig.js</code> and <code>src/site/eventSwitches.js</code>.
+            </p>
 
             <div className="ad-savebar">
               <button type="button" className="s-btn s-btn-light" onClick={save} disabled={!dirty || saving}>

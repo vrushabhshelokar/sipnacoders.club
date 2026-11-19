@@ -3,6 +3,10 @@
 import { Reveal } from './ui';
 import { Icon } from './Icons';
 import { EVENT_SCHEDULE } from '../data/vibeathonData';
+import { useLiveSettings } from './liveSettings';
+import { psRelease } from './psRelease';
+
+const PS_ROW = 'Problem Statements Released';   // this row shows the release time set in the dashboard (if it was changed)
 import './EventSchedule.css';
 
 function TimelineRow({ item, index }) {
@@ -47,6 +51,8 @@ function TimelineRow({ item, index }) {
 }
 
 export default function EventSchedule() {
+  useLiveSettings();
+  const rel = psRelease();
   return (
     <section id="schedule" className="es-section" aria-labelledby="es-heading">
       <Reveal className="es-head">
@@ -63,7 +69,7 @@ export default function EventSchedule() {
 
         {EVENT_SCHEDULE.map((item, i) => (
           <div key={item.id} role="listitem">
-            <TimelineRow item={item} index={i} />
+            <TimelineRow item={rel.custom && item.milestone === PS_ROW ? { ...item, date: rel.date, time: rel.time } : item} index={i} />
           </div>
         ))}
       </div>

@@ -9,11 +9,13 @@ import {
   getUpcoming, getPast, useCountdown, fmtDay, fmtMon, fmtFull, fmtTime, durLabel, relative, gcalLink, normCat, catColor, hasPhotos,
 } from './time';
 import { isTeaserLive } from './teaserCore';
+import { useLiveSettings } from './liveSettings';
 import { TeaserLoader } from './TeaserLoader';
 
 const HackathonTeaser = lazy(() => import('./HackathonTeaser'));
 
 export function useUpcoming() {
+  useLiveSettings();   // isTeaserLive() reads the dashboard switches: draw again when they arrive
   const [now] = useState(() => Date.now());
   return useMemo(() => getUpcoming(upcomingEvents, now), [now]);
 }

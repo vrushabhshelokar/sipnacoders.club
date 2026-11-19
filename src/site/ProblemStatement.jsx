@@ -4,6 +4,8 @@
 import { useEffect, useState } from 'react';
 import { Reveal } from './ui';
 import { PS } from '../data/problemStatement';
+import { useSwitch } from './liveSettings';
+import { psRelease } from './psRelease';
 import './ProblemStatement.css';
 
 const svg = { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true, focusable: 'false' };
@@ -19,10 +21,16 @@ function left(ms) {
 }
 
 export default function ProblemStatement() {
-  const releaseMs = Date.parse(PS.releaseAt);
-  const hasFile = typeof PS.pdf === 'string' && PS.pdf.trim() !== '';
+  // the dashboard (Site controls -> Problem statements) can change these without a deploy; data/problemStatement.js has the defaults
+  const show = useSwitch('psShow', true);
+  const pdf = String(useSwitch('psPdf', PS.pdf) || '');
+  const unlockNow = useSwitch('psUnlockNow', PS.unlockNow);
+  const count = useSwitch('psCount', PS.count);
+  const rel = psRelease();
+  const releaseMs = rel.ms;
+  const hasFile = pdf.trim() !== '';
   const [now, setNow] = useState(() => Date.now());
-  const timeOpen = PS.unlockNow || !Number.isFinite(releaseMs) || now >= releaseMs;
+  const timeOpen = unlockNow || !Number.isFinite(releaseMs) || now >= releaseMs;
   const open = timeOpen && hasFile;
 
   // keeps the countdown fresh and opens the buttons by themselves at the release time
@@ -40,7 +48,9 @@ export default function ProblemStatement() {
     ? 'The PDF opens in a new tab. Download saves it to your phone or laptop.'
     : timeOpen
       ? 'The release time has come. The PDF is being added, check back in a few minutes.'
-      : `Unlocks on ${PS.releaseLabel}${Number.isFinite(releaseMs) ? ` (in ${left(releaseMs - now)})` : ''}.`;
+      : `Unlocks on ${rel.label}${Number.isFinite(releaseMs) ? ` (in ${left(releaseMs - now)})` : ''}.`;
+
+  if (!show) return null;
 
   return (
     <section id="problem-statement" className="cy-ps" aria-labelledby="cy-ps-heading">
@@ -50,7 +60,7 @@ export default function ProblemStatement() {
           Problem Statement Release
         </h2>
         <p className="cy-why-sub">
-          {PS.count} problem statements, one PDF. Read them all, pick exactly one, build it with AI tools and deploy it.
+          {count} problem statements, one PDF. Read them all, pick exactly one, build it with AI tools and deploy it.
         </p>
       </Reveal>
 
@@ -60,23 +70,23 @@ export default function ProblemStatement() {
             {state === 'locked' ? <LockIcon /> : <i className="cy-ps-dot" aria-hidden="true" />}
             {chip}
           </span>
-          <h3 className="cy-ps-title">{PS.count} Problem Statements</h3>
+          <h3 className="cy-ps-title">{count} Problem Statements</h3>
           <p className="cy-ps-note" role="status">{note}</p>
           <ul className="cy-ps-meta" aria-label="About the file">
             <li>PDF</li>
             <li>Round 1</li>
-            <li>Pick 1 of {PS.count}</li>
+            <li>Pick 1 of {count}</li>
           </ul>
         </div>
 
         <div className="cy-ps-actions">
           {open ? (
             <>
-              <a className="cy-ps-btn cy-ps-btn-ghost" href={PS.pdf} target="_blank" rel="noopener noreferrer">
+              <a className="cy-ps-btn cy-ps-btn-ghost" href={pdf} target="_blank" rel="noopener noreferrer">
                 <EyeIcon />
                 <span>View PS</span>
               </a>
-              <a className="cy-ps-btn cy-ps-btn-main" href={PS.pdf} download={PS.fileName}>
+              <a className="cy-ps-btn cy-ps-btn-main" href={pdf} download={PS.fileName}>
                 <DownloadIcon />
                 <span>Download</span>
               </a>

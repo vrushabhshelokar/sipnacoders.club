@@ -88,11 +88,25 @@ export async function readBody(req) {
    Site switches (what the admin dashboard can change without a new deploy)
    A key that is missing means "use the value written in the code files" (eventSwitches.js, upcomingConfig.js).
    --------------------------------------------------------------------------------------------- */
-export const BOOL_KEYS = ['codeClashRegistration', 'vibeRegistration', 'codeClashPopup', 'vibePopup', 'codeClashSection'];
-export const DATE_KEYS = ['eventStart', 'roundEnd1', 'roundEnd2'];   // 'YYYY-MM-DDTHH:MM', Indian time
-export const ALL_SETTING_KEYS = [...BOOL_KEYS, ...DATE_KEYS, 'currentRound'];
+export const BOOL_KEYS = [
+  'codeClashRegistration', 'vibeRegistration', 'codeClashPopup', 'vibePopup', 'codeClashSection',
+  'upcomingShow', 'flowShow', 'psShow', 'psUnlockNow',
+];
+export const DATE_KEYS = ['eventStart', 'roundEnd1', 'roundEnd2', 'hideAfter', 'psReleaseAt'];   // 'YYYY-MM-DDTHH:MM', Indian time
+export const INT_KEYS = { psCount: [1, 99] };                                                    // whole number, [min, max]
+export const LINK_KEYS = ['psPdf'];                                                              // /file-in-public-folder.pdf or https://...
+export const ALL_SETTING_KEYS = [...BOOL_KEYS, ...DATE_KEYS, ...Object.keys(INT_KEYS), ...LINK_KEYS, 'currentRound'];
 
 const DATE_RE = /^\d{4}-\d\d-\d\dT\d\d:\d\d$/;
+const LINK_RE = /^(\/(?!\/)[^\s"'<>\\]+|https:\/\/[^\s"'<>\\]+)$/;
+
+function cleanLink(v) {
+  if (typeof v !== 'string') return null;
+  const s = v.trim();
+  if (!s || s.length > 300 || !LINK_RE.test(s)) return null;
+  if (s.startsWith('/') && s.includes('..')) return null;
+  return s;
+}
 
 // Keeps only known keys with valid values. Anything else is dropped.
 export function cleanSettings(input) {
@@ -102,6 +116,14 @@ export function cleanSettings(input) {
   for (const k of DATE_KEYS) {
     const v = input[k];
     if (typeof v === 'string' && DATE_RE.test(v) && !Number.isNaN(Date.parse(`${v}:00+05:30`))) out[k] = v;
+  }
+  for (const [k, [min, max]] of Object.entries(INT_KEYS)) {
+    const v = input[k];
+    if (Number.isInteger(v) && v >= min && v <= max) out[k] = v;
+  }
+  for (const k of LINK_KEYS) {
+    const v = cleanLink(input[k]);
+    if (v) out[k] = v;
   }
   if (input.currentRound === 1 || input.currentRound === 2) out.currentRound = input.currentRound;
   return out;
