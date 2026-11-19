@@ -4,6 +4,8 @@
 //   3 Banner            the poster(s) of the event (up to 4)
 //   4 Description       "what to expect" points
 //   5 Popup             design number, delay, small logo, own words
+// Each section is a bar you can open and close; closed, it shows one line of what is set. "Which event" and "Details" start
+// open, the others closed, and the choice is remembered for this visit (sessionStorage), also when you go to another tab and back.
 // Nothing here goes live until "Save changes" (the yellow bar). Pictures are uploaded when you choose them, and
 // they only show on the site once the settings are saved.
 import { useRef, useState } from 'react';
@@ -86,12 +88,32 @@ async function shrink(file, o) {
 const themeName = (n) => { const d = DESIGNS[n - 1]; return d ? d[0] : ''; };
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
-function Panel({ id, title, badge, sub, children }) {
+const PANELS = ['which', 'details', 'banner', 'points', 'popup'];
+const OPEN_KEY = 'scc-au-open-v1';
+const readOpen = () => {
+  try { const v = JSON.parse(sessionStorage.getItem(OPEN_KEY)); if (Array.isArray(v)) return v.filter((x) => PANELS.includes(x)); } catch { /* private mode: use the start state */ }
+  return ['which', 'details'];
+};
+
+/* one section: a bar (title, "edited" mark, one line of what is set, arrow) that opens and closes the body */
+function Panel({ id, title, badge, summary, sub, open, onToggle, children }) {
   return (
-    <section className="ad-panel au-panel" aria-labelledby={`au-h-${id}`}>
-      <h2 id={`au-h-${id}`}>{title}{badge ? <em className="ac-edited">{badge}</em> : null}</h2>
-      {sub && <p className="ad-sub">{sub}</p>}
-      {children}
+    <section className={`ad-panel au-panel ${open ? 'is-open' : ''}`} aria-labelledby={`au-h-${id}`}>
+      <h2 id={`au-h-${id}`} className="au-h">
+        <button type="button" className="au-head" aria-expanded={open} aria-controls={`au-b-${id}`} onClick={onToggle}>
+          <span className="au-head-text">
+            <span className="au-head-title">{title}{badge ? <em className="ac-edited">{badge}</em> : null}</span>
+            {summary && <small className="au-sum">{summary}</small>}
+          </span>
+          <span className="ac-fold-chev" aria-hidden="true" />
+        </button>
+      </h2>
+      {open && (
+        <div id={`au-b-${id}`} className="au-body">
+          {sub && <p className="ad-sub">{sub}</p>}
+          {children}
+        </div>
+      )}
     </section>
   );
 }
@@ -122,6 +144,11 @@ export default function AdminUpcoming({ view, edit, overrides, changed }) {
   const points = Array.isArray(view.eventPoints) ? view.eventPoints : [];
   const logo = view.popupLogo && view.popupLogo.v ? view.popupLogo : null;
   const theme = Number.isInteger(view.popupTheme) ? view.popupTheme : Math.round(Number(view.popupTheme)) || 0;
+
+  const [open, setOpen] = useState(readOpen);
+  const setOpenSaved = (next) => { setOpen(next); try { sessionStorage.setItem(OPEN_KEY, JSON.stringify(next)); } catch { /* not remembered */ } };
+  const toggle = (id) => setOpenSaved(open.includes(id) ? open.filter((x) => x !== id) : [...open, id]);
+  const panel = (id) => ({ id, open: open.includes(id), onToggle: () => toggle(id) });
 
   const [busy, setBusy] = useState('');
   const [msg, setMsg] = useState({ type: '', text: '', at: '' });
@@ -159,11 +186,31 @@ export default function AdminUpcoming({ view, edit, overrides, changed }) {
   const delayShown = view.popupDelay === '' || view.popupDelay === undefined || view.popupDelay === null ? '' : view.popupDelay;
   const pickTheme = (n) => edit('popupTheme', n);
 
+  /* the one line each closed bar shows */
+  const typeLabel = TYPES.find(([id]) => id === type)[1];
+  const boxKeys = keysFor(type);
+  const filled = boxKeys.filter((k) => String(box[k] || '').trim()).length;
+  const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+  const themeWords = theme === 0 ? 'automatic design' : theme >= 1 && theme <= DESIGNS.length ? `design ${theme} (${cap(themeName(theme))})` : 'check the design number';
+  const summary = {
+    which: [typeLabel, view.eventName ? view.eventName : 'no name yet', view.eventStart ? `starts ${stampWords(view.eventStart)}` : 'no start date', view.upcomingShow ? 'live' : 'switched off'].join(' \u00b7 '),
+    details: `${filled} of ${boxKeys.length} boxes filled`,
+    banner: banners.length ? plural(banners.length, 'picture') : 'none here: the pictures in the code folder are used, if any',
+    points: points.length ? plural(points.length, 'point') : 'none: the block is not shown',
+    popup: [themeWords, delayShown === '' ? 'usual delay' : `after ${delayShown} s`, logo ? 'logo set' : 'no logo', view.popupDesc ? 'own words' : '', view.vibePopup ? '' : 'popup is off'].filter(Boolean).join(' \u00b7 '),
+  };
+
   return (
     <div className="ac-tab au">
       <input ref={fileRef} type="file" accept="image/*" className="au-file" tabIndex={-1} aria-hidden="true" onChange={onFile} />
 
-      <Panel id="which" title="Which event is next?" badge={mark(['eventType', 'eventName', 'eventLink', 'eventStart', 'hideAfter', 'upcomingShow', 'vibePopup'])} sub="Choose the kind of event, give it a name and a date. The Upcoming page, the menu button and the popup all follow this.">
+      <div className="au-bar">
+        <span>{open.length} of {PANELS.length} sections open</span>
+        <button type="button" className="ad-link" onClick={() => setOpenSaved([...PANELS])} disabled={open.length === PANELS.length}>Open all</button>
+        <button type="button" className="ad-link" onClick={() => setOpenSaved([])} disabled={open.length === 0}>Close all</button>
+      </div>
+
+      <Panel {...panel('which')} summary={summary.which} title="Which event is next?" badge={mark(['eventType', 'eventName', 'eventLink', 'eventStart', 'hideAfter', 'upcomingShow', 'vibePopup'])} sub="Choose the kind of event, give it a name and a date. The Upcoming page, the menu button and the popup all follow this.">
         <div className="au-types" role="radiogroup" aria-label="Kind of event">
           {TYPES.map(([id, label, text]) => (
             <button key={id} type="button" role="radio" aria-checked={type === id} className={`au-type ${type === id ? 'is-on' : ''}`} onClick={() => edit('eventType', id)}>
@@ -200,7 +247,7 @@ export default function AdminUpcoming({ view, edit, overrides, changed }) {
         <SwitchLine id="vibePopup" label="Popup for this event" hint="Only one popup shows per visit. While the Code Clash popup is on, that one wins." on="On" off="Off" checked={!!view.vibePopup} onChange={(v) => edit('vibePopup', v)} />
       </Panel>
 
-      <Panel id="details" title={`Details of the ${TYPES.find(([id]) => id === type)[1].toLowerCase()}`} badge={mark(['eventDetails', 'details'])} sub="The boxes a visitor unlocks with Try to decrypt on the card. Each kind of event keeps its own words, so you can switch type and come back.">
+      <Panel {...panel('details')} summary={summary.details} title={`Details of the ${TYPES.find(([id]) => id === type)[1].toLowerCase()}`} badge={mark(['eventDetails', 'details'])} sub="The boxes a visitor unlocks with Try to decrypt on the card. Each kind of event keeps its own words, so you can switch type and come back.">
         <div className="ad-fields">
           {keysFor(type).map((k) => (
             <div className="ad-field" key={`${type}-${k}`}>
@@ -215,7 +262,7 @@ export default function AdminUpcoming({ view, edit, overrides, changed }) {
         </div>
       </Panel>
 
-      <Panel id="banner" title="Banner" badge={mark(['eventBanners'])} sub="The poster of the event, on the Upcoming card and in the popup. It appears with a short reveal animation. Up to 4 pictures: with more than one they slide by themselves.">
+      <Panel {...panel('banner')} summary={summary.banner} title="Banner" badge={mark(['eventBanners'])} sub="The poster of the event, on the Upcoming card and in the popup. It appears with a short reveal animation. Up to 4 pictures: with more than one they slide by themselves.">
         {banners.length === 0 ? (
           <p className="ad-empty au-empty">No banner uploaded here. The site uses the pictures that are in the code folder (src/assets/upcoming), if any.</p>
         ) : (
@@ -243,7 +290,7 @@ export default function AdminUpcoming({ view, edit, overrides, changed }) {
         {msg.text && msg.at === 'banner' && <Msg m={msg} />}
       </Panel>
 
-      <Panel id="points" title="Description points" badge={mark(['eventPoints'])} sub="Short points under the Upcoming card, like the steps of the membership block: a bold line and, if you want, one more line below it. Empty list: the block is not shown.">
+      <Panel {...panel('points')} summary={summary.points} title="Description points" badge={mark(['eventPoints'])} sub="Short points under the Upcoming card, like the steps of the membership block: a bold line and, if you want, one more line below it. Empty list: the block is not shown.">
         {points.length > 0 && (
           <ol className="au-points">
             {points.map((p, i) => (
@@ -275,7 +322,7 @@ export default function AdminUpcoming({ view, edit, overrides, changed }) {
         </div>
       </Panel>
 
-      <Panel id="popup" title="Popup" badge={mark(['popupTheme', 'popupDelay', 'popupLogo', 'popupDesc'])} sub="The window that comes up when someone opens the site. Its button always takes them to the Upcoming event page.">
+      <Panel {...panel('popup')} summary={summary.popup} title="Popup" badge={mark(['popupTheme', 'popupDelay', 'popupLogo', 'popupDesc'])} sub="The window that comes up when someone opens the site. Its button always takes them to the Upcoming event page.">
         <h3 className="ad-h3">Design number</h3>
         <p className="ad-row-hint ad-hint-block">Write a number or tap one. The Upcoming card gets the matching look. 0 means automatic: the site moves to the next design after every finished event.</p>
         <div className="ad-fields">

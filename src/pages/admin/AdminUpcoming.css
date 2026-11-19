@@ -1,8 +1,22 @@
 /* "Upcoming event" tab of the admin dashboard (AdminUpcoming.jsx). Builds on the classes of AdminAnalytics.css and AdminCenter.css. */
 .au-file { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
-.au .au-panel + .au-panel { margin-top: 18px; }
+.au .au-panel + .au-panel { margin-top: 12px; }
 .au-gap { margin-top: 18px; }
 .au-empty { margin: 0 0 4px; }
+
+/* sections that open and close: the bar shows the title, the "edited" mark and one line of what is set */
+.au-bar { display: flex; align-items: center; justify-content: flex-end; gap: 16px; margin: 0 0 12px; font: 500 13px var(--sans); color: var(--muted); }
+.au-bar span { margin-right: auto; }
+.au-bar .ad-link { min-height: 36px; padding: 0 2px; }
+.au-bar .ad-link:disabled { opacity: .4; cursor: default; text-decoration: none; }
+.au-panel .au-h { margin: 0; font: inherit; }
+.au-head { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 14px; min-height: 44px; padding: 0; background: none; border: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; border-radius: 10px; }
+.au-head:focus-visible { outline: 2px solid var(--blue); outline-offset: 6px; }
+.au-head-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.au-head-title { font: 700 18px var(--display); color: #fff; letter-spacing: -.01em; }
+.au-sum { font: 400 13px/1.45 var(--sans); color: var(--muted); overflow-wrap: anywhere; }
+.au-panel.is-open .ac-fold-chev { transform: rotate(-135deg); }
+.au-body { margin-top: 14px; }
 
 /* kind of event */
 .au-types { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
