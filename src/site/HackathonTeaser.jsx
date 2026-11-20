@@ -8,22 +8,55 @@ import { Reveal } from './ui';
 import PosterStage from './PosterStage';
 import { CardTitle } from './NameReveal';
 import { Actions, FieldValue, Guard, getDesign, isTeaserLive, useTeaser } from './teaserCore';
+import { eventType } from './eventLive';
+import EventPoints from './EventPoints';
 import EventSnapshot from './EventSnapshot';
 import StickyNav from './StickyNav';
 import WhyParticipate from './WhyParticipate';
 import MotivationStrip from './MotivationStrip';
+import ProblemStatement from './ProblemStatement';
 import EventJourney from './EventJourney';
 import RuleBook from './RuleBook';
 import PrizePool from './PrizePool';
 import EventSchedule from './EventSchedule';
 import EventFlow from './EventFlow';
 import FinaleSchedule from './FinaleSchedule';
+import { TeaserFailed, TeaserLoader } from './TeaserLoader';
 import './HackathonTeaser.css';
 
 export { isTeaserLive };
 
-const Cards = lazy(() => import('./TeaserCards'));
-const NewCards = lazy(() => import('./TeaserCardsNew'));   // looks 6 and up
+// The card is a separate download (it is big). One shared promise, so starting early and React's lazy() never download it twice.
+let cardsFile = null;
+let newCardsFile = null;
+const loadCards = () => { if (!cardsFile) cardsFile = import('./TeaserCards'); return cardsFile; };
+const loadNewCards = () => { if (!newCardsFile) newCardsFile = import('./TeaserCardsNew'); return newCardsFile; };
+const Cards = lazy(loadCards);
+const NewCards = lazy(loadNewCards);   // looks 6 and up
+
+// Start the download early, so the card is there sooner on a slow phone:
+//  - on /upcoming the card IS the page: start right now, before React has drawn anything
+//  - on other pages: when a finger or the mouse reaches a link to /upcoming, and when the phone is idle (not on Data Saver or 2G)
+function startCards() {
+  if (!isTeaserLive()) return;   // the card is switched off: nothing to download
+  (getDesign().card <= 5 ? loadCards : loadNewCards)().catch(() => { /* lazy() below shows the Reload message */ });
+}
+if (typeof window !== 'undefined') {
+  if (/^\/upcoming\/?$/.test(window.location.pathname)) {
+    startCards();
+  } else {
+    const warm = (e) => {
+      if (e.target && e.target.closest && e.target.closest('a[href="/upcoming"]')) startCards();
+    };
+    ['pointerover', 'touchstart', 'focusin'].forEach((ev) => window.addEventListener(ev, warm, { passive: true, capture: true }));
+    const net = navigator.connection;
+    const saving = net && (net.saveData || /(^|-)2g$/.test(net.effectiveType || ''));
+    if (!saving) {
+      const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 4000));
+      window.addEventListener('load', () => idle(startCards, { timeout: 8000 }), { once: true });
+    }
+  }
+}
 
 /* look 1: radar + glowing question mark */
 function Signal({ t }) {
@@ -100,29 +133,36 @@ export default function HackathonTeaser() {
   const t = useTeaser();
   if (!t.visible) return null;
   const STYLE = getDesign().card;
+  const hack = eventType() === 'hackathon';   // problem statements, rules, prize pool ... are hackathon things (Upcoming event tab)
   return (
     <>
       <Reveal>
         {STYLE === 1 ? (
           <Signal t={t} />
         ) : (
-          <Guard>
-            <Suspense fallback={<div className="tc-wait" aria-hidden="true" />}>
+          <Guard fallback={<TeaserFailed />}>
+            <Suspense fallback={<TeaserLoader />}>
               {STYLE <= 5 ? <Cards t={t} style={STYLE} /> : <NewCards t={t} style={STYLE} />}
             </Suspense>
           </Guard>
         )}
       </Reveal>
-      <EventSnapshot />
-      <StickyNav />
-      <MotivationStrip />
-      <WhyParticipate />
-      <EventJourney />
-      <RuleBook />
-      <PrizePool />
-      <EventSchedule />
-      <EventFlow />
-      <FinaleSchedule />
+      <EventPoints />
+      {hack && (
+        <>
+          <EventSnapshot />
+          <StickyNav />
+          <MotivationStrip />
+          <ProblemStatement />
+          <WhyParticipate />
+          <EventJourney />
+          <RuleBook />
+          <PrizePool />
+          <EventSchedule />
+          <EventFlow />
+          <FinaleSchedule />
+        </>
+      )}
     </>
   );
 }

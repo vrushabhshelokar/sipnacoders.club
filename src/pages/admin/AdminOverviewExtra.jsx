@@ -1,35 +1,8 @@
-// Overview tab extras: the registration funnel and the busiest hours of the day.
-import { useEffect, useState } from 'react';
-import { api } from './kit';
+// Overview tab extra: the busiest hours of the day.
 
 const fmt = (n) => (typeof n === 'number' ? n.toLocaleString('en-IN') : '-');
 const hourName = (h) => `${h % 12 || 12} ${h < 12 ? 'AM' : 'PM'}`;
 const span = (h) => `${hourName(h)} to ${hourName((h + 1) % 24)}`;
-
-/* how many real form submissions came in during the last `range` days (all events that have a register button) */
-export function useSubmissions(range, enabled = true, stamp = 0) {
-  const [s, setS] = useState({ ready: false, count: 0, any: false });
-  useEffect(() => {
-    if (!enabled) return undefined;
-    let alive = true;
-    (async () => {
-      const r = await api('/api/admin/registrations?summary=1');
-      if (!alive || !r.ok || !r.json.events) return;
-      const from = new Date(Date.now() + 5.5 * 3600e3 - (range - 1) * 864e5).toISOString().slice(0, 10);
-      let count = 0;
-      let any = false;
-      for (const ev of ['vibe-a-thon', 'code-clash']) {
-        const e = r.json.events[ev];
-        if (!e) continue;
-        if (e.total > 0) any = true;
-        for (const [d, n] of Object.entries(e.days || {})) if (d >= from) count += n;
-      }
-      setS({ ready: true, count, any });
-    })();
-    return () => { alive = false; };
-  }, [range, enabled, stamp]);
-  return s;
-}
 
 /* busiest hours: one bar per hour of the day (Indian time) */
 export function HoursChart({ hours }) {
