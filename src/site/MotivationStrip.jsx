@@ -1,6 +1,11 @@
-// A calm, endless strip of motivation lines on the Vibe-A-Thon page.
+// A calm, endless strip of motivation lines on the Vibe-A-Thon page. It is always ONE line that keeps moving (phones, laptops, everywhere).
 // To change the words, edit LINES below. To remove the strip, delete <MotivationStrip /> in HackathonTeaser.jsx.
+//
+// People whose phone/PC has "reduce motion" / "remove animations" turned ON still see the strip, only slower.
+// To make the strip stand still for those people (they can swipe it sideways instead), set FOLLOW_REDUCED_MOTION to true.
 import './MotivationStrip.css';
+
+const FOLLOW_REDUCED_MOTION = false;
 
 const LINES = [
   'Your innovation has value',
@@ -22,7 +27,7 @@ export default function MotivationStrip() {
     </ul>
   );
   return (
-    <section className="ms" aria-label="Vibe-A-Thon motto">
+    <section className={FOLLOW_REDUCED_MOTION ? 'ms ms-calm' : 'ms'} aria-label="Vibe-A-Thon motto">
       <div className="ms-track">
         <div className="ms-move">
           {row(false)}

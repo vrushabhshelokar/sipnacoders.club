@@ -1,5 +1,7 @@
-/* Motivation strip (site/MotivationStrip.jsx): one slow, readable line with soft faded edges. */
+/* Motivation strip (site/MotivationStrip.jsx): ONE endless line, soft faded edges, same look on every screen. */
 .ms {
+  --ms-t: 56s;        /* time for one full turn (a bit longer on big screens so the speed feels the same) */
+  --ms-slow: 1;       /* 1 = normal. People who asked their device for less motion get a slower strip. */
   position: relative;
   margin: 56px 0 8px;
   padding: 18px 0;
@@ -10,24 +12,28 @@
 
 .ms-track {
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  padding: 12px 0;      /* room for the diamond glow, so it is not cut flat at the top and bottom */
+  margin: -12px 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
 }
 
 .ms-move {
   display: flex;
   width: max-content;
-  animation: ms-slide 42s linear infinite;
+  animation: ms-slide calc(var(--ms-t) * var(--ms-slow)) linear infinite;
   will-change: transform;
 }
 
-.ms-track:hover .ms-move,
-.ms-track:focus-within .ms-move {
-  animation-play-state: paused;
+/* pause while a mouse is over it (not on phones: a tap there would freeze it) */
+@media (hover: hover) and (pointer: fine) {
+  .ms-track:hover .ms-move { animation-play-state: paused; }
 }
+.ms-track:focus-within .ms-move { animation-play-state: paused; }
 
 .ms-row {
   display: flex;
+  flex: none;
   align-items: center;
   gap: 48px;
   margin: 0;
@@ -39,38 +45,72 @@
   display: inline-flex;
   align-items: center;
   gap: 48px;
+  flex: none;
   white-space: nowrap;
-  font: 700 clamp(20px, 3vw, 32px) / 1.2 var(--cy-hud, 'Chakra Petch', system-ui, sans-serif);
+  font: 700 clamp(21px, 3vw, 32px) / 1.2 var(--cy-hud, 'Chakra Petch', system-ui, sans-serif);
   letter-spacing: -0.01em;
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(255, 255, 255, 0.84);
 }
 
-/* a small diamond between the lines */
+/* a small glowing diamond between the lines (the glow is a soft circle, so it never shows a box) */
 .ms-dot {
+  position: relative;
+  isolation: isolate;
   width: 9px;
   height: 9px;
   flex: none;
+}
+.ms-dot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
   transform: rotate(45deg);
   background: var(--cy-mint, #7cf2d4);
-  box-shadow: 0 0 14px var(--cy-mint, #7cf2d4);
+}
+.ms-dot::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: -1;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(124, 242, 212, 0.42), rgba(124, 242, 212, 0) 68%);
+  pointer-events: none;
 }
 
 @keyframes ms-slide {
-  to {
-    transform: translateX(-33.3333%);
-  }
+  to { transform: translate3d(-33.3333%, 0, 0); }
 }
 
+/* tablets */
+@media (max-width: 1000px) {
+  .ms { --ms-t: 46s; }
+}
+
+/* phones: the strip runs edge to edge (like a real ticker) and the text stays easy to read */
 @media (max-width: 640px) {
-  .ms { margin: 40px 0 4px; padding: 14px 0; }
-  .ms-row, .ms-row li { gap: 32px; }
-  .ms-move { animation-duration: 34s; }
+  .ms {
+    --ms-t: 42s;
+    margin: 36px calc(50% - 50vw) 4px;
+    padding: 15px 0;
+    border-left: 0;
+    border-right: 0;
+  }
+  .ms-row, .ms-row li { gap: 30px; }
+  .ms-row { padding: 0 15px; }
 }
 
-/* people who prefer less motion get a still, wrapped list instead */
+/* "reduce motion" / "remove animations" is ON: same strip, just much slower */
 @media (prefers-reduced-motion: reduce) {
-  .ms-move { animation: none; width: auto; flex-wrap: wrap; justify-content: center; }
-  .ms-row[aria-hidden='true'] { display: none; }
-  .ms-row { flex-wrap: wrap; justify-content: center; row-gap: 12px; }
-  .ms-track { -webkit-mask-image: none; mask-image: none; }
+  .ms { --ms-slow: 2.6; }
+}
+
+/* optional (FOLLOW_REDUCED_MOTION = true in MotivationStrip.jsx): for those people the strip stands still and can be swiped */
+@media (prefers-reduced-motion: reduce) {
+  .ms-calm .ms-move { animation: none; }
+  .ms-calm .ms-track { overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; }
+  .ms-calm .ms-track::-webkit-scrollbar { display: none; }
 }
