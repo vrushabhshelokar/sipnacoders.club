@@ -272,9 +272,16 @@ export const FEE_DATA = {
       'Food provided during the 18-hour event',
       'Accommodation / stay for the entire 18-hour event',
     ],
+    // Registration Matrix, Round 2 box: the dates under the Publishing soon strip
+    schedule: [
+      { label: 'Round 2 Payment Window', value: '17–22 Dec 2026' },
+    ],
   },
-  totalSummary: 'Total potential cost: ₹700 per qualifying team (₹200 paid initially + ₹500 paid only after qualifying for Round 2). Non-qualifying teams pay only ₹200.',
 };
+
+// "Publishing soon": while this is not empty, every Round 2 block of the page (Registration Matrix box, Milestone Schedule row, Event Flow card) shows ONLY this text.
+// When Round 2 is ready, set it to '' (two quotes, nothing between) and the full Round 2 content is back everywhere.
+export const ROUND2_SOON = 'Publishing soon';
 
 export const PARTICIPANT_TIERS = [
   {

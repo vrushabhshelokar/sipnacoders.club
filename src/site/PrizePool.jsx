@@ -7,9 +7,11 @@
 //   - PARTICIPANT TIERS // RECOGNITION (Tiers 01, 02, 03 & Certificate Distribution Matrix)
 import { Reveal } from './ui';
 import { Icon } from './Icons';
+import SoonChip from './SoonChip';
 import {
   PRIZE_DATA,
-  FEE_DATA,
+  FEE_DATA,
+  ROUND2_SOON,
   PARTICIPANT_TIERS,
   CERTIFICATE_SUMMARY,
 } from '../data/vibeathonData';
@@ -149,45 +151,53 @@ export default function PrizePool() {
 
                 {/* Round 2 Fee Box */}
                 <div className="pp-phase-box pp-phase-r2">
-                  <div className="pp-phase-head">
-                    <div>
-                      <span className="pp-phase-badge highlight">{FEE_DATA.round2.subtitle}</span>
+                  {ROUND2_SOON ? (
+                    <>
                       <h3 className="pp-phase-name">{FEE_DATA.round2.title}</h3>
-                    </div>
-                    <div className="pp-phase-cost">
-                      <span className="pp-cost-val highlight">{FEE_DATA.round2.amount}</span>
-                      <span className="pp-cost-unit">{FEE_DATA.round2.unit}</span>
-                    </div>
-                  </div>
+                      <SoonChip className="is-strip" />
+                    </>
+                  ) : (
+                    <>
+                      <div className="pp-phase-head">
+                        <div>
+                          <span className="pp-phase-badge highlight">{FEE_DATA.round2.subtitle}</span>
+                          <h3 className="pp-phase-name">{FEE_DATA.round2.title}</h3>
+                        </div>
+                        <div className="pp-phase-cost">
+                          <span className="pp-cost-val highlight">{FEE_DATA.round2.amount}</span>
+                          <span className="pp-cost-unit">{FEE_DATA.round2.unit}</span>
+                        </div>
+                      </div>
 
-                  <p className="pp-phase-qualify-note">
-                    {FEE_DATA.round2.payable}
-                  </p>
+                      <p className="pp-phase-qualify-note">
+                        {FEE_DATA.round2.payable}
+                      </p>
 
-                  <div className="pp-inclusions-block">
-                    <span className="pp-inclusions-title">INCLUDES (ROUND 2 ONLY):</span>
-                    <ul className="pp-inclusions-list">
-                      {FEE_DATA.round2.inclusions.map((inc) => (
-                        <li key={inc}>
-                          <span className="pp-inc-check" aria-hidden="true">
-                            <Icon.Check size={14} />
-                          </span>
-                          <span>{inc}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                      <ul className="pp-r2-when" aria-label="Round 2 dates">
+                        {(FEE_DATA.round2.schedule || []).map((row) => (
+                          <li key={row.label}>
+                            <span className="pp-r2-k">{row.label}</span>
+                            <span className="pp-r2-v">{row.value}</span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      <div className="pp-inclusions-block">
+                        <span className="pp-inclusions-title">INCLUDES (ROUND 2 ONLY):</span>
+                        <ul className="pp-inclusions-list">
+                          {FEE_DATA.round2.inclusions.map((inc) => (
+                            <li key={inc}>
+                              <span className="pp-inc-check" aria-hidden="true">
+                                <Icon.Check size={14} />
+                              </span>
+                              <span>{inc}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </>
+                  )}
                 </div>
-              </div>
-
-              {/* Total Fee Clarification Callout */}
-              <div className="pp-total-note">
-                <div className="pp-note-icon" aria-hidden="true">
-                  <Icon.Terminal size={16} />
-                </div>
-                <p className="pp-note-text">
-                  <strong>Total potential cost: ₹700 per qualifying team</strong> (₹200 paid initially + ₹500 paid only after qualifying for Round 2). Teams that do not qualify for Round 2 pay only the initial ₹200.
-                </p>
               </div>
             </div>
 

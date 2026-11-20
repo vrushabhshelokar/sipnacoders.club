@@ -336,14 +336,15 @@ function buildPages(d, today) {
         return `${s.title}: ${s.desc}${tools}${lv}`;
       })]);
       if (link.big) out.push(['p', `${link.top || 'Top'} ${link.big} ${link.label || 'teams qualify'} for Round 2.`]);
-      out.push(['p', `${r2.tag || 'Round 2'} (${r2.where || 'Offline'}), ${r2.name || ''}. Venue: ${r2.venue || ''}. ${r2.intro || ''}`]);
-      out.push(['ul', arr(r2.phases).map((p) => `Hour ${p.from} to ${p.to}: ${p.title}${p.check ? ` (${p.check})` : ''}`)]);
+      if (vibe.ROUND2_SOON) out.push(['p', `${r2.tag || 'Round 2'}: ${vibe.ROUND2_SOON}.`]);
+      else out.push(['p', `${r2.tag || 'Round 2'} (${r2.where || 'Offline'}), ${r2.name || ''}. Venue: ${r2.venue || ''}. ${r2.intro || ''}`]);
+      if (!vibe.ROUND2_SOON) out.push(['ul', arr(r2.phases).map((p) => `Hour ${p.from} to ${p.to}: ${p.title}${p.check ? ` (${p.check})` : ''}`)]);
       return out;
     }));
 
     b.push(...safe('schedule', () => [
       ['h3', 'Important dates'],
-      ['ul', arr(vibe.EVENT_SCHEDULE).map((s) => `${s.date}, ${s.time}: ${s.milestone}. ${s.desc}`)],
+      ['ul', arr(vibe.EVENT_SCHEDULE).map((s) => (vibe.ROUND2_SOON && /round\s*2/i.test([s.phase, s.milestone, s.desc].join(' ')) ? `Round 2: ${vibe.ROUND2_SOON}.` : `${s.date}, ${s.time}: ${s.milestone}. ${s.desc}`))],
     ]));
 
     b.push(...safe('finale', () => {
@@ -369,7 +370,7 @@ function buildPages(d, today) {
       out.push(['ul', arr(p.distribution).map((x) => `${x.title}: ${x.amount} (${x.tag})`)]);
       out.push(['ul', [
         f.round1 ? `${f.round1.title} (${f.round1.subtitle}): ${f.round1.amount} ${f.round1.unit}. ${f.round1.details || ''}` : '',
-        f.round2 ? `${f.round2.title} (${f.round2.subtitle}): ${String(f.round2.amount).replace(/^\+/, '')} ${f.round2.unit}. Includes: ${arr(f.round2.inclusions).join('; ')}.` : '',
+        f.round2 ? (vibe.ROUND2_SOON ? `${f.round2.title}: ${vibe.ROUND2_SOON}.` : `${f.round2.title} (${f.round2.subtitle}): ${String(f.round2.amount).replace(/^\+/, '')} ${f.round2.unit}. Includes: ${arr(f.round2.inclusions).join('; ')}.`) : '',
         f.totalSummary || '',
       ].filter(Boolean)]);
       out.push(['ul', arr(vibe.PARTICIPANT_TIERS).map((t) => `${t.category} (${t.scope}), ${t.certType}: ${arr(t.rewards).join('; ')}.`)]);

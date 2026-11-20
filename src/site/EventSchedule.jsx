@@ -2,7 +2,7 @@
 // Vertical timeline with 7 milestones, spine line, node circles, and content cards.
 import { Reveal } from './ui';
 import { Icon } from './Icons';
-import { EVENT_SCHEDULE } from '../data/vibeathonData';
+import { EVENT_SCHEDULE, ROUND2_SOON } from '../data/vibeathonData';
 import { liveValue, useLiveSettings } from './liveSettings';
 import { psRelease } from './psRelease';
 
@@ -26,6 +26,8 @@ import './EventSchedule.css';
 function TimelineRow({ item, index }) {
   const IconC = Icon[item.icon] || Icon.Calendar;
   const isTbd = !item.date || item.date === 'TBD' || item.date.toLowerCase().includes('announced');
+  // While ROUND2_SOON (data/vibeathonData.js) is not empty, a row that mentions Round 2 shows only "Publishing soon"
+  const soon = !!ROUND2_SOON && /round\s*2/i.test(`${item.phase} ${item.milestone} ${item.desc}`);
 
   return (
     <Reveal
@@ -37,29 +39,40 @@ function TimelineRow({ item, index }) {
       <div className="es-meta">
         <span className="es-num" aria-hidden="true">{item.id}</span>
         <span className="es-phase">{item.phase}</span>
-        <span className="es-time">{isTbd ? 'TBA' : item.time}</span>
+        {soon ? null : <span className="es-time">{isTbd ? 'TBA' : item.time}</span>}
         {/* Node on the spine */}
         <div className="es-node" aria-hidden="true" />
       </div>
 
       {/* Right: content card */}
-      <article className="es-card">
-        <div className="es-card-head">
-          <div className="es-icon" aria-hidden="true">
-            <IconC size={15} />
+      {soon ? (
+        <article className="es-card is-soon">
+          <div className="es-card-head">
+            <div className="es-icon" aria-hidden="true">
+              <IconC size={15} />
+            </div>
+            <h3 className="es-milestone es-soon-text"><i aria-hidden="true" />{ROUND2_SOON}</h3>
           </div>
-          <h3 className="es-milestone">{item.milestone}</h3>
-        </div>
+        </article>
+      ) : (
+        <article className="es-card">
+          <div className="es-card-head">
+            <div className="es-icon" aria-hidden="true">
+              <IconC size={15} />
+            </div>
+            <h3 className="es-milestone">{item.milestone}</h3>
+          </div>
 
-        <p className="es-desc">{item.desc}</p>
+          <p className="es-desc">{item.desc}</p>
 
-        <div
-          className="es-date-badge"
-          aria-label={isTbd ? 'Date to be announced' : item.date}
-        >
-          {isTbd ? 'DATE: TO BE ANNOUNCED' : item.date}
-        </div>
-      </article>
+          <div
+            className="es-date-badge"
+            aria-label={isTbd ? 'Date to be announced' : item.date}
+          >
+            {isTbd ? 'DATE: TO BE ANNOUNCED' : item.date}
+          </div>
+        </article>
+      )}
     </Reveal>
   );
 }
