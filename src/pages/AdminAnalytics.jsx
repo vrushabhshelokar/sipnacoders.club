@@ -7,20 +7,18 @@ import './admin/AdminCenter.css';
 import { EVENT_SCHEDULE } from '../data/vibeathonData';
 import { istWords } from '../site/psRelease';
 import { same } from './admin/kit';
-import AdminRegistrations from './admin/AdminRegistrations';
 import AdminAutomation from './admin/AdminAutomation';
 import AdminContent from './admin/AdminContent';
 import AdminEventContent from './admin/AdminEventContent';
 import AdminUpcoming, { pruneDetails } from './admin/AdminUpcoming';
 import { SITE_DEFAULTS, SITE_KEYS, mergeSite, prepareSite } from './admin/siteKeys';
 import './admin/AdminSite.css';
-import AdminAccess from './admin/AdminAccess';
-import { HoursChart, useSubmissions } from './admin/AdminOverviewExtra';
+import { HoursChart } from './admin/AdminOverviewExtra';
 
 /* ---------------------------------------------------------------------------------------------
    Private admin dashboard (/admin/visitor-analytics)
-   Seven tabs: Overview, Registrations, Upcoming event, Events, Site content, Automation, Access (src/pages/admin/*).
-   Overview + Registrations are also open to the view-only login. Everything else is admin only.
+   Five tabs: Overview, Upcoming event, Events, Site content, Automation (src/pages/admin/*).
+   Overview is also open to the view-only login. Everything else is admin only.
    --------------------------------------------------------------------------------------------- */
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -92,7 +90,7 @@ const OBJECT_KEYS = ['banner', 'timeline', 'details', 'eventDetails', 'eventPoin
 const UPCOMING_KEYS = ['eventType', 'eventName', 'eventLink', 'eventStart', 'hideAfter', 'upcomingShow', 'vibePopup', 'eventDetails', 'details', 'eventPoints', 'eventBanners', 'popupTheme', 'popupDelay', 'popupLogo', 'popupDesc'];   // the Upcoming event tab
 const BANNER_KEYS = ['banner', ...SITE_KEYS];                           // these belong to the Site content tab, the rest of the settings to the Events tab
 
-const TABS = [['overview', 'Overview'], ['registrations', 'Registrations'], ['upcoming', 'Upcoming event'], ['events', 'Events'], ['content', 'Site content'], ['automation', 'Automation'], ['access', 'Access']];
+const TABS = [['overview', 'Overview'], ['upcoming', 'Upcoming event'], ['events', 'Events'], ['content', 'Site content'], ['automation', 'Automation']];
 const VIEWER_TABS = ['overview'];
 const tabFromHash = () => {
   try { const h = window.location.hash.replace('#', ''); return TABS.some(([id]) => id === h) ? h : 'overview'; } catch { return 'overview'; }
@@ -439,7 +437,6 @@ export default function AdminAnalytics() {
   const [statsError, setStatsError] = useState('');
   const [range, setRange] = useState(7);
   const [role, setRole] = useState('admin');         // 'admin' | 'viewer' (view-only login)
-  const [viewerEnabled, setViewerEnabled] = useState(false);
   const [tab, setTab] = useState(tabFromHash);
 
   const [overrides, setOverrides] = useState({});   // what the admin saved (missing key = the code file decides)
@@ -468,7 +465,6 @@ export default function AdminAnalytics() {
       setData(json);
       setOverrides(json.settings || {});
       setRole(json.role === 'viewer' ? 'viewer' : 'admin');
-      setViewerEnabled(json.viewerEnabled === true);
       setAuthenticated(true);
       return true;
     } catch {
@@ -624,7 +620,6 @@ export default function AdminAnalytics() {
 
   const shownTabs = role === 'admin' ? TABS : TABS.filter(([id]) => VIEWER_TABS.includes(id));
   const active = shownTabs.some(([id]) => id === tab) ? tab : 'overview';
-  const subs = useSubmissions(range, authenticated && active === 'overview', data && data.updatedAt);   // real form submissions (funnel)
   const selectTab = (id) => {
     setTab(id);
     try { window.history.replaceState(null, '', `#${id}`); } catch { /* the address bar stays as it is */ }
@@ -717,7 +712,7 @@ export default function AdminAnalytics() {
         <div>
           <div className="s-analytics-tag">PRIVATE DASHBOARD</div>
           <h1 className="s-analytics-title">ADMIN DASHBOARD</h1>
-          <p className="s-analytics-sub">{role === 'viewer' ? 'View-only access: you can look at the Overview (visitor numbers), but nothing can be changed and no names or contact details are shown.' : 'Visitors, registrations and site controls in one place. Visitor counts are anonymous and stored in Upstash Redis.'}</p>
+          <p className="s-analytics-sub">{role === 'viewer' ? 'View-only access: you can look at the Overview (visitor numbers), but nothing can be changed and no names or contact details are shown.' : 'Visitors and site controls in one place. Visitor counts are anonymous and stored in Upstash Redis.'}</p>
         </div>
         <div className="ad-head-actions">
           <span className="ad-updated">Updated <b>{formatTimestamp(data && data.updatedAt)}</b></span>
@@ -792,7 +787,7 @@ export default function AdminAnalytics() {
                 <div className="ad-two">
                   <section className="ad-panel" aria-labelledby="ad-h-reg">
                     <h2 id="ad-h-reg">Registration funnel</h2>
-                    <p className="ad-sub">From a visit to a real form submission.</p>
+                    <p className="ad-sub">From a visit to a click on the Register button.</p>
                     <BarList
                       scale={agg.visits}
                       total={agg.visits}
@@ -800,16 +795,11 @@ export default function AdminAnalytics() {
                         { label: 'Visits', value: agg.visits },
                         { label: 'Register page views', value: registerViews },
                         { label: 'Register button clicks', value: registerClicks },
-                        ...(subs.ready && subs.any ? [{ label: 'Form submissions', value: subs.count }] : []),
                       ]}
                     />
                     <h3 className="ad-h3">Button clicks</h3>
                     <BarList rows={toRows(agg.clicks, CLICK_NAMES)} empty="No clicks counted in this range yet." />
-                    <p className="ad-note ad-note-tight">
-                      {subs.ready && subs.any
-                        ? 'Form submissions are the people in the Registrations tab (Vibe-A-Thon and Code Clash). Clicks and submissions are counted separately, so they do not always match.'
-                        : 'These are clicks, not submitted forms. Connect your forms in the Registrations tab to see real submissions here.'}
-                    </p>
+                    <p className="ad-note ad-note-tight">These are clicks on the Register buttons, counted by the site. They are not submitted forms.</p>
                   </section>
 
                   <section className="ad-panel" aria-labelledby="ad-h-hours">
@@ -843,7 +833,6 @@ export default function AdminAnalytics() {
               </>
             )}
 
-            {active === 'registrations' && <AdminRegistrations isAdmin={role === 'admin'} />}
 
             {active === 'upcoming' && role === 'admin' && <AdminUpcoming view={view} edit={edit} overrides={overrides} changed={changedKeys} />}
 
@@ -928,7 +917,6 @@ export default function AdminAnalytics() {
               />
             )}
 
-            {active === 'access' && <AdminAccess role={role} viewerEnabled={viewerEnabled} onLogout={handleLogout} />}
           </div>
         </div>
       )}
