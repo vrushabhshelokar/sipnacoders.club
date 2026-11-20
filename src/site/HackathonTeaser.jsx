@@ -14,7 +14,6 @@ import EventSnapshot from './EventSnapshot';
 import StickyNav from './StickyNav';
 import WhyParticipate from './WhyParticipate';
 import MotivationStrip from './MotivationStrip';
-import PsAlertStrip from './PsAlertStrip';
 import ProblemStatement from './ProblemStatement';
 import EventJourney from './EventJourney';
 import RuleBook from './RuleBook';
@@ -151,7 +150,6 @@ export default function HackathonTeaser() {
       <EventPoints />
       {hack && (
         <>
-          <PsAlertStrip />
           <EventSnapshot />
           <StickyNav />
           <MotivationStrip />

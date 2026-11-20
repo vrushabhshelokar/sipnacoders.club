@@ -1,13 +1,16 @@
-// Vibe-A-Thon page: a small amber ALERT strip above the first section, telling people the problem statements are coming.
+// Vibe-A-Thon page: a small amber ALERT strip at the very top of the page (just under the menu bar, above the big card), telling people the problem statements are coming.
 // The date is NOT written here. It is the "releaseLabel" in src/data/problemStatement.js (or the time set in the dashboard), so there is one place to change.
 // The strip goes away by itself once the problem statement PDF is added and its release time has come.
-// To remove the strip, delete <PsAlertStrip /> in HackathonTeaser.jsx.
+// It is mounted in src/pages/Upcoming.jsx and only shows on the Vibe-A-Thon (hackathon) page.
+// To remove the strip, delete <PsAlertStrip /> in src/pages/Upcoming.jsx.
 //
 // People whose phone/PC has "reduce motion" / "remove animations" turned ON still see the strip moving, only slower.
 // To make it a still, centered notice for those people, set FOLLOW_REDUCED_MOTION to true.
 import { PS } from '../data/problemStatement';
 import { useSwitch } from './liveSettings';
 import { psRelease } from './psRelease';
+import { isTeaserLive } from './teaserCore';
+import { eventType } from './eventLive';
 import './PsAlertStrip.css';
 
 const FOLLOW_REDUCED_MOTION = false;
@@ -28,7 +31,8 @@ export default function PsAlertStrip() {
 
   // same rule as the Problem Statement section: published = the PDF is added AND the time has come
   const published = pdf !== '' && (unlockNow || !Number.isFinite(rel.ms) || Date.now() >= rel.ms);
-  if (!show || published) return null;
+  // only on the Vibe-A-Thon page: the big card is on and the event is a hackathon
+  if (!isTeaserLive() || eventType() !== 'hackathon' || !show || published) return null;
 
   // '21 Nov 2026, 8:00 PM IST' -> '21 Nov, 8:00 PM IST'
   const when = String(rel.label || '').replace(/\s\d{4}(?=,)/, '').trim();
@@ -46,16 +50,18 @@ export default function PsAlertStrip() {
   );
 
   return (
-    <div className={FOLLOW_REDUCED_MOTION ? 'pa pa-calm' : 'pa'} role="note" aria-label="Notice about the problem statement release">
-      <span className="pa-badge">
-        <WarnIcon />
-        <b>Alert</b>
-      </span>
-      <div className="pa-track">
-        <div className="pa-move">
-          {row(false)}
-          {row(true)}
-          {row(true)}
+    <div className="s-container pa-wrap">
+      <div className={FOLLOW_REDUCED_MOTION ? 'pa pa-calm' : 'pa'} role="note" aria-label="Notice about the problem statement release">
+        <span className="pa-badge">
+          <WarnIcon />
+          <b>Alert</b>
+        </span>
+        <div className="pa-track">
+          <div className="pa-move">
+            {row(false)}
+            {row(true)}
+            {row(true)}
+          </div>
         </div>
       </div>
     </div>

@@ -10,7 +10,7 @@
   display: flex;
   align-items: stretch;
   height: var(--pa-h);
-  margin: 20px 0 0;
+  margin: 0 0 20px;
   border-bottom: 1px solid rgba(var(--pa-rgb), 0.45);
   background: linear-gradient(90deg, rgba(var(--pa-rgb), 0.2), rgba(var(--pa-rgb), 0.1) 45%, rgba(var(--pa-rgb), 0.18));
   box-shadow: 0 0 28px -8px rgba(var(--pa-rgb), 0.35);
@@ -109,7 +109,7 @@
 
 /* tablets */
 @media (max-width: 1000px) {
-  .pa { --pa-h: 44px; --pa-fs: 14px; --pa-t: 30s; margin-top: 16px; }
+  .pa { --pa-h: 44px; --pa-fs: 14px; --pa-t: 30s; margin-bottom: 16px; }
 }
 
 /* phones: small, edge to edge */
@@ -118,13 +118,35 @@
     --pa-h: 34px;
     --pa-fs: 11.5px;
     --pa-t: 28s;
-    margin: 14px calc(50% - 50vw) 0;
+    margin: 0 calc(50% - 50vw) 14px;
   }
   .pa::before { height: 3px; }
   .pa-badge { gap: 6px; padding: 3px 14px 0 12px; padding-right: 20px; letter-spacing: 0.12em; clip-path: polygon(0 0, 100% 0, calc(100% - 9px) 100%, 0 100%); }
   .pa-track { padding-top: 3px; }
   .pa-row li { gap: 20px; padding-right: 20px; }
   .pa-sep { width: 16px; }
+}
+
+/* The announcement banner from the dashboard floats just under the menu bar. While it is showing, this strip moves down
+   so the banner does not cover it (the room goes away by itself when there is no banner, or the visitor closes it). */
+body:has(.sb-pill) .pa { margin-top: 36px; }
+@media (max-width: 640px) {
+  body:has(.sb-pill) .pa { margin-top: 62px; }
+}
+
+/* On phones the big card fills the whole first screen (UpcomingClean.css). With this strip above it, the card gets
+   the same amount of height less, so it still fits between the menu bar and the bottom dock.
+   (strip height + gap below it: 44 + 16 on tablets, 34 + 14 on phones. The card text scale --u gets 62px less, so the
+   bottom of the card lands where it was before the strip was added.) */
+@media (max-width: 768px) {
+  .up-cy-named #upcoming > .pa-wrap + .s-container > .rv:first-child { min-height: calc(100vh - 78px - 60px); min-height: calc(100svh - 78px - 60px); }
+}
+@media (max-width: 640px) {
+  .up-cy-named #upcoming > .pa-wrap + .s-container > .rv:first-child { min-height: calc(100vh - 78px - 48px); min-height: calc(100svh - 78px - 48px); --u: 1px; }
+  @supports (height: 1svh) {
+    .up-cy-named #upcoming > .pa-wrap + .s-container > .rv:first-child { --u: clamp(.8px, calc((100svh - 62px) / 844), 1.12px); }
+  }
+  .up-cy .pa-wrap + .s-container .cy { min-height: calc(100vh - 156px - 48px); min-height: calc(100svh - 156px - 48px); }
 }
 
 /* "reduce motion" / "remove animations" is ON: same strip, just much slower */

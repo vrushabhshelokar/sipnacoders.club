@@ -8,6 +8,7 @@ import { PageHead } from '../site/ui';
 import { UpcomingBlock, useUpcoming } from '../site/events';
 import { isTeaserLive } from '../site/HackathonTeaser';
 import UpcomingSoon from '../site/UpcomingSoon';
+import PsAlertStrip from '../site/PsAlertStrip';
 import { getDesign } from '../site/teaserCore';
 import { eventName } from '../site/eventLive';
 import '../site/Cyber.css';
@@ -32,6 +33,7 @@ export default function Upcoming() {
         />
       )}
       <section id="upcoming" className="s-section s-section-first" style={named ? { paddingTop: 110 } : undefined}>
+        <PsAlertStrip />
         <div className="s-container">
           {quiet ? <UpcomingSoon /> : <UpcomingBlock />}
           {!quiet && (
