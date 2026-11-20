@@ -4,7 +4,8 @@ import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { Icon } from './Icons';
 import { Reveal } from './ui';
-import { LINKS, upcomingEvents, pastEvents } from '../data/site';
+import { upcomingEvents } from '../data/site';
+import { useLinks, usePastEvents } from './siteLive';
 import {
   getUpcoming, getPast, useCountdown, fmtDay, fmtMon, fmtFull, fmtTime, durLabel, relative, gcalLink, normCat, catColor, hasPhotos,
 } from './time';
@@ -19,7 +20,10 @@ export function useUpcoming() {
   const [now] = useState(() => Date.now());
   return useMemo(() => getUpcoming(upcomingEvents, now), [now]);
 }
-export const usePast = () => useMemo(() => getPast(pastEvents), []);
+export const usePast = () => {
+  const list = usePastEvents();   // the list the dashboard saved, or the one in data/site.js
+  return useMemo(() => getPast(list), [list]);
+};
 
 /* live countdown */
 export function Countdown({ at }) {
@@ -129,6 +133,7 @@ function EventCard({ ev, i }) {
 
 /* featured + the rest, or a friendly empty state */
 export function UpcomingBlock() {
+  const LINKS = useLinks();
   const list = useUpcoming();
   if (!list.length && isTeaserLive()) return <Suspense fallback={<TeaserLoader />}><HackathonTeaser /></Suspense>;
   if (!list.length) {

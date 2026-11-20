@@ -97,7 +97,7 @@ export const BOOL_KEYS = [
 export const DATE_KEYS = ['eventStart', 'roundEnd1', 'roundEnd2', 'hideAfter', 'psReleaseAt'];   // 'YYYY-MM-DDTHH:MM', Indian time
 export const INT_KEYS = { psCount: [1, 99], popupTheme: [0, 21], popupDelay: [0, 120] };                                                    // whole number, [min, max]
 export const LINK_KEYS = ['psPdf', 'eventLink'];                                                              // /file-in-public-folder.pdf or https://...
-export const OBJECT_KEYS = ['banner', 'timeline', 'details', 'eventDetails', 'eventPoints', 'eventBanners', 'popupLogo'];                                    // longer content (see the clean functions below)
+export const OBJECT_KEYS = ['banner', 'timeline', 'details', 'eventDetails', 'eventPoints', 'eventBanners', 'popupLogo', 'siteLinks', 'siteStats', 'siteText', 'sitePictures', 'faq', 'voices', 'wins', 'joinSteps', 'tracks', 'tools', 'pastEvents'];                                    // longer content (see the clean functions below)
 export const ENUM_KEYS = { eventType: ['hackathon', 'workshop', 'online'] };       // one of these words
 export const TEXT_KEYS = { eventName: 60, popupDesc: 120 };                         // one line of text, at most this long
 export const ALL_SETTING_KEYS = [...BOOL_KEYS, ...DATE_KEYS, ...Object.keys(INT_KEYS), ...LINK_KEYS, ...OBJECT_KEYS, ...Object.keys(ENUM_KEYS), ...Object.keys(TEXT_KEYS), 'currentRound'];
@@ -217,9 +217,179 @@ function cleanPopupLogo(v) {
   if (!v || typeof v !== 'object' || Array.isArray(v) || typeof v.v !== 'string' || !MEDIA_VERSION.test(v.v)) return null;
   return { v: v.v };
 }
+/* ---------------------------------------------------------------------------------------------
+   Site content (Site content tab of the dashboard): links, numbers, words, pictures, lists and past events.
+   A key that is missing means "use what is written in src/data/site.js".
+   --------------------------------------------------------------------------------------------- */
+const EMAIL_RE = /^[A-Za-z0-9._%+-]{1,64}@[A-Za-z0-9.-]{1,120}\.[A-Za-z]{2,24}$/;
+const hostOf = (s) => { try { return new URL(s).hostname.toLowerCase(); } catch { return ''; } };
+const hostIn = (s, list) => { const h = hostOf(s); return list.some((d) => h === d || h.endsWith(`.${d}`)); };
+
+// the buttons and contact links: only the ones that were changed are stored
+const SITE_LINK_KEYS = ['membershipForm', 'joinForm', 'instagram', 'linkedin', 'email'];
+function cleanSiteLinks(v) {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return null;
+  const out = {};
+  for (const k of Object.keys(v)) {
+    if (!SITE_LINK_KEYS.includes(k) || typeof v[k] !== 'string') return null;
+    const s = v[k].trim();
+    if (k === 'email') { if (!EMAIL_RE.test(s)) return null; out[k] = s; continue; }
+    const l = cleanLink(s);
+    if (l === null) return null;
+    if (k !== 'joinForm' && !l.startsWith('https://')) return null;     // only the Join button may point to a page of this site
+    if (k === 'instagram' && !hostIn(l, ['instagram.com'])) return null;
+    if (k === 'linkedin' && !hostIn(l, ['linkedin.com', 'lnkd.in'])) return null;
+    out[k] = l;
+  }
+  return Object.keys(out).length ? out : null;
+}
+
+// the four number tiles on the Home page: [{ value, suffix, label }]
+function cleanSiteStats(v) {
+  if (!Array.isArray(v) || v.length !== 4) return null;
+  const out = [];
+  for (const it of v) {
+    if (!it || typeof it !== 'object' || !Number.isInteger(it.value) || it.value < 0 || it.value > 999999) return null;
+    if (typeof it.suffix !== 'string' || !/^[+kKmM%x]{0,2}$/.test(it.suffix)) return null;
+    const label = oneLine(it.label, 24, 1);
+    if (label === null) return null;
+    out.push({ value: it.value, suffix: it.suffix, label });
+  }
+  return out;
+}
+
+// headings and sentences of the Home page (only the ones that were changed are stored)
+export const SITE_TEXT_MAX = {
+  heroPill: 60, heroLine1: 40, heroGrad: 30, heroSub: 260,
+  joinTitle: 60, joinSub: 140, pastTitle: 60, pastSub: 160, doTitle: 60, doSub: 160,
+  faqTitle: 60, faqSub: 160, crewTitle: 60, crewText: 200,
+};
+function cleanSiteText(v) {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return null;
+  const out = {};
+  for (const k of Object.keys(v)) {
+    if (!(k in SITE_TEXT_MAX)) return null;
+    const s = oneLine(v[k], SITE_TEXT_MAX[k], 1);
+    if (s === null) return null;
+    out[k] = s;
+  }
+  return Object.keys(out).length ? out : null;
+}
+
+// the two big pictures: { membership: { v, r? }, group: { v, r?, pos? } }  v = version of the stored picture, r = width / height, pos = 0 top .. 100 bottom
+function cleanSitePictures(v) {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return null;
+  const out = {};
+  for (const k of Object.keys(v)) {
+    const p = v[k];
+    if ((k !== 'membership' && k !== 'group') || !p || typeof p !== 'object' || typeof p.v !== 'string' || !MEDIA_VERSION.test(p.v)) return null;
+    const e = { v: p.v };
+    if (p.r !== undefined) { if (typeof p.r !== 'number' || !(p.r >= 0.2 && p.r <= 5)) return null; e.r = Math.round(p.r * 1000) / 1000; }
+    if (k === 'group' && p.pos !== undefined) { if (!Number.isInteger(p.pos) || p.pos < 0 || p.pos > 100) return null; e.pos = p.pos; }
+    out[k] = e;
+  }
+  return Object.keys(out).length ? out : null;
+}
+
+// simple lists of short records (FAQ, voices, wins, join steps, tracks, tools)
+export const TRACK_ICONS = ['Globe', 'Code', 'Sparkles', 'Cloud', 'Smartphone', 'Terminal', 'GitBranch', 'Zap', 'Trophy', 'Users'];
+const LIST_SPECS = {
+  faq: { min: 0, max: 16, f: { q: [3, 140], a: [3, 700] }, faqLink: true },
+  voices: { min: 0, max: 12, f: { quote: [5, 300], name: [2, 60], role: [0, 60] } },
+  wins: { min: 0, max: 12, f: { kind: ['Award', 'Project'], title: [3, 100], who: [0, 80], year: [0, 10], desc: [0, 220], link: 'link' } },
+  joinSteps: { min: 1, max: 6, f: { title: [2, 60], desc: [0, 160] } },
+  tracks: { min: 1, max: 8, f: { id: 'id', icon: TRACK_ICONS, color: 'hex', title: [2, 40], desc: [0, 140] } },
+};
+function cleanRows(name, v) {
+  const spec = LIST_SPECS[name];
+  if (!Array.isArray(v) || v.length < spec.min || v.length > spec.max) return null;
+  const ids = new Set();
+  const out = [];
+  for (const it of v) {
+    if (!it || typeof it !== 'object') return null;
+    const row = {};
+    for (const [f, rule] of Object.entries(spec.f)) {
+      if (Array.isArray(rule) && typeof rule[0] === 'string') { if (!rule.includes(it[f])) return null; row[f] = it[f]; }
+      else if (Array.isArray(rule)) { const s = oneLine(it[f] ?? '', rule[1], rule[0]); if (s === null) return null; row[f] = s; }
+      else if (rule === 'hex') { if (typeof it[f] !== 'string' || !/^#[0-9a-fA-F]{6}$/.test(it[f])) return null; row[f] = it[f].toLowerCase(); }
+      else if (rule === 'id') { if (typeof it[f] !== 'string' || !/^[a-z0-9_-]{1,12}$/.test(it[f]) || ids.has(it[f])) return null; ids.add(it[f]); row[f] = it[f]; }
+      else if (rule === 'link') { if (it[f] === undefined || it[f] === '') { row[f] = ''; continue; } const l = cleanLink(it[f]); if (l === null) return null; row[f] = l; }
+    }
+    if (spec.faqLink && it.link !== undefined && it.link !== null) {
+      const L = it.link;
+      if (!L || typeof L !== 'object') return null;
+      const label = oneLine(L.label, 30, 1);
+      const to = L.to === undefined ? null : cleanLink(L.to);
+      const href = L.href === undefined ? null : cleanLink(L.href);
+      if (label === null || (to === null) === (href === null)) return null;
+      if (to !== null && !to.startsWith('/')) return null;
+      if (href !== null && !href.startsWith('https://')) return null;
+      row.link = to !== null ? { label, to } : { label, href };
+    }
+    out.push(row);
+  }
+  return out;
+}
+const cleanFaq = (v) => cleanRows('faq', v);
+const cleanVoices = (v) => cleanRows('voices', v);
+const cleanWins = (v) => cleanRows('wins', v);
+const cleanJoinSteps = (v) => cleanRows('joinSteps', v);
+const cleanTracks = (v) => cleanRows('tracks', v);
+// the strip of tool names: ['Google Gemini', 'GitHub', ...]
+function cleanTools(v) {
+  if (!Array.isArray(v) || v.length > 14) return null;
+  const out = [];
+  for (const t of v) { const s = oneLine(t, 40, 1); if (s === null) return null; out.push(s); }
+  return out;
+}
+
+// past events with their photos. key = the event in src/data/site.js it came from (null = added here);
+// an image is { c: n } (picture n of that code event) or { id: 'g-<event id>-<1..8>', v: '<version>' } (uploaded in the dashboard)
+const PAST_ID = /^[a-z0-9]{2,10}$/;
+function cleanPastEvents(v) {
+  if (!Array.isArray(v) || v.length > 40) return null;
+  const seen = new Set();
+  const out = [];
+  for (const it of v) {
+    if (!it || typeof it !== 'object' || typeof it.id !== 'string' || !PAST_ID.test(it.id) || seen.has(it.id)) return null;
+    seen.add(it.id);
+    const key = it.key === undefined || it.key === null || it.key === '' ? null : it.key;
+    if (key !== null && !(typeof key === 'string' && /^[a-z0-9-]{1,60}$/.test(key))) return null;
+    const title = oneLine(it.title, 90, 2);
+    const category = oneLine(it.category ?? '', 30);
+    const date = oneLine(it.date ?? '', 30);
+    const description = oneLine(it.description ?? '', 320);
+    const sortDate = it.sortDate === undefined || it.sortDate === '' ? '' : (typeof it.sortDate === 'string' && /^\d{4}-\d\d-\d\d$/.test(it.sortDate) && !Number.isNaN(Date.parse(`${it.sortDate}T00:00:00Z`)) ? it.sortDate : null);
+    if (title === null || category === null || date === null || description === null || sortDate === null) return null;
+    if (!date && !sortDate) return null;
+    if (!Array.isArray(it.images) || it.images.length > 8) return null;
+    const imgs = [];
+    const used = new Set();
+    for (const im of it.images) {
+      if (!im || typeof im !== 'object') return null;
+      let one;
+      if (im.c !== undefined) {
+        if (key === null || !Number.isInteger(im.c) || im.c < 0 || im.c > 30) return null;
+        one = { c: im.c };
+      } else {
+        if (typeof im.id !== 'string' || !new RegExp(`^g-${it.id}-[1-8]$`).test(im.id) || typeof im.v !== 'string' || !MEDIA_VERSION.test(im.v)) return null;
+        one = { id: im.id, v: im.v };
+      }
+      const tag = one.id || `c${one.c}`;
+      if (used.has(tag)) return null;
+      used.add(tag);
+      imgs.push(one);
+    }
+    out.push({ id: it.id, key, title, category, date, sortDate, description, images: imgs });
+  }
+  return out;
+}
+
 const OBJECT_CLEANERS = {
   banner: cleanBanner, timeline: cleanTimeline, details: cleanDetails,
   eventDetails: cleanEventDetails, eventPoints: cleanEventPoints, eventBanners: cleanEventBanners, popupLogo: cleanPopupLogo,
+  siteLinks: cleanSiteLinks, siteStats: cleanSiteStats, siteText: cleanSiteText, sitePictures: cleanSitePictures,
+  faq: cleanFaq, voices: cleanVoices, wins: cleanWins, joinSteps: cleanJoinSteps, tracks: cleanTracks, tools: cleanTools, pastEvents: cleanPastEvents,
 };
 
 // Keeps only known keys with valid values. Anything else is dropped.

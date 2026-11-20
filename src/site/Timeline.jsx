@@ -9,7 +9,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from './Icons';
 import { Reveal } from './ui';
 import { Lightbox, usePast } from './events';
-import { pastEvents } from '../data/site';
+import { usePastEvents } from './siteLive';
 import { normCat, catColor, dateFromText } from './time';
 import './TimelineSoon.css';
 
@@ -27,9 +27,10 @@ const SOON_COLOR = '#c792ea';
 
 // events you announced (they have a title) but that have no photos yet
 const hasImages = (e) => !!(e.images && e.images.length);
-const soonEvents = pastEvents.filter((e) => e.title && String(e.title).trim() && !hasImages(e));
 
 export default function Timeline() {
+  const allPast = usePastEvents();
+  const soonEvents = useMemo(() => allPast.filter((e) => e.title && String(e.title).trim() && !hasImages(e)), [allPast]);
   const photos = usePast();                 // finished events that have photos, newest first
   const wrap = useRef(null);
   const [fill, setFill] = useState(0);

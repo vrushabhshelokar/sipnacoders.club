@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { LINKS } from '../data/site';
+import { currentLinks } from './siteLive';
 import { CODE_CLASH_FORM } from './eventSwitches';
 
 // Anonymous visit statistics for the private dashboard (/admin/visitor-analytics). No names, no personal data.
@@ -68,7 +68,8 @@ function sourceTag() {
 function clickKind(href) {
   if (!href) return null;
   if (CODE_CLASH_FORM && href.startsWith(CODE_CLASH_FORM)) return 'register-codeclash';
-  if (LINKS.membershipForm && href.startsWith(LINKS.membershipForm)) return 'membership';
+  const membership = currentLinks().membershipForm;
+  if (membership && href.startsWith(membership)) return 'membership';
   if (/^(https?:\/\/(www\.)?sipnacoders\.club)?\/register([?#/]|$)/.test(href)) return 'register-vibeathon';
   return null;
 }

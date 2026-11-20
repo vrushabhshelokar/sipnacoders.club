@@ -1,8 +1,9 @@
 // Shown on /register while the admin has Vibe-A-Thon registration switched off (dashboard -> Site controls).
 import { Link } from 'react-router-dom';
-import { LINKS } from '../data/site';
+import { useLinks } from './siteLive';
 
 export default function RegistrationClosed() {
+  const LINKS = useLinks();
   return (
     <header className="s-pagehead s-register-pagehead">
       <div className="s-pagehead-glow" aria-hidden="true" />

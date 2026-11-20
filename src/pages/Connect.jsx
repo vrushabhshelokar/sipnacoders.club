@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Icon } from '../site/Icons';
 import { PageHead, Reveal } from '../site/ui';
-import { LINKS } from '../data/site';
+import { useLinks } from '../site/siteLive';
 
 export default function Connect() {
+  const LINKS = useLinks();
   const [copied, setCopied] = useState(false);
   const [form, setForm] = useState({ name: '', subject: '', message: '' });
 

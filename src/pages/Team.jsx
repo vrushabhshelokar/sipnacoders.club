@@ -1,10 +1,13 @@
 import { Icon } from '../site/Icons';
 import { PageHead, Reveal } from '../site/ui';
-import { LINKS, groupPhoto } from '../data/site';
+import { useLinks, usePictures, useText } from '../site/siteLive';
 import { useTeam } from '../site/peopleStore';
 
 export default function Team() {
   const team = useTeam();
+  const LINKS = useLinks();
+  const T = useText();
+  const pics = usePictures();
   const toTeam = (e) => {
     e.preventDefault();
     const el = document.getElementById('current-team');
@@ -18,11 +21,11 @@ export default function Team() {
       <section className="s-section s-section-first s-team-founders">
         <div className="s-container">
           <Reveal className="s-banner">
-            <img src={groupPhoto} alt="The members who started Sipna Coders Club" loading="eager" fetchPriority="high" decoding="async" />
+            <img src={pics.group.src} style={{ objectPosition: `50% ${pics.group.pos}%` }} alt="The members who started Sipna Coders Club" loading="eager" fetchPriority="high" decoding="async" />
             <div className="s-banner-body">
               <span className="s-eyebrow">Where it started</span>
-              <h2 className="s-h2">The founding crew</h2>
-              <p>The members who started Sipna Coders Club and built the community we have today.</p>
+              <h2 className="s-h2">{T.crewTitle}</h2>
+              <p>{T.crewText}</p>
               <a href="#current-team" onClick={toTeam} className="s-btn s-btn-light">
                 Meet the current team <Icon.ArrowRight size={16} style={{ transform: 'rotate(90deg)' }} />
               </a>

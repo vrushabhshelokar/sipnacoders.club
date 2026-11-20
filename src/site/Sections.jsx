@@ -4,7 +4,8 @@ import { Fragment, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon } from './Icons';
 import { Reveal, SectionHead } from './ui';
-import { TOOLS, FAQ, VOICES, WINS, LINKS, PROGRAMS } from '../data/site';
+import { PROGRAMS } from '../data/site';
+import { useFaq, useLinks, useText, useTools, useVoices, useWins } from './siteLive';
 import { useAmbassadors } from './peopleStore';
 import './Ambassadors.css';
 
@@ -25,6 +26,7 @@ const QuoteMark = () => (
 
 /* ---------- tools & platforms: an endless strip of names ---------- */
 export function ToolStrip() {
+  const TOOLS = useTools();
   if (!TOOLS.length) return null;
   const row = (hidden) => (
     <ul className="s-tools-row" aria-hidden={hidden || undefined}>
@@ -47,6 +49,7 @@ export function ToolStrip() {
 
 /* ---------- wins & projects ---------- */
 export function Wins() {
+  const WINS = useWins();
   if (!WINS.length) return null;
   return (
     <section id="wins" className="s-section">
@@ -78,6 +81,7 @@ export function Wins() {
 
 /* ---------- member voices ---------- */
 export function Voices() {
+  const VOICES = useVoices();
   if (!VOICES.length) return null;
   return (
     <section id="voices" className="s-section s-section-tint">
@@ -218,13 +222,16 @@ export function Ambassadors() {
 
 /* ---------- FAQ ---------- */
 export function Faq() {
+  const FAQ = useFaq();
+  const LINKS = useLinks();
+  const T = useText();
   const [open, setOpen] = useState(0);
   if (!FAQ.length) return null;
   return (
     <section id="faq" className="s-section">
       <div className="s-container s-faq">
         <div className="s-faq-side">
-          <SectionHead eyebrow="FAQ" title="Questions, answered" sub="Everything people usually ask us before joining." />
+          <SectionHead eyebrow="FAQ" title={T.faqTitle} sub={T.faqSub} />
           <Reveal className="s-faq-help">
             <b>Still have a question?</b>
             <span>We reply on email, Instagram and LinkedIn.</span>

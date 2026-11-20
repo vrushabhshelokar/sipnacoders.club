@@ -12,7 +12,8 @@ import VisitorTracker from './VisitorTracker';
 import './NavFix.css';
 import './UpcomingPage.css';
 import '../styles/a11y.css';
-import { LINKS, logo } from '../data/site';
+import { logo } from '../data/site';
+import { useLinks } from './siteLive';
 
 const NAV = [
   { to: '/', label: 'Home' },
@@ -39,6 +40,7 @@ const isFreshNavigation = () => {
 };
 
 export default function Layout({ children }) {
+  const LINKS = useLinks();
   const { pathname, hash } = useLocation();
   const firstLoad = useRef(true);
   const [scrolled, setScrolled] = useState(false);

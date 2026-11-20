@@ -7,9 +7,15 @@ import { ToolStrip, Wins, Voices, Faq, Ambassadors } from '../site/Sections';
 import CodeClash from '../site/CodeClash';
 import LiveEvent from '../site/LiveEvent';
 import { CountBubble, FoundMessage, upcomingLabel, useUpcomingCount } from '../site/UpcomingFound';
-import { LINKS, STATS, TRACKS, JOIN_STEPS, membershipPoster, groupPhoto } from '../data/site';
+import FitPoster from '../site/FitPoster';
+import { useJoinSteps, useLinks, usePictures, useStats, useText, useTracks } from '../site/siteLive';
 
 export default function Home() {
+  const LINKS = useLinks();
+  const T = useText();
+  const pics = usePictures();
+  const TRACKS = useTracks();
+  const JOIN_STEPS = useJoinSteps();
   return (
     <>
       <Hero />
@@ -23,13 +29,11 @@ export default function Home() {
       <section id="join" className="s-section">
         <div className="s-container">
           <Reveal className="s-join">
-            <div className="s-join-poster">
-              <img src={membershipPoster} alt="Coders Club membership poster" loading="lazy" decoding="async" />
-            </div>
+            <FitPoster src={pics.membership.src} ratio={pics.membership.ratio} alt="Coders Club membership poster" />
             <div className="s-join-body">
               <span className="s-eyebrow">Membership</span>
-              <h2 className="s-h2">Join Coders Community</h2>
-              <p className="s-sub">Registrations are open. Three simple steps and you&apos;re in.</p>
+              <h2 className="s-h2">{T.joinTitle}</h2>
+              <p className="s-sub">{T.joinSub}</p>
               <ol className="s-steps">
                 {JOIN_STEPS.map((s, i) => (
                   <li key={s.title}>
@@ -53,14 +57,14 @@ export default function Home() {
 
       <section id="recent" className="s-section s-section-tint">
         <div className="s-container">
-          <SectionHead eyebrow="Past events" title="What we've done" sub="Workshops, hackathons and seminars. Tap any event to see the photos." />
+          <SectionHead eyebrow="Past events" title={T.pastTitle} sub={T.pastSub} />
           <PastBento />
         </div>
       </section>
 
       <section id="what-we-do" className="s-section">
         <div className="s-container">
-          <SectionHead eyebrow="What we do" title="Learn by building" sub="Pick a track, learn with friends and ship something real." />
+          <SectionHead eyebrow="What we do" title={T.doTitle} sub={T.doSub} />
           <div className="s-tracks">
             {TRACKS.map((t, i) => {
               const IconC = Icon[t.icon] || Icon.Code;
@@ -89,11 +93,11 @@ export default function Home() {
       <section className="s-section">
         <div className="s-container">
           <Reveal className="s-banner">
-            <img src={groupPhoto} alt="The members who started Sipna Coders Club" loading="lazy" decoding="async" />
+            <img src={pics.group.src} style={{ objectPosition: `50% ${pics.group.pos}%` }} alt="The members who started Sipna Coders Club" loading="lazy" decoding="async" />
             <div className="s-banner-body">
               <span className="s-eyebrow">Where it started</span>
-              <h2 className="s-h2">The founding crew</h2>
-              <p>The members who started Sipna Coders Club and built the community we have today.</p>
+              <h2 className="s-h2">{T.crewTitle}</h2>
+              <p>{T.crewText}</p>
               <Link to="/team" className="s-btn s-btn-light">Meet the current team <Icon.ArrowRight size={16} /></Link>
             </div>
           </Reveal>
@@ -104,6 +108,8 @@ export default function Home() {
 }
 
 function Hero() {
+  const LINKS = useLinks();
+  const T = useText();
   const live = useIntroDone();
   const found = useUpcomingCount();
   const move = (e) => {
@@ -122,15 +128,12 @@ function Hero() {
       </div>
       <div className="s-container s-hero-in">
         <div className="s-hero-copy">
-          <span className="s-pill"><i /> Sipna College of Engineering &amp; Technology</span>
+          <span className="s-pill"><i /> {T.heroPill}</span>
           <h1 className="s-hero-title">
-            <span>Compile your</span>
-            <span><span className="s-grad">future</span><span className="s-caret">_</span></span>
+            <span>{T.heroLine1}</span>
+            <span><span className="s-grad">{T.heroGrad}</span><span className="s-caret">_</span></span>
           </h1>
-          <p className="s-hero-sub">
-            Not just a club. A runtime environment for the next generation of software engineers.
-            Build, break, and ship code that matters.
-          </p>
+          <p className="s-hero-sub">{T.heroSub}</p>
           <div className="s-actions">
             <a className="s-btn s-btn-light s-btn-lg" href={LINKS.joinForm} target="_blank" rel="noopener noreferrer">
               Join Coders Community <Icon.ArrowUpRight size={17} />
@@ -152,6 +155,7 @@ function Hero() {
 const STAT_COLORS = ['#4285f4', '#34a853', '#fbbc05', '#ea4335'];
 
 function Stats() {
+  const STATS = useStats();
   const [ref, inView] = useInView(0.3);
   return (
     <div className="s-container">

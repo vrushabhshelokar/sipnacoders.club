@@ -20,6 +20,11 @@ export const ID_RE = /^[a-z0-9][a-z0-9_-]{1,38}$/;
 export const EVENT_MEDIA_IDS = ['e-b1', 'e-b2', 'e-b3', 'e-b4', 'e-logo'];
 export const MAX_BANNER_BYTES = 420 * 1024;
 export const MAX_LOGO_BYTES = 120 * 1024;
+// the two big pictures of the Site content tab (membership poster, founding crew photo) and the photos of past events (g-<event>-<1..8>)
+export const SITE_MEDIA_IDS = ['s-membership', 's-group'];
+export const MAX_SITE_BYTES = 420 * 1024;
+export const GALLERY_ID_RE = /^g-[a-z0-9]{2,10}-[1-8]$/;
+export const MAX_GALLERY_BYTES = 320 * 1024;
 
 const clean = (v, max) => (typeof v === 'string'
   ? v.replace(/[\u0000-\u001f\u007f<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, max)

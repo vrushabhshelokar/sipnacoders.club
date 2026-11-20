@@ -1,20 +1,28 @@
-// Site content tab: the announcement banner, and the team + ambassadors lists.
+// Site content tab: the announcement banner, pictures, links, numbers and words, the lists of the Home page, past events with photos,
+// and the team + ambassadors lists. The sections are bars that open and close (the choice is remembered for the visit).
 import { BannerPill } from '../../site/SiteBanner';
 import PeopleManager from '../AdminPeople';
+import PastEditor, { pastSummary } from './AdminPast';
+import SitePanels, { SITE_PANELS, sitePanelSummaries } from './AdminSite';
 import { stampWords } from './kit';
+import { Panel, PanelBar, usePanels } from './Panel';
 
 const TONES = [['info', 'Blue: news'], ['urgent', 'Red: urgent'], ['success', 'Green: good news']];
+const IDS = ['banner', ...SITE_PANELS, 'past'];
 
 export default function AdminContent({ view, edit, overrides, changed, isAdmin }) {
   const b = view.banner;
   const set = (patch) => edit('banner', { ...b, ...patch });
-  const mark = changed.includes('banner') ? 'unsaved changes' : 'banner' in overrides ? 'edited here' : '';
+  const mark = (keys) => (keys.some((k) => changed.includes(k)) ? 'unsaved changes' : keys.some((k) => k in overrides) ? 'edited here' : '');
+  const st = usePanels('scc-as-open-v1', IDS, ['banner']);
+  const sum = sitePanelSummaries(view);
+  const bannerSum = b.on ? `shown: "${String(b.text || '').slice(0, 50)}${String(b.text || '').length > 50 ? '...' : ''}"` : 'hidden';
   return (
-    <div className="ac-tab">
-      <section className="ad-panel" aria-labelledby="ac-h-banner">
-        <h2 id="ac-h-banner">Announcement banner{mark && <em className="ac-edited">{mark}</em>}</h2>
-        <p className="ad-sub">One line of news at the top of every page: a deadline, a result, a change of plan. Visitors can close it. It appears and disappears without a deploy.</p>
+    <div className="ac-tab au as">
+      <PanelBar st={st} />
 
+      <h2 className="as-group">Top of the site</h2>
+      <Panel {...st.panel('banner')} title="Announcement banner" badge={mark(['banner'])} summary={bannerSum} sub="One line of news at the top of every page: a deadline, a result, a change of plan. Visitors can close it. It appears and disappears without a deploy.">
         <div className="ad-row">
           <div className="ad-row-text">
             <span id="lbl-banner-on" className="ad-row-label">Show the banner on the site</span>
@@ -57,11 +65,21 @@ export default function AdminContent({ view, edit, overrides, changed, isAdmin }
 
         <h3 className="ad-h3">How it looks</h3>
         <div className="ac-preview"><BannerPill b={b} preview /></div>
-        <p className="ad-note ad-note-tight">Changes go live only after you press <b>Save changes</b> in the yellow bar that appears at the top.</p>
-      </section>
+      </Panel>
 
+      <SitePanels view={view} edit={edit} st={st} mark={mark} sum={sum} />
+
+      <h2 className="as-group">Events</h2>
+      <Panel {...st.panel('past')} title="Past events and photos" badge={mark(['pastEvents'])} summary={pastSummary(view)} sub="Add an event, change its words, add or remove its photos.">
+        <PastEditor view={view} edit={edit} overrides={overrides} />
+      </Panel>
+
+      <p className="ad-note ad-note-tight">Everything above goes live only after you press <b>Save changes</b> in the yellow bar that appears at the top.</p>
+
+      <h2 className="as-group">People</h2>
       <p className="ad-note ac-people-note">The team and ambassadors below are saved on their own, with the Save button inside that box (they are stored separately from the switches above).</p>
       <PeopleManager />
     </div>
   );
 }
+

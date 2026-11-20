@@ -4,7 +4,7 @@
 import { Link } from 'react-router-dom';
 import { Icon } from './Icons';
 import { Reveal } from './ui';
-import { LINKS } from '../data/site';
+import { useLinks } from './siteLive';
 import './UpcomingPage.css';
 
 /* ✏️ EDIT HERE: the kinds of events shown as "in the works" ------------------ */
@@ -17,6 +17,7 @@ const IN_THE_WORKS = [
 /* ---------------------------------------------------------------------------- */
 
 export default function UpcomingSoon() {
+  const LINKS = useLinks();
   return (
     <Reveal className="s-soon s-soon-ig">
       <div className="s-soon-glow" aria-hidden="true" />

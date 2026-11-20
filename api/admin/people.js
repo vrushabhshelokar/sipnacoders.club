@@ -7,7 +7,7 @@
 import { getRedisClient, sendResponse } from '../../api-lib/shared.js';
 import { isAdmin } from '../../api-lib/adminAuth.js';
 import {
-  EVENT_MEDIA_IDS, ID_RE, LISTS, MAX_BANNER_BYTES, MAX_LOGO_BYTES, PEOPLE_KEY, cleanList, parseDataUrl, parseStored, photoKey, readJson, sameOrigin,
+  EVENT_MEDIA_IDS, GALLERY_ID_RE, ID_RE, LISTS, MAX_BANNER_BYTES, MAX_GALLERY_BYTES, MAX_LOGO_BYTES, MAX_SITE_BYTES, PEOPLE_KEY, SITE_MEDIA_IDS, cleanList, parseDataUrl, parseStored, photoKey, readJson, sameOrigin,
 } from '../../api-lib/peopleData.js';
 
 export default async function handler(req, res) {
@@ -36,11 +36,14 @@ export default async function handler(req, res) {
     /* ---- upload one photo (already made small by the dashboard) ---- */
     if (body.action === 'photo') {
       const id = typeof body.id === 'string' ? body.id.toLowerCase() : '';
-      const isMedia = EVENT_MEDIA_IDS.includes(id);   // e-b1 .. e-b4 (banners) and e-logo (popup logo) of the Upcoming event tab
-      if (!ID_RE.test(id) || (!isMedia && !Object.values(LISTS).some((p) => id.startsWith(p)))) {
+      // e-b1 .. e-b4 (banners) and e-logo (popup logo): Upcoming event tab. s-membership, s-group, g-<event>-<n>: Site content tab.
+      const limit = EVENT_MEDIA_IDS.includes(id) ? (id === 'e-logo' ? MAX_LOGO_BYTES : MAX_BANNER_BYTES)
+        : SITE_MEDIA_IDS.includes(id) ? MAX_SITE_BYTES
+          : GALLERY_ID_RE.test(id) ? MAX_GALLERY_BYTES : null;   // null = a team / ambassador photo
+      if (!ID_RE.test(id) || (limit === null && !Object.values(LISTS).some((p) => id.startsWith(p)))) {
         return sendResponse(res, 400, { ok: false, error: 'Invalid id.' });
       }
-      const img = parseDataUrl(body.data, isMedia ? (id === 'e-logo' ? MAX_LOGO_BYTES : MAX_BANNER_BYTES) : undefined);
+      const img = parseDataUrl(body.data, limit === null ? undefined : limit);
       if (img.error) return sendResponse(res, 400, { ok: false, error: img.error });
       const version = Date.now().toString(36);
       await redis.set(photoKey(id), JSON.stringify({ v: version, t: img.mime, d: img.b64 }));

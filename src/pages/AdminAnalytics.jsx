@@ -12,6 +12,8 @@ import AdminAutomation from './admin/AdminAutomation';
 import AdminContent from './admin/AdminContent';
 import AdminEventContent from './admin/AdminEventContent';
 import AdminUpcoming, { pruneDetails } from './admin/AdminUpcoming';
+import { SITE_DEFAULTS, SITE_KEYS, mergeSite, prepareSite } from './admin/siteKeys';
+import './admin/AdminSite.css';
 import AdminAccess from './admin/AdminAccess';
 import { HoursChart, useSubmissions } from './admin/AdminOverviewExtra';
 
@@ -82,11 +84,13 @@ const FILE_DEFAULTS = {
   codeClashRegistration: true,
   codeClashPopup: CODE_CLASH_POPUP,
   codeClashSection: CODE_CLASH_SECTION,
+  // Site content tab: links, numbers, words, pictures, lists and past events (admin/siteKeys.js)
+  ...SITE_DEFAULTS,
 };
 const SETTING_KEYS = Object.keys(FILE_DEFAULTS);
-const OBJECT_KEYS = ['banner', 'timeline', 'details', 'eventDetails', 'eventPoints', 'eventBanners', 'popupLogo'];   // saved as a whole; equal to the code file = "not changed"
+const OBJECT_KEYS = ['banner', 'timeline', 'details', 'eventDetails', 'eventPoints', 'eventBanners', 'popupLogo', ...SITE_KEYS];   // saved as a whole; equal to the code file = "not changed"
 const UPCOMING_KEYS = ['eventType', 'eventName', 'eventLink', 'eventStart', 'hideAfter', 'upcomingShow', 'vibePopup', 'eventDetails', 'details', 'eventPoints', 'eventBanners', 'popupTheme', 'popupDelay', 'popupLogo', 'popupDesc'];   // the Upcoming event tab
-const BANNER_KEYS = ['banner'];                           // these belong to the Site content tab, the rest of the settings to the Events tab
+const BANNER_KEYS = ['banner', ...SITE_KEYS];                           // these belong to the Site content tab, the rest of the settings to the Events tab
 
 const TABS = [['overview', 'Overview'], ['registrations', 'Registrations'], ['upcoming', 'Upcoming event'], ['events', 'Events'], ['content', 'Site content'], ['automation', 'Automation'], ['access', 'Access']];
 const VIEWER_TABS = ['overview'];
@@ -444,7 +448,7 @@ export default function AdminAnalytics() {
   const [saveMsg, setSaveMsg] = useState({ type: '', text: '' });
   const [confirmReset, setConfirmReset] = useState(false);
 
-  const effective = useMemo(() => ({ ...FILE_DEFAULTS, ...overrides }), [overrides]);
+  const effective = useMemo(() => mergeSite({ ...FILE_DEFAULTS, ...overrides }), [overrides]);
   const view = draft || effective;
   const changedKeys = draft ? SETTING_KEYS.filter((k) => !same(draft[k], effective[k])) : [];
   const dirty = changedKeys.length > 0;
@@ -569,8 +573,10 @@ export default function AdminAnalytics() {
   const save = async () => {
     if (!draft) return;
     const patch = {};
+    const siteProblems = [];
     for (const k of SETTING_KEYS) {
       if (same(draft[k], effective[k])) continue;
+      if (SITE_KEYS.includes(k)) { const r = prepareSite(k, draft[k]); siteProblems.push(...r.problems); patch[k] = r.value; continue; }
       let v = typeof draft[k] === 'string' ? draft[k].trim() : draft[k];
       if (k === 'banner') v = { ...v, text: v.text.trim(), link: v.link.trim(), linkText: v.linkText.trim() };
       if (k === 'eventDetails') v = pruneDetails(v);
@@ -580,7 +586,7 @@ export default function AdminAnalytics() {
       else patch[k] = v === '' ? null : v;                                              // an emptied date or link goes back to the code file's value
     }
     if (!Object.keys(patch).length) return;
-    const problems = [];
+    const problems = [...siteProblems];
     if (typeof patch.psPdf === 'string' && !PDF_LINK_OK(patch.psPdf)) problems.push('PDF link: start it with / (a file in the public folder) or https://, and use no spaces.');
     if (typeof patch.psCount === 'number' && !(Number.isInteger(patch.psCount) && patch.psCount >= 1 && patch.psCount <= 99)) problems.push('How many problem statements: a whole number from 1 to 99.');
     if (patch.banner) {

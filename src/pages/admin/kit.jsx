@@ -115,6 +115,8 @@ export const KEY_LABELS = {
   banner: 'Announcement banner', timeline: 'Timeline rows', details: 'Detail boxes',
   eventType: 'Kind of event', eventName: 'Event name', eventLink: 'Register button link', eventDetails: 'Event detail boxes', eventPoints: 'Description points',
   eventBanners: 'Event banners', popupTheme: 'Popup design number', popupDelay: 'Popup delay (seconds)', popupLogo: 'Popup logo', popupDesc: 'Popup words',
+  siteLinks: 'Links', siteStats: 'Numbers on the Home page', siteText: 'Headings and sentences', sitePictures: 'Membership poster / founding crew photo',
+  faq: 'Questions and answers', voices: 'Member voices', wins: 'Wins and projects', joinSteps: 'Steps to join', tracks: 'What we do (tracks)', tools: 'Tools and platforms', pastEvents: 'Past events and photos',
 };
 
 /* one saved value in plain words */
@@ -132,6 +134,12 @@ export function describeValue(key, v) {
   if (key === 'popupLogo') return 'a logo';
   if (key === 'popupTheme') return Number(v) === 0 ? 'automatic' : `design ${v}`;
   if (key === 'popupDelay') return `${v} seconds`;
+  if (key === 'siteLinks' && typeof v === 'object') return `${Object.keys(v).length} link(s) changed`;
+  if (key === 'siteText' && typeof v === 'object') return `${Object.keys(v).length} text(s) changed`;
+  if (key === 'siteStats' && Array.isArray(v)) return v.map((s) => `${s.value}${s.suffix || ''} ${s.label}`).join(', ');
+  if (key === 'sitePictures' && typeof v === 'object') return Object.keys(v).map((k) => (k === 'group' ? 'founding crew photo' : 'membership poster')).join(' and ');
+  if (key === 'pastEvents' && Array.isArray(v)) return `${v.length} event${v.length === 1 ? '' : 's'}`;
+  if (['faq', 'voices', 'wins', 'joinSteps', 'tracks', 'tools'].includes(key) && Array.isArray(v)) return v.length ? `${v.length} item${v.length === 1 ? '' : 's'}` : 'empty (the section is hidden)';
   if (key === 'eventName' && v === '') return 'no name';
   return String(v).length > 50 ? `${String(v).slice(0, 50)}...` : String(v);
 }

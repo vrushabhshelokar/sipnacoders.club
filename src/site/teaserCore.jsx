@@ -3,7 +3,7 @@
 import { Component, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon } from './Icons';
-import { LINKS, pastEvents } from '../data/site';
+import { currentPastEvents, useLinks } from './siteLive';
 import { dateFromText, getPast, toDate } from './time';
 import { liveValue, useLiveSettings } from './liveSettings';
 import * as C from './upcomingConfig';
@@ -43,7 +43,7 @@ const LIST = Array.isArray(DESIGN_LIST) && DESIGN_LIST.length ? DESIGN_LIST : [[
 // finished events (with photos) dated on or after ROTATION_FROM: each one moves the next event on to the next design
 const finishedSince = () => {
   const from = String(C.ROTATION_FROM || '');
-  return getPast(pastEvents).filter((e) => { const d = e.sortDate || dateFromText(e.date); return !!d && d >= from; }).length;
+  return getPast(currentPastEvents()).filter((e) => { const d = e.sortDate || dateFromText(e.date); return !!d && d >= from; }).length;
 };
 export function getDesign() {
   let q = null;
@@ -249,6 +249,7 @@ export function useTeaser() {
 /* the buttons under every card: Get notified, Try to decrypt, Instagram.
    When you have filled in details, a hint appears and "Try to decrypt" glows until the visitor presses it. */
 export function Actions({ t, className = '' }) {
+  const LINKS = useLinks();
   const goTo = eventLink();                       // Upcoming event tab: a form link, or empty = the site's own Register page
   const external = /^https:\/\//.test(goTo);
   return (
