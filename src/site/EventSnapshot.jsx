@@ -61,8 +61,8 @@ const SNAPSHOT_ITEMS = [
   {
     id: 'fees',
     label: 'ENTRY FEE',
-    value: '₹200 / ₹700',
-    sub: '₹200 R1 · +₹500 R2',
+    value: '₹200',
+    sub: '₹200 R1',
     icon: 'CreditCard',
     accent: '#4c8dff',
     accentRgb: '76, 141, 255',
