@@ -1,0 +1,146 @@
+/* Problem Statement alert strip (site/PsAlertStrip.jsx): amber "caution" theme, bigger on laptops, small on phones. */
+.pa {
+  --pa: #ffb454;
+  --pa-rgb: 255, 180, 84;
+  --pa-t: 34s;        /* time for one full turn */
+  --pa-slow: 1;       /* 1 = normal. People who asked their device for less motion get a slower strip. */
+  --pa-h: 50px;
+  --pa-fs: 16px;
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  height: var(--pa-h);
+  margin: 20px 0 0;
+  border-bottom: 1px solid rgba(var(--pa-rgb), 0.45);
+  background: linear-gradient(90deg, rgba(var(--pa-rgb), 0.2), rgba(var(--pa-rgb), 0.1) 45%, rgba(var(--pa-rgb), 0.18));
+  box-shadow: 0 0 28px -8px rgba(var(--pa-rgb), 0.35);
+}
+
+/* a thin caution-tape line along the top edge */
+.pa::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 4px;
+  background: repeating-linear-gradient(135deg, var(--pa) 0 9px, #1a1306 9px 18px);
+}
+
+.pa-badge {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 18px 0;
+  background: var(--pa);
+  color: #1a1204;
+  font: 700 calc(var(--pa-fs) - 2px) / 1 var(--cy-hud, 'Chakra Petch', system-ui, sans-serif);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+  padding-right: 26px;
+}
+.pa-badge b { font-weight: 700; }
+.pa-badge svg { width: calc(var(--pa-fs) + 2px); height: calc(var(--pa-fs) + 2px); flex: none; }
+
+.pa-track {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding-top: 4px;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 94%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 4%, #000 94%, transparent);
+}
+
+.pa-move {
+  display: flex;
+  width: max-content;
+  animation: pa-slide calc(var(--pa-t) * var(--pa-slow)) linear infinite;
+  will-change: transform;
+}
+
+/* pause while a mouse is over it (not on phones: a tap there would freeze it) */
+@media (hover: hover) and (pointer: fine) {
+  .pa-track:hover .pa-move { animation-play-state: paused; }
+}
+
+.pa-row {
+  display: flex;
+  flex: none;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pa-row li {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 28px;
+  padding-right: 28px;
+  white-space: nowrap;
+}
+
+.pa-text {
+  font: 700 var(--pa-fs) / 1.2 var(--cy-hud, 'Chakra Petch', system-ui, sans-serif);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #ffe6bd;
+}
+
+/* three small slashes between the messages (same "///" look as the Round 1 heading) */
+.pa-sep {
+  flex: none;
+  display: inline-block;
+  width: 22px;
+  height: calc(var(--pa-fs) - 2px);
+  background: repeating-linear-gradient(115deg, var(--pa) 0 3px, transparent 3px 8px);
+}
+
+@keyframes pa-slide {
+  to { transform: translate3d(-33.3333%, 0, 0); }
+}
+
+/* tablets */
+@media (max-width: 1000px) {
+  .pa { --pa-h: 44px; --pa-fs: 14px; --pa-t: 30s; margin-top: 16px; }
+}
+
+/* phones: small, edge to edge */
+@media (max-width: 640px) {
+  .pa {
+    --pa-h: 34px;
+    --pa-fs: 11.5px;
+    --pa-t: 28s;
+    margin: 14px calc(50% - 50vw) 0;
+  }
+  .pa::before { height: 3px; }
+  .pa-badge { gap: 6px; padding: 3px 14px 0 12px; padding-right: 20px; letter-spacing: 0.12em; clip-path: polygon(0 0, 100% 0, calc(100% - 9px) 100%, 0 100%); }
+  .pa-track { padding-top: 3px; }
+  .pa-row li { gap: 20px; padding-right: 20px; }
+  .pa-sep { width: 16px; }
+}
+
+/* "reduce motion" / "remove animations" is ON: same strip, just much slower */
+@media (prefers-reduced-motion: reduce) {
+  .pa { --pa-slow: 2.6; }
+}
+
+/* optional (FOLLOW_REDUCED_MOTION = true in PsAlertStrip.jsx): a still, centered notice for those people */
+@media (prefers-reduced-motion: reduce) {
+  .pa-calm { height: auto; min-height: var(--pa-h); }
+  .pa-calm .pa-move { animation: none; width: auto; flex: 1 1 auto; min-width: 0; }
+  .pa-calm .pa-row[aria-hidden='true'] { display: none; }
+  .pa-calm .pa-row { flex: 1 1 auto; min-width: 0; }
+  .pa-calm .pa-row li:nth-child(2) { display: none; }
+  .pa-calm .pa-track { -webkit-mask-image: none; mask-image: none; padding: 7px 12px 6px; }
+  .pa-calm .pa-row li { flex: 1 1 auto; min-width: 0; padding-right: 0; white-space: normal; }
+  .pa-calm .pa-sep { display: none; }
+  .pa-calm .pa-text { line-height: 1.35; }
+}
