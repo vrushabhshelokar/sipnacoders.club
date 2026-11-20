@@ -7,7 +7,7 @@ import { PS } from '../data/problemStatement';
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const STAMP = /^(\d{4})-(\d\d)-(\d\d)T(\d\d):(\d\d)$/;
 
-// '2026-11-22T00:00' (Indian time) -> { date: '22 Nov 2026', time: '12:00 AM' }
+// '2026-11-22T00:00' (Indian time) -> { date: '20 Nov 2026', time: '12:00 AM' }
 export function istWords(stamp) {
   const m = STAMP.exec(String(stamp || ''));
   if (!m || !MONTHS[Number(m[2]) - 1]) return null;
