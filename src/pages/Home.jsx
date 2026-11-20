@@ -7,6 +7,7 @@ import { ToolStrip, Wins, Voices, Faq, Ambassadors } from '../site/Sections';
 import CodeClash from '../site/CodeClash';
 import LiveEvent from '../site/LiveEvent';
 import { CountBubble, FoundMessage, upcomingLabel, useUpcomingCount } from '../site/UpcomingFound';
+import RegOpen from '../site/RegOpen';
 import FitPoster from '../site/FitPoster';
 import { useJoinSteps, useLinks, usePictures, useStats, useText, useTracks } from '../site/siteLive';
 
@@ -139,7 +140,7 @@ function Hero() {
               Join Coders Community <Icon.ArrowUpRight size={17} />
             </a>
             <Link className={`s-btn s-btn-ghost s-btn-lg ${found ? 'has-found' : ''}`} to="/upcoming">
-              {upcomingLabel(found)} <CountBubble n={found} />
+              {upcomingLabel(found)} <CountBubble n={found} /><RegOpen />
             </Link>
           </div>
           <FoundMessage n={found} />
