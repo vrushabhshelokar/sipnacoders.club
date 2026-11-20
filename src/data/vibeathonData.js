@@ -375,7 +375,7 @@ export const EVENT_SCHEDULE = [
     phase: 'ROUND 1',
     milestone: 'Problem Statements Released',
     time: '08:00 PM',
-    date: '22 Nov 2026',
+    date: '21 Nov 2026',
     desc: '10 problem statements are published. Teams choose one and begin building their Round 1 module.',
     accent: '#4c8dff',
     accentRgb: '76, 141, 255',
