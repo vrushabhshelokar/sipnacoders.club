@@ -13,7 +13,7 @@ export const PS = {
   pdf: '',                                              // '' = not added yet (buttons stay locked). Example: '/Vibe-A-Thon-Problem-Statements.pdf'
   fileName: 'Vibe-A-Thon-Problem-Statements.pdf',       // the name the file gets when someone downloads it
   releaseAt: '2026-11-21T20:00:00+05:30',               // when the buttons switch on (21 Nov 2026, 8:00 PM IST, same as the Timeline)
-  releaseLabel: '21 Nov 2026, 8:00 PM IST',            // the same moment, written for people
+  releaseLabel: '21 Nov 2026,  IST',            // the same moment, written for people
   count: 10,                                            // how many problem statements are in the PDF
   unlockNow: false,                                     // true = buttons open right now (testing only)
 };
