@@ -64,6 +64,7 @@ const FILE_DEFAULTS = {
   psPdf: PS.pdf || '',
   psCount: Number(PS.count) || 10,
   psAlertText: String(PS.alertText || ''),
+  psAlertText2: String(PS.alertText2 || ''),
   // longer text (Events tab: timeline + detail boxes, Site content tab: banner)
   banner: { on: false, text: '', link: '', linkText: '', until: '', tone: 'info' },
   timeline: TL_DEFAULT,
@@ -117,9 +118,10 @@ const SECTIONS = [
       },
       {
         title: 'Alert strip (amber strip at the top of the Vibe-A-Thon page)',
-        hint: 'To change the date, edit it in the words below and press Save changes. Empty = the usual words. The strip goes away by itself once the problem statement PDF is added and its release time has come.',
+        hint: 'To change the date, edit it in point 1 and press Save changes. Point 1 empty = the usual words. Point 2 is optional: it is shown right after point 1 on the same moving line (empty = only point 1). The strip goes away by itself once the problem statement PDF is added and its release time has come.',
         items: [
-          { key: 'psAlertText', type: 'line', max: 120, label: 'Alert strip words', placeholder: 'Problem Statement tentative publish on 21 Nov, IST', wide: true, hint: 'At most 120 letters.' },
+          { key: 'psAlertText', type: 'line', max: 120, label: 'Point 1', placeholder: 'Problem Statement tentative publish on 21 Nov, IST', wide: true, hint: 'At most 120 letters.' },
+          { key: 'psAlertText2', type: 'line', max: 120, label: 'Point 2 (new)', placeholder: 'Optional. Shown right after point 1.', wide: true, hint: 'At most 120 letters. Shown right after point 1, on the same moving line. Empty = only point 1.' },
         ],
       },
     ],
@@ -570,7 +572,8 @@ export default function AdminAnalytics() {
     if (typeof patch.eventName === 'string' && patch.eventName.length > 60) problems.push('Event name: at most 60 letters.');
     if (typeof patch.eventLink === 'string' && !PDF_LINK_OK(patch.eventLink)) problems.push('Register button link: start it with / (a page of this site) or https://, and use no spaces.');
     if (typeof patch.popupDesc === 'string' && patch.popupDesc.length > 120) problems.push('Popup words: at most 120 letters.');
-    if (typeof patch.psAlertText === 'string' && patch.psAlertText.length > 120) problems.push('Alert strip words: at most 120 letters.');
+    if (typeof patch.psAlertText === 'string' && patch.psAlertText.length > 120) problems.push('Alert strip point 1: at most 120 letters.');
+    if (typeof patch.psAlertText2 === 'string' && patch.psAlertText2.length > 120) problems.push('Alert strip point 2: at most 120 letters.');
     if (typeof patch.popupTheme === 'number' && !(Number.isInteger(patch.popupTheme) && patch.popupTheme >= 0 && patch.popupTheme <= 21)) problems.push('Popup design number: a whole number from 0 to 21.');
     if (typeof patch.popupDelay === 'number' && !(Number.isInteger(patch.popupDelay) && patch.popupDelay >= 0 && patch.popupDelay <= 120)) problems.push('Popup delay: a whole number of seconds from 0 to 120.');
     if (patch.eventDetails) Object.values(patch.eventDetails).forEach((d) => Object.entries(d).forEach(([k, val]) => { if (String(val || '').trim().length > 80) problems.push(`${k}: at most 80 letters.`); }));

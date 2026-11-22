@@ -16,5 +16,6 @@ export const PS = {
   releaseLabel: '22 Nov 2026,  IST',            // the same moment, written for people
   count: 10,                                            // how many problem statements are in the PDF
   alertText: 'Problem Statement tentative publish on 21 Nov, IST',   // words of the amber alert strip (dashboard: Events tab -> Date and time can change them without a deploy)
+  alertText2: '',                                       // optional 2nd point, shown right after the first on the strip ('' = none). Dashboard: Alert strip point 2
   unlockNow: false,                                     // true = buttons open right now (testing only)
 };
