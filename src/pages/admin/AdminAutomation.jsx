@@ -3,20 +3,13 @@ import { useMemo, useState } from 'react';
 import { Fold, KEY_LABELS, Msg, api, describeValue, errorText, istStamp, isoWords, stampWords, useLoad } from './kit';
 
 /* the things that can be scheduled. Each one is a patch of site switches. `banner:` actions use the banner words saved at that moment. */
-function buildActions(presets, banner) {
-  const p = (id) => presets.find((x) => x.id === id);
+function buildActions(banner) {
   const list = [];
-  if (p('vibe')) list.push({ group: 'Switch the whole site', id: 'preset-vibe', label: p('vibe').label, patch: p('vibe').values });
-  if (p('clash')) list.push({ group: 'Switch the whole site', id: 'preset-clash', label: p('clash').label, patch: p('clash').values });
   list.push(
     { group: 'Registration', id: 'vr-on', label: 'Open Vibe-A-Thon registration', patch: { vibeRegistration: true } },
     { group: 'Registration', id: 'vr-off', label: 'Close Vibe-A-Thon registration', patch: { vibeRegistration: false } },
-    { group: 'Registration', id: 'cr-on', label: 'Open Code Clash registration', patch: { codeClashRegistration: true } },
-    { group: 'Registration', id: 'cr-off', label: 'Close Code Clash registration', patch: { codeClashRegistration: false } },
     { group: 'Popups', id: 'vp-on', label: 'Turn the Vibe-A-Thon popup on', patch: { vibePopup: true } },
     { group: 'Popups', id: 'vp-off', label: 'Turn the Vibe-A-Thon popup off', patch: { vibePopup: false } },
-    { group: 'Popups', id: 'cp-on', label: 'Turn the Code Clash popup on', patch: { codeClashPopup: true } },
-    { group: 'Popups', id: 'cp-off', label: 'Turn the Code Clash popup off', patch: { codeClashPopup: false } },
     { group: 'Problem statements', id: 'ps-show', label: 'Show the Problem Statement section', patch: { psShow: true } },
     { group: 'Problem statements', id: 'ps-hide', label: 'Hide the Problem Statement section', patch: { psShow: false } },
     { group: 'Problem statements', id: 'ps-open', label: 'Open the PDF buttons (needs a PDF link)', patch: { psUnlockNow: true } },
@@ -30,9 +23,9 @@ function buildActions(presets, banner) {
 const WHO = { admin: 'You', schedule: 'Schedule' };
 const KIND = { save: 'Saved changes', reset: 'Reset to the code files', scheduled: 'Scheduled change', undo: 'Undo' };
 
-export default function AdminAutomation({ presets, banner, locked, onSettingsChanged }) {
+export default function AdminAutomation({ banner, locked, onSettingsChanged }) {
   const [state, reload] = useLoad(() => api('/api/admin/control'));
-  const actions = useMemo(() => buildActions(presets, banner), [presets, banner]);
+  const actions = useMemo(() => buildActions(banner), [banner]);
   const [actionId, setActionId] = useState('');
   const [at, setAt] = useState(() => istStamp(60));
   const [msg, setMsg] = useState({ type: '', text: '' });

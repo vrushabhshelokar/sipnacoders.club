@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './AdminAnalytics.css';
-import { CODE_CLASH_POPUP, VIBEATHON_POPUP, CODE_CLASH_SECTION } from '../site/eventSwitches';
+import { VIBEATHON_POPUP } from '../site/eventSwitches';
 import * as C from '../site/upcomingConfig';
 import { PS } from '../data/problemStatement';
 import './admin/AdminCenter.css';
@@ -79,10 +79,6 @@ const FILE_DEFAULTS = {
   popupDelay: Math.round((Number(C.POPUP_DELAY) || 0) / 1000),
   popupLogo: null,
   popupDesc: '',
-  // Code Clash
-  codeClashRegistration: true,
-  codeClashPopup: CODE_CLASH_POPUP,
-  codeClashSection: CODE_CLASH_SECTION,
   // Site content tab: links, numbers, words, pictures, lists and past events (admin/siteKeys.js)
   ...SITE_DEFAULTS,
 };
@@ -158,43 +154,6 @@ const SECTIONS = [
         ],
       },
     ],
-  },
-  {
-    id: 'clash',
-    title: 'Code Clash',
-    tag: 'Home page event',
-    link: { href: '/#code-clash', text: 'Open the Code Clash block' },
-    blocks: [
-      {
-        title: 'Registration',
-        items: [
-          { key: 'codeClashRegistration', label: 'Code Clash registration', on: 'Open', off: 'Closed', hint: 'Closed: the Register now button on the Home page becomes "Registration closed".' },
-        ],
-      },
-      {
-        title: 'Popup and Home page block',
-        items: [
-          { key: 'codeClashPopup', label: 'Code Clash popup', on: 'On', off: 'Off', hint: 'Only one popup shows per visit. If both are on, the Code Clash one wins.' },
-          { key: 'codeClashSection', label: 'Code Clash block on the Home page', on: 'Shown', off: 'Hidden', hint: 'Also controls the Code Clash button under the hero buttons and the Code Clash popup.' },
-        ],
-      },
-    ],
-  },
-];
-
-// one click fills in the switches (nothing goes live until "Save changes")
-const PRESETS = [
-  {
-    id: 'vibe',
-    label: 'Code Clash is over: show Vibe-A-Thon',
-    hint: 'Code Clash popup, Home page block and registration go off. Vibe-A-Thon popup and Upcoming card go on.',
-    values: { codeClashPopup: false, codeClashSection: false, codeClashRegistration: false, vibePopup: true, upcomingShow: true },
-  },
-  {
-    id: 'clash',
-    label: 'Back to Code Clash mode',
-    hint: 'Code Clash popup, Home page block and registration go on. The Vibe-A-Thon popup goes off.',
-    values: { codeClashPopup: true, codeClashSection: true, codeClashRegistration: true, vibePopup: false },
   },
 ];
 
@@ -552,13 +511,6 @@ export default function AdminAnalytics() {
     setDraft((d) => ({ ...(d || effective), [key]: value }));
   };
 
-  // fills in the switches of a quick switch; nothing is saved until "Save changes"
-  const applyPreset = (preset) => {
-    setSaveMsg({ type: '', text: '' });
-    setConfirmReset(false);
-    setDraft((d) => ({ ...(d || effective), ...preset.values }));
-  };
-
   const postSettings = async (patch) => {
     setSaving(true);
     setSaveMsg({ type: '', text: '' });
@@ -859,19 +811,7 @@ export default function AdminAnalytics() {
             {active === 'events' && role === 'admin' && (
               <section className="ad-panel ad-controls" aria-labelledby="ad-h-ctl">
                 <h2 id="ad-h-ctl">Events</h2>
-                <p className="ad-sub">Everything about Vibe-A-Thon and Code Clash, grouped by event. Change the live site without a deploy. Anything you do not change keeps the value written in the code files.</p>
-
-                <div className="ad-presets" role="group" aria-label="Quick switch between events">
-                  <div className="ad-presets-text">
-                    <strong>Quick switch</strong>
-                    <span>Fills in the switches for you. Nothing goes live until you press Save changes.</span>
-                  </div>
-                  <div className="ad-presets-btns">
-                    {PRESETS.map((p) => (
-                      <button key={p.id} type="button" className="ad-chip" title={p.hint} onClick={() => applyPreset(p)} disabled={saving}>{p.label}</button>
-                    ))}
-                  </div>
-                </div>
+                <p className="ad-sub">Everything about Vibe-A-Thon. Change the live site without a deploy. Anything you do not change keeps the value written in the code files.</p>
 
                 {SECTIONS.map((s) => (
                   <div className="ad-sec" key={s.id} role="group" aria-labelledby={`ad-sec-${s.id}`}>
@@ -915,7 +855,7 @@ export default function AdminAnalytics() {
                 ))}
 
                 <p className="ad-note ad-note-tight">
-                  The event name, banner, details and popup (design, delay, logo) are in the Upcoming event tab. Still in the code files (they rarely change): the Two-Round Event Flow words, the Code Clash words, and fees or dates that are written inside other sections (prize pool, event snapshot, sticky bar). They live in <code>src/site/upcomingConfig.js</code>, <code>src/site/eventSwitches.js</code> and <code>src/data/vibeathonData.js</code>.
+                  The event name, banner, details and popup (design, delay, logo) are in the Upcoming event tab. Still in the code files (they rarely change): the Two-Round Event Flow words, and fees or dates that are written inside other sections (prize pool, event snapshot, sticky bar). They live in <code>src/site/upcomingConfig.js</code>, <code>src/site/eventSwitches.js</code> and <code>src/data/vibeathonData.js</code>.
                 </p>
 
                 <div className="ad-resetrow">
@@ -930,7 +870,6 @@ export default function AdminAnalytics() {
 
             {active === 'automation' && role === 'admin' && (
               <AdminAutomation
-                presets={PRESETS}
                 banner={effective.banner}
                 locked={dirty}
                 onSettingsChanged={(s) => { setOverrides(s || {}); setDraft(null); }}

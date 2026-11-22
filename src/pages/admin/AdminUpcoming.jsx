@@ -244,7 +244,7 @@ export default function AdminUpcoming({ view, edit, overrides, changed }) {
         </div>
 
         <SwitchLine id="upcomingShow" label="Upcoming card, menu number and popup" hint="Off: the Upcoming page shows the quiet 'coming soon' panel and no popup comes." on="Live" off="Off" checked={!!view.upcomingShow} onChange={(v) => edit('upcomingShow', v)} />
-        <SwitchLine id="vibePopup" label="Popup for this event" hint="Only one popup shows per visit. While the Code Clash popup is on, that one wins." on="On" off="Off" checked={!!view.vibePopup} onChange={(v) => edit('vibePopup', v)} />
+        <SwitchLine id="vibePopup" label="Popup for this event" hint="The announcement popup that takes visitors to the Vibe-A-Thon page." on="On" off="Off" checked={!!view.vibePopup} onChange={(v) => edit('vibePopup', v)} />
       </Panel>
 
       <Panel {...panel('details')} summary={summary.details} title={`Details of the ${TYPES.find(([id]) => id === type)[1].toLowerCase()}`} badge={mark(['eventDetails', 'details'])} sub="The boxes a visitor unlocks with Try to decrypt on the card. Each kind of event keeps its own words, so you can switch type and come back.">

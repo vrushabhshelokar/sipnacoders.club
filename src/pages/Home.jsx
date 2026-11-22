@@ -4,8 +4,6 @@ import { Odometer, Reveal, SectionHead, useInView, useIntroDone } from '../site/
 import HeroArt from '../site/HeroArt';
 import { PastBento } from '../site/events';
 import { ToolStrip, Wins, Voices, Faq, Ambassadors } from '../site/Sections';
-import CodeClash from '../site/CodeClash';
-import LiveEvent from '../site/LiveEvent';
 import { CountBubble, FoundMessage, upcomingLabel, useUpcomingCount } from '../site/UpcomingFound';
 import RegOpen from '../site/RegOpen';
 import FitPoster from '../site/FitPoster';
@@ -21,11 +19,7 @@ export default function Home() {
     <>
       <Hero />
 
-      <LiveEvent />
-
       <Ambassadors />
-
-      <CodeClash />
 
       <section id="join" className="s-section">
         <div className="s-container">
