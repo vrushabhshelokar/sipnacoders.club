@@ -27,6 +27,20 @@
   background: repeating-linear-gradient(135deg, var(--pa) 0 9px, #1a1306 9px 18px);
 }
 
+/* the matching end cap on the right: the words slide in under the slanted edge of the ALERT badge and out under this one,
+   so the strip has clean ends (no faded, blurry rectangles at the sides) */
+.pa::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 22px;
+  background: var(--pa);
+  clip-path: polygon(12px 0, 100% 0, 100% 100%, 0 100%);
+}
+
 .pa-badge {
   position: relative;
   z-index: 1;
@@ -53,8 +67,7 @@
   display: flex;
   align-items: center;
   padding-top: 4px;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 94%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 4%, #000 94%, transparent);
+  margin-left: -12px;   /* starts under the slanted edge of the ALERT badge: no gap, no fade */
 }
 
 .pa-move {
@@ -122,7 +135,8 @@
   }
   .pa::before { height: 3px; }
   .pa-badge { gap: 6px; padding: 3px 14px 0 12px; padding-right: 20px; letter-spacing: 0.12em; clip-path: polygon(0 0, 100% 0, calc(100% - 9px) 100%, 0 100%); }
-  .pa-track { padding-top: 3px; }
+  .pa-track { padding-top: 3px; margin-left: -9px; }
+  .pa::after { width: 16px; clip-path: polygon(9px 0, 100% 0, 100% 100%, 0 100%); }
   .pa-row li { gap: 20px; padding-right: 20px; }
   .pa-sep { width: 16px; }
 }
@@ -161,8 +175,9 @@ body:has(.sb-pill) .pa { margin-top: 36px; }
   .pa-calm .pa-row[aria-hidden='true'] { display: none; }
   .pa-calm .pa-row { flex: 1 1 auto; min-width: 0; }
   .pa-calm .pa-row li:nth-child(2) { display: none; }
-  .pa-calm .pa-track { -webkit-mask-image: none; mask-image: none; padding: 7px 12px 6px; }
-  .pa-calm .pa-row li { flex: 1 1 auto; min-width: 0; padding-right: 0; white-space: normal; }
+  .pa-calm .pa-track { margin-left: 0; padding: 7px 12px 6px; }
+  .pa-calm::after { display: none; }
+  .pa-calm .pa-row li { flex: 1 1 auto; flex-wrap: wrap; row-gap: 4px; min-width: 0; padding-right: 0; white-space: normal; }
   .pa-calm .pa-sep { display: none; }
   .pa-calm .pa-text { line-height: 1.35; }
 }

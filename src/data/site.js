@@ -101,15 +101,6 @@ export const pastEvents = [
     images: [],
   },
   {
-    id: 'code-clash',
-    title: 'Code Clash',
-    category: 'Online Contest',
-    date: '21 NOV 2026',
-    sortDate: '2026-11-21',
-    description: 'An online coding competition in collaboration with HackerRank and Sipna Coders Club.',
-    images: [],
-  },
-  {
     id: 'gemini-build-night',
     title: 'Fund My Crazy – Build Night with Gemini',
     category: 'Online Build Night',

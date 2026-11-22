@@ -99,7 +99,7 @@ export const INT_KEYS = { psCount: [1, 99], popupTheme: [0, 21], popupDelay: [0,
 export const LINK_KEYS = ['psPdf', 'eventLink'];                                                              // /file-in-public-folder.pdf or https://...
 export const OBJECT_KEYS = ['banner', 'timeline', 'details', 'eventDetails', 'eventPoints', 'eventBanners', 'popupLogo', 'siteLinks', 'siteStats', 'siteText', 'sitePictures', 'faq', 'voices', 'wins', 'joinSteps', 'tracks', 'tools', 'pastEvents'];                                    // longer content (see the clean functions below)
 export const ENUM_KEYS = { eventType: ['hackathon', 'workshop', 'online'] };       // one of these words
-export const TEXT_KEYS = { eventName: 60, popupDesc: 120, psAlertText: 120 };                         // one line of text, at most this long
+export const TEXT_KEYS = { eventName: 60, popupDesc: 120, psAlertText: 120, psAlertText2: 120 };                         // one line of text, at most this long
 export const ALL_SETTING_KEYS = [...BOOL_KEYS, ...DATE_KEYS, ...Object.keys(INT_KEYS), ...LINK_KEYS, ...OBJECT_KEYS, ...Object.keys(ENUM_KEYS), ...Object.keys(TEXT_KEYS), 'currentRound'];
 
 const DATE_RE = /^\d{4}-\d\d-\d\dT\d\d:\d\d$/;

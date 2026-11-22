@@ -6,7 +6,6 @@ The website is a JavaScript app, so its pages only show their full content in a 
 
 ## Upcoming events
 
-- [Code Clash](https://sipnacoders.club/#code-clash): online coding competition on HackerRank, 21 November 2026, 2 PM to 4 PM IST. Two rounds, any programming language, solo entry, open to all engineering students, registration fee Rs 49. Under HackerRank Campus Crew, in association with Sipna Coders Club. Every participant gets a certificate. Register: https://forms.gle/b1sEdP7bd2VGTysDA
 - [Vibe-A-Thon](https://sipnacoders.club/upcoming): hackathon by Sipna Coders Club. The final round is on campus at Sipna COET, Amravati, on 26 and 27 December 2026. Register: https://sipnacoders.club/register
 
 ## Pages

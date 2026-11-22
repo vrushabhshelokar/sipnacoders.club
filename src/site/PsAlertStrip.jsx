@@ -1,11 +1,13 @@
 // Vibe-A-Thon page: a small amber ALERT strip at the very top of the page (just under the menu bar, above the big card), telling people the problem statements are coming.
-// The words come from the dashboard (Events tab -> Date and time -> Alert strip words) or, when that is empty, from alertText in src/data/problemStatement.js.
+// The words come from the dashboard (Events tab -> Date and time -> Alert strip) or, when point 1 is empty, from alertText in src/data/problemStatement.js.
+// There can be a second point (dashboard: Alert strip point 2, or alertText2 in problemStatement.js). It is shown right after point 1 on the same moving line.
 // The strip goes away by itself once the problem statement PDF is added and its release time has come.
 // It is mounted in src/pages/Upcoming.jsx and only shows on the Vibe-A-Thon (hackathon) page.
 // To remove the strip, delete <PsAlertStrip /> in src/pages/Upcoming.jsx.
 //
 // People whose phone/PC has "reduce motion" / "remove animations" turned ON still see the strip moving, only slower.
 // To make it a still, centered notice for those people, set FOLLOW_REDUCED_MOTION to true.
+import { Fragment } from 'react';
 import { PS } from '../data/problemStatement';
 import { useSwitch } from './liveSettings';
 import { psRelease } from './psRelease';
@@ -27,7 +29,8 @@ export default function PsAlertStrip() {
   const show = useSwitch('psShow', true);
   const pdf = String(useSwitch('psPdf', PS.pdf) || '').trim();
   const unlockNow = useSwitch('psUnlockNow', PS.unlockNow);
-  const alertOwn = String(useSwitch('psAlertText', PS.alertText || '') || '').trim();   // words from the dashboard (or alertText in problemStatement.js)
+  const alertOwn = String(useSwitch('psAlertText', PS.alertText || '') || '').trim();   // point 1: words from the dashboard (or alertText in problemStatement.js)
+  const alertOwn2 = String(useSwitch('psAlertText2', PS.alertText2 || '') || '').trim();   // point 2 (optional): shown right after point 1
   const rel = psRelease();
 
   // same rule as the Problem Statement section: published = the PDF is added AND the time has come
@@ -39,12 +42,18 @@ export default function PsAlertStrip() {
   const when = String(rel.label || '').replace(/\s\d{4}(?=,)/, '').trim();
   const text = alertOwn || (when ? `Problem Statement tentative publish on ${when}` : 'Problem Statement will be published soon');
 
+  const points = [text, alertOwn2].filter(Boolean);   // point 1, then point 2 when it is written
+
   const row = (hidden) => (
     <ul className="pa-row" aria-hidden={hidden || undefined}>
       {[0, 1].map((n) => (
         <li key={n} aria-hidden={n > 0 ? 'true' : undefined}>
-          <span className="pa-text">{text}</span>
-          <i className="pa-sep" aria-hidden="true" />
+          {points.map((pt, i) => (
+            <Fragment key={i}>
+              <span className="pa-text">{pt}</span>
+              <i className="pa-sep" aria-hidden="true" />
+            </Fragment>
+          ))}
         </li>
       ))}
     </ul>
