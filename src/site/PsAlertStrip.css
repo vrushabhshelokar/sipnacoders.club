@@ -1,183 +1,110 @@
-/* Problem Statement alert strip (site/PsAlertStrip.jsx): amber "caution" theme, bigger on laptops, small on phones. */
+
+.pa-wrap {
+  margin: 10px auto 14px;
+}
+
 .pa {
-  --pa: #ffb454;
-  --pa-rgb: 255, 180, 84;
-  --pa-t: 34s;        /* time for one full turn */
-  --pa-slow: 1;       /* 1 = normal. People who asked their device for less motion get a slower strip. */
-  --pa-h: 50px;
-  --pa-fs: 16px;
-  position: relative;
+  height: 34px;
   display: flex;
-  align-items: stretch;
-  height: var(--pa-h);
-  margin: 0 0 20px;
-  border-bottom: 1px solid rgba(var(--pa-rgb), 0.45);
-  background: linear-gradient(90deg, rgba(var(--pa-rgb), 0.2), rgba(var(--pa-rgb), 0.1) 45%, rgba(var(--pa-rgb), 0.18));
-  box-shadow: 0 0 28px -8px rgba(var(--pa-rgb), 0.35);
-}
-
-/* a thin caution-tape line along the top edge */
-.pa::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 4px;
-  background: repeating-linear-gradient(135deg, var(--pa) 0 9px, #1a1306 9px 18px);
-}
-
-/* the matching end cap on the right: the words slide in under the slanted edge of the ALERT badge and out under this one,
-   so the strip has clean ends (no faded, blurry rectangles at the sides) */
-.pa::after {
-  content: '';
-  position: absolute;
-  z-index: 1;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 22px;
-  background: var(--pa);
-  clip-path: polygon(12px 0, 100% 0, 100% 100%, 0 100%);
-}
-
-.pa-badge {
-  position: relative;
-  z-index: 1;
-  flex: none;
-  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 4px 18px 0;
-  background: var(--pa);
-  color: #1a1204;
-  font: 700 calc(var(--pa-fs) - 2px) / 1 var(--cy-hud, 'Chakra Petch', system-ui, sans-serif);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
-  padding-right: 26px;
+  gap: 10px;
+  overflow: hidden;
+  padding: 0 14px;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 6px;
+  background: rgba(245, 158, 11, 0.045);
+  color: #eab65c;
 }
-.pa-badge b { font-weight: 700; }
-.pa-badge svg { width: calc(var(--pa-fs) + 2px); height: calc(var(--pa-fs) + 2px); flex: none; }
+
+.pa-indicator {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 6px;
+  border-radius: 50%;
+  background: #f5ad32;
+  box-shadow: 0 0 8px rgba(245, 173, 50, 0.45);
+}
 
 .pa-track {
-  flex: 1 1 auto;
+  flex: 1;
   min-width: 0;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  padding-top: 4px;
-  margin-left: -12px;   /* starts under the slanted edge of the ALERT badge: no gap, no fade */
 }
 
 .pa-move {
   display: flex;
   width: max-content;
-  animation: pa-slide calc(var(--pa-t) * var(--pa-slow)) linear infinite;
-  will-change: transform;
-}
-
-/* pause while a mouse is over it (not on phones: a tap there would freeze it) */
-@media (hover: hover) and (pointer: fine) {
-  .pa-track:hover .pa-move { animation-play-state: paused; }
+  animation: pa-scroll 24s linear infinite;
 }
 
 .pa-row {
   display: flex;
-  flex: none;
   align-items: center;
-  margin: 0;
-  padding: 0;
+  flex-shrink: 0;
   list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .pa-row li {
-  display: inline-flex;
-  flex: none;
+  display: flex;
   align-items: center;
-  gap: 28px;
+  flex-shrink: 0;
+  gap: 14px;
   padding-right: 28px;
   white-space: nowrap;
 }
 
 .pa-text {
-  font: 700 var(--pa-fs) / 1.2 var(--cy-hud, 'Chakra Petch', system-ui, sans-serif);
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: #ffe6bd;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.025em;
 }
 
-/* three small slashes between the messages (same "///" look as the Round 1 heading) */
 .pa-sep {
-  flex: none;
-  display: inline-block;
-  width: 22px;
-  height: calc(var(--pa-fs) - 2px);
-  background: repeating-linear-gradient(115deg, var(--pa) 0 3px, transparent 3px 8px);
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(245, 173, 50, 0.55);
 }
 
-@keyframes pa-slide {
-  to { transform: translate3d(-33.3333%, 0, 0); }
+@keyframes pa-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-33.333%);
+  }
 }
 
-/* tablets */
-@media (max-width: 1000px) {
-  .pa { --pa-h: 44px; --pa-fs: 14px; --pa-t: 30s; margin-bottom: 16px; }
+.pa-calm .pa-move {
+  animation: none;
+  width: 100%;
+  justify-content: center;
 }
 
-/* phones: small, edge to edge */
-@media (max-width: 640px) {
+.pa-calm .pa-row[aria-hidden="true"] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pa-move {
+    animation-duration: 60s;
+  }
+}
+
+@media (max-width: 600px) {
+  .pa-wrap {
+    margin: 8px auto 10px;
+  }
+
   .pa {
-    --pa-h: 34px;
-    --pa-fs: 11.5px;
-    --pa-t: 28s;
-    margin: 0 calc(50% - 50vw) 14px;
+    height: 32px;
+    padding: 0 10px;
+    gap: 8px;
   }
-  .pa::before { height: 3px; }
-  .pa-badge { gap: 6px; padding: 3px 14px 0 12px; padding-right: 20px; letter-spacing: 0.12em; clip-path: polygon(0 0, 100% 0, calc(100% - 9px) 100%, 0 100%); }
-  .pa-track { padding-top: 3px; margin-left: -9px; }
-  .pa::after { width: 16px; clip-path: polygon(9px 0, 100% 0, 100% 100%, 0 100%); }
-  .pa-row li { gap: 20px; padding-right: 20px; }
-  .pa-sep { width: 16px; }
-}
 
-/* The announcement banner from the dashboard floats just under the menu bar. While it is showing, this strip moves down
-   so the banner does not cover it (the room goes away by itself when there is no banner, or the visitor closes it). */
-body:has(.sb-pill) .pa { margin-top: 36px; }
-@media (max-width: 640px) {
-  body:has(.sb-pill) .pa { margin-top: 62px; }
-}
-
-/* On phones the big card fills the whole first screen (UpcomingClean.css). With this strip above it, the card gets
-   the same amount of height less, so it still fits between the menu bar and the bottom dock.
-   (strip height + gap below it: 44 + 16 on tablets, 34 + 14 on phones. The card text scale --u gets 62px less, so the
-   bottom of the card lands where it was before the strip was added.) */
-@media (max-width: 768px) {
-  .up-cy-named #upcoming > .pa-wrap + .s-container > .rv:first-child { min-height: calc(100vh - 78px - 60px); min-height: calc(100svh - 78px - 60px); }
-}
-@media (max-width: 640px) {
-  .up-cy-named #upcoming > .pa-wrap + .s-container > .rv:first-child { min-height: calc(100vh - 78px - 48px); min-height: calc(100svh - 78px - 48px); --u: 1px; }
-  @supports (height: 1svh) {
-    .up-cy-named #upcoming > .pa-wrap + .s-container > .rv:first-child { --u: clamp(.8px, calc((100svh - 62px) / 844), 1.12px); }
+  .pa-text {
+    font-size: 10px;
   }
-  .up-cy .pa-wrap + .s-container .cy { min-height: calc(100vh - 156px - 48px); min-height: calc(100svh - 156px - 48px); }
-}
-
-/* "reduce motion" / "remove animations" is ON: same strip, just much slower */
-@media (prefers-reduced-motion: reduce) {
-  .pa { --pa-slow: 2.6; }
-}
-
-/* optional (FOLLOW_REDUCED_MOTION = true in PsAlertStrip.jsx): a still, centered notice for those people */
-@media (prefers-reduced-motion: reduce) {
-  .pa-calm { height: auto; min-height: var(--pa-h); }
-  .pa-calm .pa-move { animation: none; width: auto; flex: 1 1 auto; min-width: 0; }
-  .pa-calm .pa-row[aria-hidden='true'] { display: none; }
-  .pa-calm .pa-row { flex: 1 1 auto; min-width: 0; }
-  .pa-calm .pa-row li:nth-child(2) { display: none; }
-  .pa-calm .pa-track { margin-left: 0; padding: 7px 12px 6px; }
-  .pa-calm::after { display: none; }
-  .pa-calm .pa-row li { flex: 1 1 auto; flex-wrap: wrap; row-gap: 4px; min-width: 0; padding-right: 0; white-space: normal; }
-  .pa-calm .pa-sep { display: none; }
-  .pa-calm .pa-text { line-height: 1.35; }
 }

@@ -60,20 +60,21 @@ export default function PsAlertStrip() {
   );
 
   return (
-    <div className="s-container pa-wrap">
-      <div className={FOLLOW_REDUCED_MOTION ? 'pa pa-calm' : 'pa'} role="note" aria-label="Notice about the problem statement release">
-        <span className="pa-badge">
-          <WarnIcon />
-          <b>Alert</b>
-        </span>
-        <div className="pa-track">
-          <div className="pa-move">
-            {row(false)}
-            {row(true)}
-            {row(true)}
-          </div>
+     <div className="s-container pa-wrap">
+    <div
+      className={FOLLOW_REDUCED_MOTION ? 'pa pa-calm' : 'pa'}
+      role="note"
+      aria-label="Problem statement announcement"
+    >
+      <span className="pa-indicator" aria-hidden="true" />
+      <div className="pa-track">
+        <div className="pa-move">
+          {row(false)}
+          {row(true)}
+          {row(true)}
         </div>
       </div>
     </div>
+  </div>
   );
 }
