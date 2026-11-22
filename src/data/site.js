@@ -33,6 +33,9 @@ import FunNight_1 from '../assets/events/gemini_funnight_1.webp';
 import FunNight_2 from '../assets/events/gemini_funnight_2.webp';
 import FunNight_3 from '../assets/events/gemini_funnight_3.webp';
 import FunNight_4 from '../assets/events/gemini_funnight_4.webp';
+import CodeClash_1 from '../assets/events/code_clash_1.avif';
+import CodeClash_2 from '../assets/events/code_clash_2.avif';
+import CodeClash_3 from '../assets/events/code_clash_3.avif';
 
 import ashay from '../assets/people/ashay.webp';
 import vrushabh from '../assets/people/vrush.webp';
@@ -99,6 +102,15 @@ export const pastEvents = [
     sortDate: '2026-12-26',
     description: 'Our 18-hour AI build-a-thon, with an online round and an on-campus finale.',
     images: [],
+  },
+  {
+    id: 'code-clash',
+    title: 'Code Clash',
+    category: 'Online Contest',
+    date: '21 NOV 2026',
+    sortDate: '2026-11-21',
+    description: 'An online coding competition in collaboration with HackerRank and Sipna Coders Club.',
+    images: [CodeClash_1, CodeClash_2, CodeClash_3],
   },
   {
     id: 'gemini-build-night',
