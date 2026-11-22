@@ -63,6 +63,7 @@ const FILE_DEFAULTS = {
   psReleaseAt: PS_STAMP,
   psPdf: PS.pdf || '',
   psCount: Number(PS.count) || 10,
+  psAlertText: String(PS.alertText || ''),
   // longer text (Events tab: timeline + detail boxes, Site content tab: banner)
   banner: { on: false, text: '', link: '', linkText: '', until: '', tone: 'info' },
   timeline: TL_DEFAULT,
@@ -102,6 +103,32 @@ const PDF_LINK_OK = (v) => /^(\/(?!\/)[^\s"'<>\\]+|https:\/\/[^\s"'<>\\]+)$/.tes
 /* The controls, grouped by event. type: 'switch' (default) | 'date' | 'select' | 'text' | 'number' */
 const SECTIONS = [
   {
+    id: 'dates',
+    title: 'Date and time',
+    tag: 'Vibe-A-Thon only',
+    link: { href: '/upcoming', text: 'Open the Vibe-A-Thon page' },
+    blocks: [
+      {
+        title: 'Vibe-A-Thon dates and times (Indian time)',
+        hint: 'Leave a date empty to use the one written in the code files.',
+        items: [
+          { key: 'eventStart', type: 'date', label: 'Event start', hint: 'The big card counts down to this moment. The same box is in the Upcoming event tab.' },
+          { key: 'psReleaseAt', type: 'date', label: 'Problem statement PDF release time', hint: 'Before this moment View PS and Download are locked and show a countdown. The Timeline row on the page follows it.' },
+          { key: 'currentRound', type: 'select', label: 'Current round', options: [[1, 'Round 1'], [2, 'Round 2']] },
+          { key: 'roundEnd1', type: 'date', label: 'Round 1 ends' },
+          { key: 'roundEnd2', type: 'date', label: 'Round 2 ends' },
+        ],
+      },
+      {
+        title: 'Alert strip (amber strip at the top of the Vibe-A-Thon page)',
+        hint: 'To change the date, edit it in the words below and press Save changes. Empty = the usual words. The strip goes away by itself once the problem statement PDF is added and its release time has come.',
+        items: [
+          { key: 'psAlertText', type: 'line', max: 120, label: 'Alert strip words', placeholder: 'Problem Statement tentative publish on 21 Nov, IST', wide: true, hint: 'At most 120 letters.' },
+        ],
+      },
+    ],
+  },
+  {
     id: 'vibe',
     title: 'Vibe-A-Thon',
     tag: 'Upcoming event',
@@ -121,21 +148,11 @@ const SECTIONS = [
         ],
       },
       {
-        title: 'Countdown and rounds (Indian time)',
-        hint: 'The two-round design counts down to the end of the current round. The event start itself is set in the Upcoming event tab. Leave a date empty to use the code file.',
-        items: [
-          { key: 'currentRound', type: 'select', label: 'Current round', options: [[1, 'Round 1'], [2, 'Round 2']] },
-          { key: 'roundEnd1', type: 'date', label: 'Round 1 ends' },
-          { key: 'roundEnd2', type: 'date', label: 'Round 2 ends' },
-        ],
-      },
-      {
         title: 'Problem statements (Round 1 briefing)',
         hint: 'The "Problem Statement Release" section with the View PS and Download buttons. The buttons open by themselves at the release time, once a PDF link is set.',
         items: [
           { key: 'psShow', label: 'Problem Statement Release section', on: 'Shown', off: 'Hidden', hint: 'Hides the whole section on the Vibe-A-Thon page.' },
           { key: 'psUnlockNow', label: 'Open the PDF buttons right now', on: 'Open now', off: 'On schedule', hint: 'Opens View PS and Download at once, before the release time. Needs the PDF link below.' },
-          { key: 'psReleaseAt', type: 'date', label: 'PDF release time (Indian time)', hint: 'Before this moment the buttons are locked and show a countdown. The Timeline row on the page follows it.' },
           { key: 'psPdf', type: 'text', label: 'PDF link', placeholder: '/Vibe-A-Thon-Problem-Statements.pdf or https://...', wide: true, hint: 'A file from the public folder (starts with /) or a full https:// link. A link to another website opens in a new tab, it cannot be saved with the Download button.' },
           { key: 'psCount', type: 'number', label: 'How many problem statements', min: 1, max: 99 },
         ],
@@ -211,6 +228,8 @@ function FieldInput({ it, view, overrides, edit }) {
     );
   } else if (it.type === 'date') {
     input = <input id={id} type="datetime-local" value={value} onChange={(e) => edit(it.key, e.target.value)} />;
+  } else if (it.type === 'line') {
+    input = <input id={id} type="text" maxLength={it.max || 120} autoComplete="off" placeholder={it.placeholder || ''} value={value} onChange={(e) => edit(it.key, e.target.value)} />;
   } else if (it.type === 'number') {
     input = <input id={id} type="number" inputMode="numeric" min={it.min} max={it.max} step="1" value={value} onChange={(e) => edit(it.key, e.target.value === '' ? '' : Number(e.target.value))} />;
   } else {
@@ -599,6 +618,7 @@ export default function AdminAnalytics() {
     if (typeof patch.eventName === 'string' && patch.eventName.length > 60) problems.push('Event name: at most 60 letters.');
     if (typeof patch.eventLink === 'string' && !PDF_LINK_OK(patch.eventLink)) problems.push('Register button link: start it with / (a page of this site) or https://, and use no spaces.');
     if (typeof patch.popupDesc === 'string' && patch.popupDesc.length > 120) problems.push('Popup words: at most 120 letters.');
+    if (typeof patch.psAlertText === 'string' && patch.psAlertText.length > 120) problems.push('Alert strip words: at most 120 letters.');
     if (typeof patch.popupTheme === 'number' && !(Number.isInteger(patch.popupTheme) && patch.popupTheme >= 0 && patch.popupTheme <= 21)) problems.push('Popup design number: a whole number from 0 to 21.');
     if (typeof patch.popupDelay === 'number' && !(Number.isInteger(patch.popupDelay) && patch.popupDelay >= 0 && patch.popupDelay <= 120)) problems.push('Popup delay: a whole number of seconds from 0 to 120.');
     if (patch.eventDetails) Object.values(patch.eventDetails).forEach((d) => Object.entries(d).forEach(([k, val]) => { if (String(val || '').trim().length > 80) problems.push(`${k}: at most 80 letters.`); }));

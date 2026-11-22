@@ -1,5 +1,5 @@
 // Vibe-A-Thon page: a small amber ALERT strip at the very top of the page (just under the menu bar, above the big card), telling people the problem statements are coming.
-// The date is NOT written here. It is the "releaseLabel" in src/data/problemStatement.js (or the time set in the dashboard), so there is one place to change.
+// The words come from the dashboard (Events tab -> Date and time -> Alert strip words) or, when that is empty, from alertText in src/data/problemStatement.js.
 // The strip goes away by itself once the problem statement PDF is added and its release time has come.
 // It is mounted in src/pages/Upcoming.jsx and only shows on the Vibe-A-Thon (hackathon) page.
 // To remove the strip, delete <PsAlertStrip /> in src/pages/Upcoming.jsx.
@@ -27,6 +27,7 @@ export default function PsAlertStrip() {
   const show = useSwitch('psShow', true);
   const pdf = String(useSwitch('psPdf', PS.pdf) || '').trim();
   const unlockNow = useSwitch('psUnlockNow', PS.unlockNow);
+  const alertOwn = String(useSwitch('psAlertText', PS.alertText || '') || '').trim();   // words from the dashboard (or alertText in problemStatement.js)
   const rel = psRelease();
 
   // same rule as the Problem Statement section: published = the PDF is added AND the time has come
@@ -36,7 +37,7 @@ export default function PsAlertStrip() {
 
   // '21 Nov 2026, 8:00 PM IST' -> '21 Nov, 8:00 PM IST'
   const when = String(rel.label || '').replace(/\s\d{4}(?=,)/, '').trim();
-  const text = when ? `Problem Statement tentative publish on ${when}` : 'Problem Statement will be published soon';
+  const text = alertOwn || (when ? `Problem Statement tentative publish on ${when}` : 'Problem Statement will be published soon');
 
   const row = (hidden) => (
     <ul className="pa-row" aria-hidden={hidden || undefined}>
