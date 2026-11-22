@@ -15,6 +15,6 @@ export const PS = {
   releaseAt: '2026-11-21T20:00:00+05:30',               // when the buttons switch on (21 Nov 2026, 8:00 PM IST, same as the Timeline)
   releaseLabel: ' ? Nov 2026,  IST',            // the same moment, written for people
   count: 10,                                            // how many problem statements are in the PDF
-  alertText: 'Problem Statement tentative publish on 21 Nov, IST',   // words of the amber alert strip (dashboard: Events tab -> Date and time can change them without a deploy)
+  alertText: 'Problem Statement Revel Soon',   // words of the amber alert strip (dashboard: Events tab -> Date and time can change them without a deploy)
   unlockNow: false,                                     // true = buttons open right now (testing only)
 };
