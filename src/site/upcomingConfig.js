@@ -47,7 +47,7 @@ export const ROUND_END = { 1: '', 2: '' };     // when Round 1 ends, when Round 
 // A box left '' stays "Will be revealed soon". Type a detail and "Try to decrypt" types it out in its box.
 // Only the block of your EVENT_TYPE is used. Examples: Format '18 hours', Team size '4 members', Venue 'Seminar Hall'.
 export const DETAILS = {
-  hackathon: { Format: '18-hour build-a-thon', Rounds: '2 (online + offline)', 'Team size': '1 to 4 members', Theme: 'AI & vibe coding', Prizes: '₹40,000+ cash And HackerRank suprizes' },
+  hackathon: { Format: '18-hour build-a-thon', Rounds: '2 (online + offline)', 'Team size': '1 to 4 members', Theme: 'AI & vibe coding', Prizes: '₹50,000+ cash And HackerRank suprizes' },
   workshop: { Topic: '', Speaker: '', Duration: '', Venue: '', Seats: '', Registration: '' },
   online: { Platform: '', Host: '', Duration: '', 'Join link': '', Certificate: '', Registration: '' },
 };
