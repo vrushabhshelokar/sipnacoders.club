@@ -113,7 +113,7 @@ export const EVENT_JOURNEY = [
     'Selected teams check in at Sipna COET on 26 Dec, 10 AM',
     'The 18-hour hackathon starts at 2:00 PM',
     'Live project presentations on 27 Dec, 10 AM',
-    'Prize distribution of ₹40,000+ on 27 Dec, 2 PM',
+    'Prize distribution of ₹50,000+ on 27 Dec, 2 PM',
   ],
 },
 ];
@@ -187,7 +187,7 @@ export const RULEBOOK_CATEGORIES = [
     tag: 'EVAL_MATRIX',
     title: 'Judging & Rewards',
     icon: 'Trophy',
-    intro: 'Compete for ₹40,000+ in cash prizes and exclusive HackerRank winner perks.',
+    intro: 'Compete for ₹50,000+ in cash prizes and exclusive HackerRank winner perks.',
     points: [
       'Projects are evaluated on Innovation, Technical Architecture, Execution, AI Implementation, and Live Demo.',
       'Judging panel decisions are definitive and binding.',
@@ -295,7 +295,7 @@ export const PARTICIPANT_TIERS = [
     certBadge: 'CASH + PERKS',
     certType: 'Physical Trophy & Cash',
     rewards: [
-      'Cash prizes from ₹40,000+ pool (₹25,000 1st / ₹10,000 2nd / ₹5,000 3rd)',
+      'Cash prizes from ₹50,000+ pool (₹25,000 1st / ₹10,000 2nd / ₹5,000 3rd)',
       'HackerRank Infinity Subscription',
       'Mock Interview Credits',
       'Official HackerRank Goodies & Access to 1,500+ AI Tools',
