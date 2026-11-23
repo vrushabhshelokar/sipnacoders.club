@@ -111,7 +111,6 @@ export const KEY_LABELS = {
   vibeRegistration: 'Vibe-A-Thon registration', vibePopup: 'Vibe-A-Thon popup', upcomingShow: 'Upcoming card and menu number', flowShow: 'Event Flow section',
   hideAfter: 'Hide card and popup after', eventStart: 'Event start', currentRound: 'Current round', roundEnd1: 'Round 1 ends', roundEnd2: 'Round 2 ends',
   psShow: 'Problem Statement section', psUnlockNow: 'PDF buttons open now', psReleaseAt: 'PDF release time', psAlertText: 'Alert strip point 1', psAlertText2: 'Alert strip point 2', psPdf: 'PDF link', psCount: 'Number of problem statements',
-  codeClashRegistration: 'Code Clash registration', codeClashPopup: 'Code Clash popup', codeClashSection: 'Code Clash block on Home',
   banner: 'Announcement banner', timeline: 'Timeline rows', details: 'Detail boxes',
   eventType: 'Kind of event', eventName: 'Event name', eventLink: 'Register button link', eventDetails: 'Event detail boxes', eventPoints: 'Description points',
   eventBanners: 'Event banners', popupTheme: 'Popup design number', popupDelay: 'Popup delay (seconds)', popupLogo: 'Popup logo', popupDesc: 'Popup words',

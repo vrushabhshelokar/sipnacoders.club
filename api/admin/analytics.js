@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import {
-  KEYS, applyPatch, getRedisClient, istDay, parseCookies, parseStoredSettings, readBody, sendResponse,
+  KEYS, applyPatch, canonicalSource, getRedisClient, istDay, parseCookies, parseStoredSettings, readBody, sendResponse,
 } from '../../api-lib/shared.js';
 import { createViewerToken, getRole, getViewerSecret } from '../../api-lib/adminAuth.js';
 import {
@@ -70,13 +70,21 @@ function isAuthenticated(req, secret) {
 
 // One day's hash ({ visits, 'pv:/team': 3, 'dev:mobile': 9, ... }) -> a tidy object for the dashboard
 function shapeDay(date, hash, unique) {
-  const day = { date, visits: 0, unique: Number(unique) || 0, pages: {}, devices: {}, sources: {}, clicks: {}, hours: {} };
+  const day = { date, visits: 0, unique: Number(unique) || 0, newVisitors: 0, returning: 0, pages: {}, devices: {}, sources: {}, clicks: {}, hours: {} };
   const parts = { 'pv:': 'pages', 'dev:': 'devices', 'src:': 'sources', 'clk:': 'clicks', 'hr:': 'hours' };
   for (const [field, value] of Object.entries(hash || {})) {
     const n = Number(value) || 0;
     if (field === 'visits') { day.visits = n; continue; }
+    if (field === 'new') { day.newVisitors = n; continue; }
+    if (field === 'ret') { day.returning = n; continue; }
+    if (field === 'clk:register-codeclash') continue;   // the Code Clash button is gone from the site: its old clicks are not shown any more
     for (const [prefix, bucket] of Object.entries(parts)) {
-      if (field.startsWith(prefix)) { day[bucket][field.slice(prefix.length)] = n; break; }
+      if (field.startsWith(prefix)) {
+        let name = field.slice(prefix.length);
+        if (bucket === 'sources') name = canonicalSource(name);   // "ig" and "instagram" become one row
+        day[bucket][name] = (day[bucket][name] || 0) + n;
+        break;
+      }
     }
   }
   // keep each list short, so one noisy day can never make the response huge

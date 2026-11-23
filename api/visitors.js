@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import {
-  KEYS, KEEP_DAYS, getRedisClient, parseCookies, readBody, sendResponse, istDay,
+  KEYS, KEEP_DAYS, getRedisClient, parseCookies, readBody, sendResponse, istDay, canonicalSource,
 } from '../api-lib/shared.js';
 import { clientIp, memoryHit } from '../api-lib/ratelimit.js';
 
@@ -24,7 +24,7 @@ function isBot(userAgent) {
    If you add a new page to the site, add its path to PAGES.
    --------------------------------------------------------------------------------------------- */
 const PAGES = new Set(['/', '/upcoming', '/events', '/team', '/connect', '/register']);
-const CLICKS = new Set(['register-vibeathon', 'register-codeclash', 'membership']);
+const CLICKS = new Set(['register-vibeathon', 'membership']);
 
 // where a visitor came from, by the website name in the referrer
 const SOURCE_BY_HOST = [
@@ -79,14 +79,14 @@ function deviceOf(ua) {
 
 function sourceOf(body, ua, ownHost) {
   const tag = cleanTag(body.src);
-  if (tag) return tag;
+  if (tag) return canonicalSource(tag);
 
   if (typeof body.ref === 'string' && body.ref) {
     try {
       const host = new URL(body.ref).hostname.replace(/^www\./, '').toLowerCase();
       if (host && host !== ownHost) {
-        for (const [re, name] of SOURCE_BY_HOST) if (re.test(host)) return name;
-        return host.replace(/[^a-z0-9.-]/g, '').slice(0, 30) || 'direct';
+        for (const [re, name] of SOURCE_BY_HOST) if (re.test(host)) return canonicalSource(name);
+        return canonicalSource(host.replace(/[^a-z0-9.-]/g, '').slice(0, 30)) || 'direct';
       }
     } catch { /* not a link: ignore */ }
   }
@@ -176,21 +176,30 @@ export default async function handler(req, res) {
 
     const ownHost = String(req.headers.host || '').split(':')[0].replace(/^www\./, '').toLowerCase();
 
+    // The first four commands keep their place: the results below are read by index.
     const pipeline = redis.pipeline();
-    pipeline.incr(KEYS.total);
-    pipeline.sadd(KEYS.unique, vid);
-    pipeline.hincrby(dayKey, 'visits', 1);                                        // result index 2
+    pipeline.incr(KEYS.total);                                                    // result index 0
+    pipeline.sadd(KEYS.unique, vid);                                              // 1: 1 = this browser was never seen before, 0 = seen on an earlier visit
+    pipeline.hincrby(dayKey, 'visits', 1);                                        // 2: 1 = the first visit of the day
+    pipeline.pfadd(KEYS.dayUnique(day), vid);                                     // 3: 1 = the first time this browser shows up today
     pipeline.hincrby(dayKey, `dev:${deviceOf(userAgent)}`, 1);
     pipeline.hincrby(dayKey, `src:${sourceOf(body, userAgent, ownHost)}`, 1);
     if (path) pipeline.hincrby(dayKey, `pv:${path}`, 1);
-    pipeline.pfadd(KEYS.dayUnique(day), vid);
     pipeline.hincrby(dayKey, `hr:${String(new Date(Date.now() + 5.5 * 3600e3).getUTCHours()).padStart(2, '0')}`, 1);   // hour of the day, Indian time
     const results = await pipeline.exec();
 
-    // the first visit of a day creates the day's keys: tell Redis to delete them after KEEP_DAYS
-    if (Number(results[2]) === 1) {
-      const ttl = KEEP_DAYS * 86400;
-      await redis.pipeline().expire(dayKey, ttl).expire(KEYS.dayUnique(day), ttl).exec();
+    const firstOfDay = Number(results[2]) === 1;       // this visit creates the day's keys: Redis must delete them after KEEP_DAYS
+    const firstToday = Number(results[3]) === 1;       // first time this browser shows up today
+    const knownBefore = Number(results[1]) === 0;      // ... and the browser was already known from an earlier day = a RETURNING visitor
+    if (firstOfDay || firstToday) {
+      const after = redis.pipeline();
+      // new / ret = browsers per day, counted once a day each (the dashboard shows "New and returning visitors")
+      if (firstToday) after.hincrby(dayKey, knownBefore ? 'ret' : 'new', 1);
+      if (firstOfDay) {
+        const ttl = KEEP_DAYS * 86400;
+        after.expire(dayKey, ttl).expire(KEYS.dayUnique(day), ttl);
+      }
+      await after.exec();
     }
 
     // Never return counts to public visitors

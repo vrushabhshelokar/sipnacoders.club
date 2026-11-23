@@ -35,7 +35,7 @@ const SOURCE_NAMES = {
 };
 const DEVICE_NAMES = { mobile: 'Phone', desktop: 'Laptop / desktop', tablet: 'Tablet' };
 const CLICK_NAMES = {
-  'register-vibeathon': 'Vibe-A-Thon register button', 'register-codeclash': 'Code Clash register button', membership: 'Membership form button',
+  'register-vibeathon': 'Vibe-A-Thon register button', membership: 'Membership form button',
 };
 
 // what the code files say today. The dashboard shows these until an admin changes something.
@@ -387,9 +387,11 @@ function DailyChart({ days }) {
 
 /* sum the daily objects for the chosen range */
 function aggregate(days) {
-  const sum = { visits: 0, pages: {}, devices: {}, sources: {}, clicks: {}, hours: Array(24).fill(0) };
+  const sum = { visits: 0, newVisitors: 0, returning: 0, pages: {}, devices: {}, sources: {}, clicks: {}, hours: Array(24).fill(0) };
   for (const d of days) {
     sum.visits += d.visits;
+    sum.newVisitors += d.newVisitors || 0;
+    sum.returning += d.returning || 0;
     for (const [h, v] of Object.entries(d.hours || {})) { const i = Number(h); if (i >= 0 && i < 24) sum.hours[i] += Number(v) || 0; }
     for (const bucket of ['pages', 'devices', 'sources', 'clicks']) {
       for (const [k, v] of Object.entries(d[bucket] || {})) sum[bucket][k] = (sum[bucket][k] || 0) + v;
@@ -630,7 +632,8 @@ export default function AdminAnalytics() {
   const pageTotal = Object.values(agg.pages).reduce((s, v) => s + v, 0);
   const deviceTotal = Object.values(agg.devices).reduce((s, v) => s + v, 0);
   const sourceTotal = Object.values(agg.sources).reduce((s, v) => s + v, 0);
-  const registerClicks = (agg.clicks['register-vibeathon'] || 0) + (agg.clicks['register-codeclash'] || 0);
+  const registerClicks = agg.clicks['register-vibeathon'] || 0;
+  const visitorKinds = agg.newVisitors + agg.returning;
   const registerViews = agg.pages['/register'] || 0;
   const configured = !data || data.configured !== false;
 
@@ -793,6 +796,17 @@ export default function AdminAnalytics() {
                     <h2 id="ad-h-dev">Phone or laptop</h2>
                     <p className="ad-sub">Share of visits by device.</p>
                     <BarList rows={toRows(agg.devices, DEVICE_NAMES)} total={deviceTotal} />
+                  </section>
+
+                  <section className="ad-panel" aria-labelledby="ad-h-ret">
+                    <h2 id="ad-h-ret">New and returning visitors</h2>
+                    <p className="ad-sub">New: this browser opened the site for the first time. Returning: it came back on a later day. Each browser is counted once a day.</p>
+                    <BarList
+                      rows={[{ label: 'New visitors', value: agg.newVisitors }, { label: 'Returning visitors', value: agg.returning }]}
+                      total={visitorKinds}
+                      empty="No visitors counted in this range yet."
+                    />
+                    <p className="ad-note ad-note-tight">Counting started when this update went live, so older days show 0. A visitor who clears the browser data or opens the site on another device counts as new.</p>
                   </section>
 
                   <section className="ad-panel" aria-labelledby="ad-h-src">

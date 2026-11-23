@@ -7,7 +7,8 @@ import { Redis } from '@upstash/redis';
    scc:visitors:total          all-time visits (a counter)                      (already existed)
    scc:visitors:unique_set     all-time unique browsers (a set)                 (already existed)
    scc:day:YYYY-MM-DD          one small hash per day (Indian date): visits, pv:<page>, dev:<device>,
-                               src:<source>, clk:<button>. Deleted by Redis after KEEP_DAYS.
+                               src:<source>, clk:<button>, new / ret (new and returning visitors of that day).
+                               Deleted by Redis after KEEP_DAYS.
    scc:day:YYYY-MM-DD:u        unique browsers of that day (a HyperLogLog: tiny, counts distinct)
    scc:settings                the switches saved from the admin dashboard (JSON)
    --------------------------------------------------------------------------------------------- */
@@ -22,6 +23,12 @@ export const KEYS = {
 };
 
 export const KEEP_DAYS = 90;
+
+// The same place can reach us under different names (a poster tagged ?src=ig, the Instagram app, a link from l.instagram.com).
+// Every source name goes through this, so "ig" and "instagram" are ONE row in the dashboard. It runs when a visit is counted
+// AND when the dashboard reads the days, so the numbers already stored are merged too.
+const SOURCE_ALIASES = { ig: 'instagram', insta: 'instagram', instagr: 'instagram' };
+export const canonicalSource = (name) => SOURCE_ALIASES[name] || name;
 
 // Today's date in Indian time (YYYY-MM-DD). offsetDays = 1 gives yesterday, and so on.
 export function istDay(offsetDays = 0, now = Date.now()) {
@@ -91,7 +98,7 @@ export async function readBody(req) {
    A key that is missing means "use the value written in the code files" (eventSwitches.js, upcomingConfig.js).
    --------------------------------------------------------------------------------------------- */
 export const BOOL_KEYS = [
-  'codeClashRegistration', 'vibeRegistration', 'codeClashPopup', 'vibePopup', 'codeClashSection',
+  'vibeRegistration', 'vibePopup',
   'upcomingShow', 'flowShow', 'psShow', 'psUnlockNow',
 ];
 export const DATE_KEYS = ['eventStart', 'roundEnd1', 'roundEnd2', 'hideAfter', 'psReleaseAt'];   // 'YYYY-MM-DDTHH:MM', Indian time
