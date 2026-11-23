@@ -39,10 +39,24 @@ export function NewTag() {
   return <span className="s-uf-new" aria-hidden="true">New</span>;
 }
 
-/* the line under the hero buttons: "scanning…" first, then "1 upcoming event found" */
+/* how long (ms) the strip glows after it shows up, to pull the eye to it. (The glow is 3 pulses of 1 s in UpcomingFound.css -> keep them in step.) */
+const GLOW_MS = 3000;
+
+/* the Vibe-A-Thon section lives on the Upcoming page (id "upcoming"). The page is downloaded on the first visit, so wait until
+   that section exists, then slide down to it (the Layout already scrolls the page to the top first). */
+function scrollToSection(id, tries = 50) {
+  const el = document.getElementById(id);
+  if (el) { setTimeout(() => el.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth' }), 60); return; }
+  if (tries > 0) setTimeout(() => scrollToSection(id, tries - 1), 60);
+}
+const plainClick = (e) => e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey;
+
+/* the line under the hero buttons: "scanning…" first, then "Vibe-A-Thon alert found  [View]".
+   It glows for the first GLOW_MS after it shows up. View opens the Vibe-A-Thon section of the Upcoming page. */
 export function FoundMessage({ n }) {
   const live = useIntroDone();
   const [found, setFound] = useState(() => reduced());
+  const [glowDone, setGlowDone] = useState(false);
 
   useEffect(() => {
     if (!live || found) return undefined;
@@ -50,16 +64,27 @@ export function FoundMessage({ n }) {
     return () => clearTimeout(id);
   }, [live, found]);
 
+  // the strip glows for 3 seconds from the moment it shows up, then goes calm
+  useEffect(() => {
+    if (!found) return undefined;
+    const id = setTimeout(() => setGlowDone(true), GLOW_MS);
+    return () => clearTimeout(id);
+  }, [found]);
+
   if (!n) return null;
-  const text = `${n} upcoming event${n === 1 ? '' : 's'} found${hasFresh() ? ' · new details unlocked' : ''}`;
+  const name = eventName();
+  const alert = isTeaserLive();   // the Vibe-A-Thon card is on: show the alert. Otherwise the plain "N upcoming events found".
+  const title = alert ? `${name || 'New event'} alert found` : `${n} upcoming event${n === 1 ? '' : 's'} found${hasFresh() ? ' · new details unlocked' : ''}`;
 
   return (
-    <div className={`s-uf ${found ? 'is-found' : 'is-scan'}`} aria-live="polite">
+    <div className={`s-uf ${found ? 'is-found' : 'is-scan'}${found && !glowDone ? ' is-glow' : ''}`} aria-live="polite">
       <span className="s-uf-dot" aria-hidden="true" />
       {found ? (
         <>
-          <span className="s-uf-t" key="found">{text}</span>{' '}
-          <Link className="s-uf-go" to="/upcoming">View <Icon.ArrowRight size={14} /></Link>
+          <span className="s-uf-t" key="found">
+            <b className="s-uf-ttl">{title}</b>
+          </span>{' '}
+          <Link className="s-uf-go" to="/upcoming" onClick={(e) => { if (plainClick(e)) scrollToSection('upcoming'); }}>View <Icon.ArrowRight size={14} /></Link>
         </>
       ) : (
         <span className="s-uf-t s-uf-scan" aria-hidden="true">scanning for events<i>.</i><i>.</i><i>.</i></span>

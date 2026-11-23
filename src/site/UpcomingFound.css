@@ -17,27 +17,37 @@
 .s-uf-count.is-new::after { border-color: rgba(126, 231, 135, .8); }
 .s-uf-new { display: inline-block; margin-left: -2px; padding: 4px 7px 3px; border-radius: 999px; font: 800 10px/1 var(--mono, ui-monospace, monospace); letter-spacing: .1em; text-transform: uppercase; color: #052b12; background: #7ee787; box-shadow: 0 0 12px rgba(126, 231, 135, .8); animation: s-uf-newglow 1.6s ease-in-out infinite; }
 
-/* the message line */
+/* the message line: the Vibe-A-Thon alert strip. Brighter than before so it is easy to spot; for the first 3 s after it shows up it also glows (.is-glow) */
 .s-uf {
-  display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; max-width: 100%; margin-top: 18px; padding: 8px 14px 8px 12px; border-radius: 999px;
-  font: 500 13px/1.2 var(--mono, ui-monospace, monospace); color: #e8d3f8;
-  background: rgba(199, 146, 234, .08); border: 1px solid rgba(199, 146, 234, .28);
+  display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; max-width: 100%; margin-top: 18px; padding: 9px 10px 9px 15px; border-radius: 999px;
+  font: 500 13.5px/1.25 var(--mono, ui-monospace, monospace); color: #f3e6fd;
+  background: linear-gradient(100deg, rgba(199, 146, 234, .20), rgba(126, 231, 135, .10)); border: 1.5px solid rgba(199, 146, 234, .6);
+  box-shadow: 0 0 0 0 rgba(199, 146, 234, 0), 0 0 0 0 rgba(199, 146, 234, 0), 0 8px 26px -14px rgba(199, 146, 234, .8);
+  transition: border-color .5s, box-shadow .5s;
 }
 .s-hero.is-live .s-hero-copy > .s-uf { transition-delay: .5s; }
 .s-hero .s-hero-copy > .s-uf { align-self: flex-start; }
-.s-uf-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: #c792ea; box-shadow: 0 0 10px #c792ea; animation: s-uf-pulse 1.5s ease-in-out infinite; }
-.s-uf.is-found .s-uf-dot { background: #7ee787; box-shadow: 0 0 10px #7ee787; }
+.s-uf-dot { flex: none; width: 9px; height: 9px; border-radius: 50%; background: #c792ea; box-shadow: 0 0 10px #c792ea; animation: s-uf-pulse 1.5s ease-in-out infinite; }
+.s-uf.is-found .s-uf-dot { background: #7ee787; box-shadow: 0 0 12px #7ee787; }
 .s-uf-t { color: #f3e6fd; }
+.s-uf-ttl { font-weight: 700; color: #fff; }
 .s-uf-scan { color: #bfa4d6; }
 .s-uf-scan i { font-style: normal; animation: s-uf-dots 1.2s steps(1, end) infinite; }
 .s-uf-scan i:nth-child(2) { animation-delay: .2s; }
 .s-uf-scan i:nth-child(3) { animation-delay: .4s; }
 .s-uf.is-found .s-uf-t { animation: s-uf-in .5s var(--ease, cubic-bezier(.2, .8, .2, 1)) both; }
-.s-uf-go { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; color: #fff; padding: 4px 10px; border-radius: 999px; background: rgba(255, 255, 255, .1); transition: background .2s, gap .2s; animation: s-uf-in .5s .12s var(--ease, cubic-bezier(.2, .8, .2, 1)) both; }
-.s-uf-go:hover { background: rgba(255, 255, 255, .2); gap: 8px; }
+/* View: a solid light button, the clear thing to tap */
+.s-uf-go { display: inline-flex; align-items: center; gap: 5px; font-weight: 700; color: #1b0a29; padding: 6px 13px; border-radius: 999px; background: #f3e6fd; transition: background .2s, gap .2s, transform .2s; animation: s-uf-in .5s .12s var(--ease, cubic-bezier(.2, .8, .2, 1)) both; }
+.s-uf-go:hover { background: #fff; gap: 8px; }
+.s-uf-go:active { transform: scale(.96); }
 .s-uf-go:focus-visible { outline: 2px solid #c792ea; outline-offset: 2px; }
 
+/* the strip has just shown up: 3 glow pulses of 1 s = 3 s (GLOW_MS in UpcomingFound.jsx), then it goes calm */
+.s-uf.is-glow { border-color: rgba(217, 174, 245, .95); animation: s-uf-alert 1s ease-in-out 3; }
+.s-uf.is-glow .s-uf-go { box-shadow: 0 0 14px rgba(243, 230, 253, .55); }
+
 @keyframes s-uf-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(199, 146, 234, 0), 0 10px 32px -14px rgba(199, 146, 234, .6); } 50% { box-shadow: 0 0 0 5px rgba(199, 146, 234, .12), 0 10px 36px -12px rgba(199, 146, 234, .9); } }
+@keyframes s-uf-alert { 0%, 100% { box-shadow: 0 0 0 0 rgba(199, 146, 234, 0), 0 0 0 0 rgba(199, 146, 234, 0), 0 8px 26px -14px rgba(199, 146, 234, .8); } 50% { box-shadow: 0 0 0 7px rgba(199, 146, 234, .22), 0 0 40px rgba(199, 146, 234, 1), 0 8px 30px -10px rgba(199, 146, 234, 1); } }
 @keyframes s-uf-newglow { 0%, 100% { box-shadow: 0 0 0 0 rgba(126, 231, 135, 0), 0 0 8px rgba(126, 231, 135, .6); } 50% { box-shadow: 0 0 0 4px rgba(126, 231, 135, .25), 0 0 16px rgba(126, 231, 135, .95); } }
 @keyframes s-uf-ring { 0% { transform: scale(.8); opacity: .9; } 100% { transform: scale(1.7); opacity: 0; } }
 @keyframes s-uf-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .45; transform: scale(.7); } }
@@ -45,9 +55,16 @@
 @keyframes s-uf-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
 @media (max-width: 480px) {
-  .s-uf { font-size: 12.5px; padding: 8px 12px 8px 11px; }
+  /* phone: a full-width card, the text on the left and the View button on the right */
+  .s-uf { display: flex; flex-wrap: nowrap; width: 100%; box-sizing: border-box; gap: 10px; padding: 10px 10px 10px 14px; border-radius: 18px; font-size: 12.5px; }
+  .s-hero .s-hero-copy > .s-uf { align-self: stretch; }
+  .s-uf-t { flex: 1 1 auto; min-width: 0; text-wrap: balance; }
+  .s-uf-ttl { font-size: 14.5px; }
+  .s-uf-go { flex: none; min-height: 38px; padding: 0 15px; font-size: 13.5px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .s-hero .s-btn.has-found, .s-uf-count::after, .s-uf-new, .s-uf-dot, .s-uf-scan i, .s-uf.is-found .s-uf-t, .s-uf-go { animation: none !important; }
   .s-uf-count::after { display: none; }
+  /* no pulsing: the strip just stays lit for those 3 seconds */
+  .s-uf.is-glow { animation: none; box-shadow: 0 0 0 4px rgba(199, 146, 234, .14), 0 0 26px rgba(199, 146, 234, .7); }
 }

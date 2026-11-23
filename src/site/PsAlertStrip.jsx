@@ -7,15 +7,20 @@
 //
 // People whose phone/PC has "reduce motion" / "remove animations" turned ON still see the strip moving, only slower.
 // To make it a still, centered notice for those people, set FOLLOW_REDUCED_MOTION to true.
-import { Fragment } from 'react';
+//
+// When someone opens the Vibe-A-Thon page, the strip GLOWS for 3 seconds (GLOW_MS) to pull the eye to it. The 3 seconds start
+// once the opening animation is over and the strip is on screen (so it also works when the View button on the Home page scrolls here).
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { PS } from '../data/problemStatement';
 import { useSwitch } from './liveSettings';
 import { psRelease } from './psRelease';
 import { isTeaserLive } from './teaserCore';
 import { eventType } from './eventLive';
+import { useIntroDone } from './ui';
 import './PsAlertStrip.css';
 
 const FOLLOW_REDUCED_MOTION = false;
+const GLOW_MS = 3000;   // how long the strip glows (3 pulses of 1 s in PsAlertStrip.css -> keep them in step)
 
 const WarnIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
@@ -36,7 +41,25 @@ export default function PsAlertStrip() {
   // same rule as the Problem Statement section: published = the PDF is added AND the time has come
   const published = pdf !== '' && (unlockNow || !Number.isFinite(rel.ms) || Date.now() >= rel.ms);
   // only on the Vibe-A-Thon page: the big card is on and the event is a hackathon
-  if (!isTeaserLive() || eventType() !== 'hackathon' || !show || published) return null;
+  const hidden = !isTeaserLive() || eventType() !== 'hackathon' || !show || published;
+
+  // glow for GLOW_MS the first time the strip is on screen (after the opening animation)
+  const live = useIntroDone();
+  const box = useRef(null);
+  const [glow, setGlow] = useState(false);
+  const active = live && !hidden;
+  useEffect(() => {
+    const el = box.current;
+    if (!active || !el) return undefined;
+    let off;
+    const start = () => { setGlow(true); off = setTimeout(() => setGlow(false), GLOW_MS); };
+    if (!('IntersectionObserver' in window)) { const t0 = setTimeout(start, 0); return () => { clearTimeout(t0); clearTimeout(off); }; }
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); start(); } }, { threshold: 0.6 });
+    io.observe(el);
+    return () => { io.disconnect(); clearTimeout(off); };
+  }, [active]);
+
+  if (hidden) return null;
 
   // '21 Nov 2026, 8:00 PM IST' -> '21 Nov, 8:00 PM IST'
   const when = String(rel.label || '').replace(/\s\d{4}(?=,)/, '').trim();
@@ -62,11 +85,17 @@ export default function PsAlertStrip() {
   return (
      <div className="s-container pa-wrap">
     <div
-      className={FOLLOW_REDUCED_MOTION ? 'pa pa-calm' : 'pa'}
+      ref={box}
+      className={`pa${FOLLOW_REDUCED_MOTION ? ' pa-calm' : ''}${glow ? ' is-glow' : ''}`}
       role="note"
       aria-label="Problem statement announcement"
     >
-      <span className="pa-indicator" aria-hidden="true" />
+      {/* police beacon: a red dome that flashes, with a red beam sweeping round it (pure CSS, see PsAlertStrip.css) */}
+      <span className="pa-siren" aria-hidden="true">
+        <i className="pa-siren-beam" />
+        <i className="pa-siren-dome" />
+        <i className="pa-siren-base" />
+      </span>
       <div className="pa-track">
         <div className="pa-move">
           {row(false)}

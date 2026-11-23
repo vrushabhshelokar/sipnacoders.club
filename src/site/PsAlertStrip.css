@@ -4,37 +4,99 @@
 }
 
 .pa {
-  height: 34px;
+  height: 56px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   overflow: hidden;
-  padding: 0 14px;
+  padding: 0 18px 0 12px;
   border: 1px solid rgba(245, 158, 11, 0.2);
-  border-radius: 6px;
-  background: rgba(245, 158, 11, 0.045);
+  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.06);
   color: #eab65c;
+  transition: border-color 0.5s, background-color 0.5s, color 0.5s;
 }
 
-.pa-indicator {
-  width: 6px;
-  height: 6px;
-  flex: 0 0 6px;
+/* someone just opened the page: the strip glows for 3 s (3 pulses of 1 s = GLOW_MS in PsAlertStrip.jsx), then goes calm again */
+.pa.is-glow {
+  border-color: rgba(245, 173, 50, 0.95);
+  background: rgba(245, 158, 11, 0.13);
+  color: #ffd58a;
+  animation: pa-glow 1s ease-in-out 3;
+}
+
+
+@keyframes pa-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(245, 173, 50, 0), 0 0 0 0 rgba(245, 173, 50, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(245, 173, 50, 0.22), 0 0 30px rgba(245, 173, 50, 0.8);
+  }
+}
+
+.pa-siren {
+  position: relative;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+}
+
+/* the red beam that sweeps round: two wedges, one turn per 1.2 s, faded towards the edge */
+.pa-siren-beam {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 92px;
+  height: 92px;
+  margin: -46px 0 0 -46px;
   border-radius: 50%;
-  background: #f5ad32;
-  box-shadow: 0 0 8px rgba(245, 173, 50, 0.45);
+  background: conic-gradient(from 0deg, rgba(255, 36, 36, 0) 0deg, rgba(255, 36, 36, 0.85) 38deg, rgba(255, 36, 36, 0) 84deg, rgba(255, 36, 36, 0) 180deg, rgba(255, 36, 36, 0.85) 218deg, rgba(255, 36, 36, 0) 264deg);
+  -webkit-mask-image: radial-gradient(circle, #000 14%, transparent 68%);
+  mask-image: radial-gradient(circle, #000 14%, transparent 68%);
+  animation: pa-spin 1.2s linear infinite;
+  will-change: transform;
+}
+
+/* the red dome (light) and its dark base */
+.pa-siren-dome {
+  position: absolute;
+  left: 50%;
+  top: 4px;
+  width: 24px;
+  height: 20px;
+  margin-left: -12px;
+  border-radius: 12px 12px 3px 3px;
+  background: radial-gradient(circle at 36% 28%, #ffc9c9 0%, #ff5252 34%, #d10000 72%, #860000 100%);
+  box-shadow: 0 0 14px 3px rgba(255, 36, 36, 0.9), inset 0 -4px 6px rgba(0, 0, 0, 0.35);
+  animation: pa-flash 0.6s ease-in-out infinite;
+}
+
+.pa-siren-base {
+  position: absolute;
+  left: 50%;
+  top: 23px;
+  width: 32px;
+  height: 7px;
+  margin-left: -16px;
+  border-radius: 3px;
+  background: linear-gradient(#4b5262, #20242d);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12) inset;
 }
 
 .pa-track {
   flex: 1;
   min-width: 0;
   overflow: hidden;
+  /* the moving text fades in and out at both ends instead of being cut off */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 22px, #000 calc(100% - 22px), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 22px, #000 calc(100% - 22px), transparent);
 }
 
 .pa-move {
   display: flex;
   width: max-content;
-  animation: pa-scroll 24s linear infinite;
+  animation: pa-scroll 30s linear infinite;
 }
 
 .pa-row {
@@ -50,22 +112,39 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  gap: 14px;
-  padding-right: 28px;
+  gap: 18px;
+  padding-right: 40px;
   white-space: nowrap;
 }
 
 .pa-text {
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.025em;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
 }
 
 .pa-sep {
-  width: 3px;
-  height: 3px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  background: rgba(245, 173, 50, 0.55);
+  background: rgba(245, 173, 50, 0.7);
+}
+
+@keyframes pa-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pa-flash {
+  0%, 100% {
+    filter: brightness(1.3);
+    box-shadow: 0 0 18px 5px rgba(255, 36, 36, 0.95), inset 0 -4px 6px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    filter: brightness(0.7);
+    box-shadow: 0 0 6px 1px rgba(255, 36, 36, 0.45), inset 0 -4px 6px rgba(0, 0, 0, 0.4);
+  }
 }
 
 @keyframes pa-scroll {
@@ -89,7 +168,22 @@
 
 @media (prefers-reduced-motion: reduce) {
   .pa-move {
-    animation-duration: 60s;
+    animation-duration: 75s;
+  }
+
+  .pa-siren-beam,
+  .pa-siren-dome {
+    animation: none;
+  }
+
+  .pa-siren-beam {
+    opacity: 0.45;
+  }
+
+  /* no pulsing: the strip just stays lit for those 3 seconds */
+  .pa.is-glow {
+    animation: none;
+    box-shadow: 0 0 0 3px rgba(245, 173, 50, 0.16), 0 0 22px rgba(245, 173, 50, 0.6);
   }
 }
 
@@ -99,12 +193,39 @@
   }
 
   .pa {
-    height: 32px;
-    padding: 0 10px;
+    height: 50px;
+    padding: 0 12px 0 8px;
     gap: 8px;
   }
 
+  .pa-siren {
+    flex-basis: 30px;
+    width: 30px;
+    height: 30px;
+  }
+
+  .pa-siren-dome {
+    top: 3px;
+    width: 21px;
+    height: 17px;
+    margin-left: -10.5px;
+  }
+
+  .pa-siren-base {
+    top: 19px;
+    width: 28px;
+    height: 6px;
+    margin-left: -14px;
+  }
+
+  .pa-siren-beam {
+    width: 80px;
+    height: 80px;
+    margin: -40px 0 0 -40px;
+  }
+
   .pa-text {
-    font-size: 10px;
+    font-size: 13px;
+    letter-spacing: 0.06em;
   }
 }
