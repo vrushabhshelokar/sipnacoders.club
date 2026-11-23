@@ -217,7 +217,7 @@ export const RULEBOOK_CATEGORIES = [
    SECTION 5 — PRIZE POOL, REGISTRATION FEES & WHAT'S INCLUDED
    ===================================================================== */
 export const PRIZE_DATA = {
-  totalPool: '₹40,000+',
+  totalPool: '₹50,000+',
   eventHighlight: '18-Hour Offline Finale',
   distribution: [
     {
@@ -233,7 +233,7 @@ export const PRIZE_DATA = {
     {
       rank: '02',
       title: '2nd Prize',
-      amount: '₹10,000+',
+      amount: '₹15,000+',
       accent: '#fbbc05',
       accentRgb: '251, 188, 5',
       featured: false,
@@ -243,7 +243,7 @@ export const PRIZE_DATA = {
     {
       rank: '03',
       title: '3rd Prize',
-      amount: '₹5,000+',
+      amount: '₹10,000+',
       accent: '#ff5468',
       accentRgb: '255, 84, 104',
       featured: false,
