@@ -14,7 +14,7 @@
 // To test the open buttons on your own computer, set  unlockNow: true  (and put it back to false before you push).
 export const PS = {
   pdf: '',                                              // keep EMPTY: the link is set in the dashboard so it stays private until Open (for a test on your own computer, put the path here and put '' back before you push)
-  fileName: 'PS-Vibethon.pdf',                          // the name the file gets when someone downloads it (Download button saves it straight away with this name; vercel.json gives the same name when the PDF is opened in a tab and saved from there)
+  fileName: 'ps-vibeathon.pdf',                         // the name the file gets when someone downloads it (Download button saves it straight away with this name; vercel.json gives the same name when the PDF is opened in a tab and saved from there)
   releaseAt: '2026-11-21T20:00:00+05:30',               // only the date shown in the Timeline row. It does NOT open the buttons any more
   releaseLabel: ' ? Nov 2026,  IST',            // the same moment, written for people
   count: 10,                                            // how many problem statements are in the PDF

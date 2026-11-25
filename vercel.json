@@ -31,7 +31,7 @@
     {
       "source": "/ps-vibeathon-r1-61aeb47606.pdf",
       "headers": [
-        { "key": "Content-Disposition", "value": "inline; filename=\"PS-Vibethon.pdf\"" }
+        { "key": "Content-Disposition", "value": "inline; filename=\"ps-vibeathon.pdf\"" }
       ]
     },
     {

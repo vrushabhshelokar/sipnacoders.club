@@ -159,7 +159,7 @@ const SECTIONS = [
         items: [
           { key: 'psShow', label: 'Problem Statement Release section', on: 'Shown', off: 'Hidden', hint: 'Hides the whole section on the Vibe-A-Thon page.' },
           { key: 'psUnlockNow', label: 'Problem statement buttons (View PS and Download)', on: 'Open', off: 'Locked', hint: 'Locked until you switch this on, and it does not follow any schedule. Switch on, then press Save changes: View PS then shows the 5 domains. Download uses the PDF link below (empty = the Round 1 PDF already added to the site).' },
-          { key: 'psPdf', type: 'text', label: 'PDF link', placeholder: 'Empty = the Round 1 PDF added to the site', wide: true, hint: 'Leave this empty to use the Round 1 PDF that is already in the public folder. Only fill it to use another file (a path starting with /, or an https:// link). Visitors never see this link while the buttons are Locked. A link to another website opens in a new tab and cannot be saved with the Download button. The saved file is always named PS-Vibethon.pdf.' },
+          { key: 'psPdf', type: 'text', label: 'PDF link', placeholder: 'Empty = the Round 1 PDF added to the site', wide: true, hint: 'Leave this empty to use the Round 1 PDF that is already in the public folder. Only fill it to use another file (a path starting with /, or an https:// link). Visitors never see this link while the buttons are Locked. A link to another website opens in a new tab and cannot be saved with the Download button. The saved file is always named ps-vibeathon.pdf.' },
           { key: 'psCount', type: 'number', label: 'How many problem statements', min: 1, max: 99 },
         ],
       },
