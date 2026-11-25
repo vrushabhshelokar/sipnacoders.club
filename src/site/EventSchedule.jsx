@@ -2,7 +2,8 @@
 // Vertical timeline with 7 milestones, spine line, node circles, and content cards.
 import { Reveal } from './ui';
 import { Icon } from './Icons';
-import { EVENT_SCHEDULE, ROUND2_SOON } from '../data/vibeathonData';
+import { EVENT_SCHEDULE } from '../data/vibeathonData';
+import { useRound2Soon } from './round2';
 import { liveValue, useLiveSettings } from './liveSettings';
 import { psRelease } from './psRelease';
 
@@ -26,8 +27,9 @@ import './EventSchedule.css';
 function TimelineRow({ item, index }) {
   const IconC = Icon[item.icon] || Icon.Calendar;
   const isTbd = !item.date || item.date === 'TBD' || item.date.toLowerCase().includes('announced');
-  // While ROUND2_SOON (data/vibeathonData.js) is not empty, a row that mentions Round 2 shows only "Publishing soon"
-  const soon = !!ROUND2_SOON && /round\s*2/i.test(`${item.phase} ${item.milestone} ${item.desc}`);
+  // While the Round 2 details are off (dashboard switch), a row that mentions Round 2 shows only "Publishing soon"
+  const soonText = useRound2Soon();
+  const soon = !!soonText && /round\s*2/i.test(`${item.phase} ${item.milestone} ${item.desc}`);
 
   return (
     <Reveal
@@ -51,7 +53,7 @@ function TimelineRow({ item, index }) {
             <div className="es-icon" aria-hidden="true">
               <IconC size={15} />
             </div>
-            <h3 className="es-milestone es-soon-text"><i aria-hidden="true" />{ROUND2_SOON}</h3>
+            <h3 className="es-milestone es-soon-text"><i aria-hidden="true" />{soonText}</h3>
           </div>
         </article>
       ) : (

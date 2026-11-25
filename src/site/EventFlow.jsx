@@ -6,7 +6,7 @@ import { Reveal, useInView } from './ui';
 import { eventType } from './eventLive';
 import { FLOW, SHOW_FLOW } from './upcomingConfig';
 import { useSwitch } from './liveSettings';
-import { ROUND2_SOON } from '../data/vibeathonData';
+import { useRound2Soon } from './round2';
 import './EventFlow.css';
 
 // one colour for each phase of Round 2 (the same four colours as the stats on the home page)
@@ -59,16 +59,17 @@ function Round1({ r }) {
 }
 
 function Round2({ r }) {
+  const soonText = useRound2Soon();   // "Publishing soon", or '' once the Round 2 details switch is on
   const [barRef, barIn] = useInView(0.3);
   const total = r.phases[r.phases.length - 1].to || 1;
   const at = (h) => `${(h / total) * 100}%`;
   const ticks = [0, ...r.phases.map((p) => p.to)];
   const summary = r.phases.map((p, i) => `Phase ${i + 1}, hours ${num(p.from)} to ${num(p.to)}: ${p.title}`).join('. ');
 
-  // Round 2 is not published yet (ROUND2_SOON in data/vibeathonData.js): only the tag and "Publishing soon"
-  if (ROUND2_SOON) {
+  // Round 2 is not published yet (the dashboard switch is off): only the tag and "Publishing soon"
+  if (soonText) {
     return (
-      <Reveal as="article" className="s-fl s-fl-2 is-soon" delay={120} aria-label={`${r.tag}: ${ROUND2_SOON}`}>
+      <Reveal as="article" className="s-fl s-fl-2 is-soon" delay={120} aria-label={`${r.tag}: ${soonText}`}>
         <span className="s-fl-ghost" aria-hidden="true">2</span>
         <header className="s-fl-top">
           <span className="s-fl-tag"><b>{r.tag}</b></span>

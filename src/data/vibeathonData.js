@@ -57,7 +57,9 @@ export const WHY_PARTICIPATE = [
   
 ];
 
-export const EVENT_JOURNEY = [
+/* Round 2 details: the lines marked `r2 ? [...] : []` below only exist when the "Round 2 details" switch is ON
+   (dashboard -> Events tab -> Vibe-A-Thon -> Round 2). With the switch OFF the page says "Publishing soon" for Round 2. */
+export const buildJourney = (r2 = false) => [
   {
   stage: '01',
   label: 'Stage 01',
@@ -98,7 +100,7 @@ export const EVENT_JOURNEY = [
   points: [
     'The jury checks your project, live demo, and GitHub code',
     'Top 75 teams announced: 17–18 Dec 2026',
-    // 'Selected teams must pay the ₹500 Round 2 fee between 17–22 Dec 2026 (food and stay included)',
+    ...(r2 ? ['Selected teams must pay the ₹500 Round 2 fee between 17–22 Dec 2026 (food and stay included)'] : []),
   ],
 },
   {
@@ -122,7 +124,10 @@ export const EVENT_JOURNEY = [
    SECTION 4 — RULEBOOK CATEGORIES
    6 consolidated categories. Update TBD placeholders when confirmed.
    ===================================================================== */
-export const RULEBOOK_CATEGORIES = [
+export const EVENT_JOURNEY = buildJourney(false);   // the "switch OFF" version (the page itself uses buildJourney(switch))
+
+
+export const buildRulebook = (r2 = false) => [
   {
     id: '01',
     tag: 'TEAM_PROTOCOLS',
@@ -148,7 +153,7 @@ export const RULEBOOK_CATEGORIES = [
       'Round 1 submission requires a live Vercel deployment URL and a public GitHub repository with a README Vibe Log.',
       'Round 1 registration & submission deadline: 12 December 2026.',
       'Top 75 qualifying teams announcement: 17–18 December 2026.',
-      //'Round 2 payment window: 17 December – 22 December 2026 (only for Top 75 qualifiers).',
+      ...(r2 ? ['Round 2 payment window: 17 December – 22 December 2026 (only for Top 75 qualifiers).'] : []),
       'Round 2 (Offline Finale): 26–27 December 2026 at Sipna COET, Amravati — a continuous 18-hour build marathon.',
     ],
   },
@@ -160,9 +165,9 @@ export const RULEBOOK_CATEGORIES = [
     intro: 'Registration details and two-phase fee structure.',
     points: [
       'Round 1 Registration Fee: ₹200 per team (payable during initial registration, deadline: 12 December 2026).',
-      // 'Teams qualifying for the Top 75 must pay an additional ₹500 during the payment window (17–22 December 2026).',
+      ...(r2 ? ['Teams qualifying for the Top 75 must pay an additional ₹500 during the payment window (17–22 December 2026).'] : []),
       'Food and campus accommodation for the entire 18-hour event.',
-      // 'Total potential fee for a qualifying team is ₹700 across both phases (non-qualifying teams pay only ₹200).',
+      ...(r2 ? ['Total potential fee for a qualifying team is ₹700 across both phases (non-qualifying teams pay only ₹200).'] : []),
       'Round 2 payment instructions will be shared directly with qualified teams.',
       'All official registrations and payments must be processed solely through sipnacoders.club.',
     ],
@@ -211,6 +216,7 @@ export const RULEBOOK_CATEGORIES = [
   ],
 },
 ];
+export const RULEBOOK_CATEGORIES = buildRulebook(false);   // the "switch OFF" version (the page itself uses buildRulebook(switch))
 
 
 /* =====================================================================
@@ -265,7 +271,8 @@ export const FEE_DATA = {
   round2: {
     title: 'Round 2',
     subtitle: 'Top 75 Qualifiers Only',
-    amount: '-',
+    amount: '-',          // shown nowhere while the Round 2 box says "Publishing soon" (and the search-engine text keeps it neutral)
+    liveAmount: '₹500',   // the amount people see when the "Round 2 details" switch is ON
     unit: 'additional / team',
     payable: 'Payable only by teams qualifying for Round 2',
     inclusions: [
@@ -280,7 +287,8 @@ export const FEE_DATA = {
 };
 
 // "Publishing soon": while this is not empty, every Round 2 block of the page (Registration Matrix box, Milestone Schedule row, Event Flow card) shows ONLY this text.
-// When Round 2 is ready, set it to '' (two quotes, nothing between) and the full Round 2 content is back everywhere.
+// You do not need to edit this: the "Round 2 details" switch in the dashboard (Events tab -> Vibe-A-Thon -> Round 2) turns the full Round 2 content on and off live.
+// (Setting it to '' here shows the full Round 2 content always, whatever the switch says.)
 export const ROUND2_SOON = 'Publishing soon';
 
 export const PARTICIPANT_TIERS = [
@@ -416,8 +424,7 @@ export const EVENT_SCHEDULE = [
     milestone: 'Round 2 Payment Window',
     time: 'Finalist Portal',
     date: '17–22 Dec 2026',
-    desc: 'Details will be share soon',
-    // desc: 'Top 75 qualifying teams pay the ₹500 Round 2 fee (covering food and stay for the 18-hour event).',
+    desc: 'Top 75 qualifying teams pay the ₹500 Round 2 fee (covering food and stay for the 18-hour event).',   // shown only when the "Round 2 details" switch is ON
     accent: '#7cf2d4',
     accentRgb: '124, 242, 212',
     icon: 'CreditCard',

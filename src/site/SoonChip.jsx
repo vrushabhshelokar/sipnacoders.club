@@ -1,12 +1,13 @@
-// SoonChip.jsx: the amber "Publishing soon" label. The words are ROUND2_SOON in data/vibeathonData.js ('' = no label, the full Round 2 content is shown).
-import { ROUND2_SOON } from '../data/vibeathonData';
+// SoonChip.jsx: the amber "Publishing soon" label. The words are ROUND2_SOON in data/vibeathonData.js; the "Round 2 details" switch in the dashboard hides it and shows the full Round 2 content.
+import { useRound2Soon } from './round2';
 import './SoonChip.css';
 
 export default function SoonChip({ className = '' }) {
-  if (!ROUND2_SOON) return null;
+  const soon = useRound2Soon();
+  if (!soon) return null;
   return (
     <span className={('soon-chip ' + className).trim()}>
-      <i aria-hidden="true" />{ROUND2_SOON}
+      <i aria-hidden="true" />{soon}
     </span>
   );
 }

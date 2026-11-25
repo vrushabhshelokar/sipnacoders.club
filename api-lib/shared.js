@@ -99,7 +99,7 @@ export async function readBody(req) {
    --------------------------------------------------------------------------------------------- */
 export const BOOL_KEYS = [
   'vibeRegistration', 'vibePopup',
-  'upcomingShow', 'flowShow', 'psShow', 'psUnlockNow',
+  'upcomingShow', 'flowShow', 'psShow', 'psUnlockNow', 'round2Details',
 ];
 export const DATE_KEYS = ['eventStart', 'roundEnd1', 'roundEnd2', 'hideAfter', 'psReleaseAt'];   // 'YYYY-MM-DDTHH:MM', Indian time
 export const INT_KEYS = { psCount: [1, 99], popupTheme: [0, 21], popupDelay: [0, 120] };                                                    // whole number, [min, max]

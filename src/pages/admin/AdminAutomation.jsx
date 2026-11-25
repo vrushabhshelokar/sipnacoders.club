@@ -10,6 +10,8 @@ function buildActions(banner) {
     { group: 'Registration', id: 'vr-off', label: 'Close Vibe-A-Thon registration', patch: { vibeRegistration: false } },
     { group: 'Popups', id: 'vp-on', label: 'Turn the Vibe-A-Thon popup on', patch: { vibePopup: true } },
     { group: 'Popups', id: 'vp-off', label: 'Turn the Vibe-A-Thon popup off', patch: { vibePopup: false } },
+    { group: 'Round 2', id: 'r2-show', label: 'Show the Round 2 details', patch: { round2Details: true } },
+    { group: 'Round 2', id: 'r2-hide', label: 'Put Round 2 back to "Publishing soon"', patch: { round2Details: false } },
     { group: 'Problem statements', id: 'ps-show', label: 'Show the Problem Statement section', patch: { psShow: true } },
     { group: 'Problem statements', id: 'ps-hide', label: 'Hide the Problem Statement section', patch: { psShow: false } },
     { group: 'Problem statements', id: 'ps-open', label: 'Open the PDF buttons (needs a PDF link)', patch: { psUnlockNow: true } },

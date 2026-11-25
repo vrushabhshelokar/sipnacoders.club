@@ -108,7 +108,7 @@ export function useLoad(loader, deps = []) {
 
 /* names for the settings, used in the history and in the schedule */
 export const KEY_LABELS = {
-  vibeRegistration: 'Vibe-A-Thon registration', vibePopup: 'Vibe-A-Thon popup', upcomingShow: 'Upcoming card and menu number', flowShow: 'Event Flow section',
+  vibeRegistration: 'Vibe-A-Thon registration', vibePopup: 'Vibe-A-Thon popup', upcomingShow: 'Upcoming card and menu number', flowShow: 'Event Flow section', round2Details: 'Round 2 details',
   hideAfter: 'Hide card and popup after', eventStart: 'Event start', currentRound: 'Current round', roundEnd1: 'Round 1 ends', roundEnd2: 'Round 2 ends',
   psShow: 'Problem Statement section', psUnlockNow: 'PDF buttons open now', psReleaseAt: 'PDF release time', psAlertText: 'Alert strip point 1', psAlertText2: 'Alert strip point 2', psPdf: 'PDF link', psCount: 'Number of problem statements',
   banner: 'Announcement banner', timeline: 'Timeline rows', details: 'Detail boxes',

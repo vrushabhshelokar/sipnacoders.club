@@ -2,7 +2,8 @@
 // Four connected stages explaining the Vibe-A-Thon participant flow.
 import { Reveal } from './ui';
 import { Icon } from './Icons';
-import { EVENT_JOURNEY } from '../data/vibeathonData';
+import { buildJourney } from '../data/vibeathonData';
+import { useRound2On } from './round2';
 import './EventJourney.css';
 
 function StageCard({ stage }) {
@@ -50,6 +51,7 @@ function StageCard({ stage }) {
 }
 
 export default function EventJourney() {
+  const journey = buildJourney(useRound2On());   // the Round 2 fee line only shows when the dashboard's Round 2 details switch is on
   return (
     <section
       id="event-journey"
@@ -71,7 +73,7 @@ export default function EventJourney() {
       </Reveal>
 
       <div className="ej-pipeline" role="list" aria-label="Vibe-A-Thon event journey stages">
-        {EVENT_JOURNEY.map((stage, i) => (
+        {journey.map((stage, i) => (
           <Reveal key={stage.stage} delay={i * 100} role="listitem">
             <StageCard stage={stage} />
           </Reveal>

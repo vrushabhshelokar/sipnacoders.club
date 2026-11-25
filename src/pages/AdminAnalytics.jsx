@@ -52,6 +52,7 @@ const FILE_DEFAULTS = {
   vibePopup: VIBEATHON_POPUP,
   upcomingShow: !!C.SHOW_UPCOMING,
   flowShow: !!C.SHOW_FLOW,
+  round2Details: false,   // false = every Round 2 block says "Publishing soon"
   hideAfter: C.HIDE_AFTER || '',
   eventStart: C.EVENT_START || '',
   currentRound: Math.round(Number(C.CURRENT_ROUND)) === 2 ? 2 : 1,
@@ -143,6 +144,13 @@ const SECTIONS = [
         hint: 'The card, popup, name, banner, date and on / off switches are in the Upcoming event tab. This block is the hackathon-only flow.',
         items: [
           { key: 'flowShow', label: 'Two-Round Event Flow section', on: 'Shown', off: 'Hidden', hint: 'The "How it works" block under the Upcoming card.' },
+        ],
+      },
+      {
+        title: 'Round 2',
+        hint: 'Round 2 is shown as "Publishing soon" until you switch its details on. The change is live as soon as you press Save changes.',
+        items: [
+          { key: 'round2Details', label: 'Round 2 details', on: 'Shown', off: 'Publishing soon', hint: 'Off: the Round 2 fee box, the Round 2 row of the timeline and the Round 2 card of the event flow show only "Publishing soon". On: the full Round 2 details (fee, payment window, what is included, the 18-hour plan) appear in their place, and the rulebook and journey add the Round 2 fee lines.' },
         ],
       },
       {

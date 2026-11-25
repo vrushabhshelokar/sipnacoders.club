@@ -8,16 +8,18 @@
 import { Reveal } from './ui';
 import { Icon } from './Icons';
 import SoonChip from './SoonChip';
+import { useRound2Soon } from './round2';
 import {
   PRIZE_DATA,
-  FEE_DATA,
-  ROUND2_SOON,
+  FEE_DATA,
+
   PARTICIPANT_TIERS,
   CERTIFICATE_SUMMARY,
 } from '../data/vibeathonData';
 import './PrizePool.css';
 
 export default function PrizePool() {
+  const round2Soon = useRound2Soon();   // "Publishing soon", or '' once the Round 2 details switch is on
   const { totalPool, eventHighlight, distribution } = PRIZE_DATA;
   const firstPrize = distribution.find((p) => p.rank === '01');
   const runnerUpPrizes = distribution.filter((p) => p.rank !== '01');
@@ -151,7 +153,7 @@ export default function PrizePool() {
 
                 {/* Round 2 Fee Box */}
                 <div className="pp-phase-box pp-phase-r2">
-                  {ROUND2_SOON ? (
+                  {round2Soon ? (
                     <>
                       <h3 className="pp-phase-name">{FEE_DATA.round2.title}</h3>
                       <SoonChip className="is-strip" />
@@ -164,7 +166,7 @@ export default function PrizePool() {
                           <h3 className="pp-phase-name">{FEE_DATA.round2.title}</h3>
                         </div>
                         <div className="pp-phase-cost">
-                          <span className="pp-cost-val highlight">{FEE_DATA.round2.amount}</span>
+                          <span className="pp-cost-val highlight">{FEE_DATA.round2.liveAmount || FEE_DATA.round2.amount}</span>
                           <span className="pp-cost-unit">{FEE_DATA.round2.unit}</span>
                         </div>
                       </div>

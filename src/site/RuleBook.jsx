@@ -3,12 +3,14 @@
 import { useState, useRef, useCallback } from 'react';
 import { Reveal } from './ui';
 import { Icon } from './Icons';
-import { RULEBOOK_CATEGORIES } from '../data/vibeathonData';
+import { RULEBOOK_CATEGORIES, buildRulebook } from '../data/vibeathonData';
+import { useRound2On } from './round2';
 import './RuleBook.css';
 
 const TOTAL = RULEBOOK_CATEGORIES.length;
 
 export default function RuleBook() {
+  const cats = useRound2On() ? buildRulebook(true) : RULEBOOK_CATEGORIES;   // Round 2 fee lines only show when the dashboard's Round 2 details switch is on
   const [activeIdx, setActiveIdx] = useState(0);
   const [fading, setFading] = useState(false);
   const [mobileOpenCat, setMobileOpenCat] = useState('01');
@@ -34,7 +36,7 @@ export default function RuleBook() {
   const prev = () => goTo(Math.max(0, activeIdx - 1));
   const next = () => goTo(Math.min(TOTAL - 1, activeIdx + 1));
 
-  const cat = RULEBOOK_CATEGORIES[activeIdx];
+  const cat = cats[activeIdx];
   const IconC = Icon[cat.icon] || Icon.Files;
 
   return (
@@ -105,7 +107,7 @@ export default function RuleBook() {
       {/* ---- Holographic Tab Strip ---- */}
       <div className="rb-tabs-wrap">
         <div className="rb-tabs" ref={tabsRef} role="tablist" aria-label="Rulebook categories">
-          {RULEBOOK_CATEGORIES.map((c, i) => (
+          {cats.map((c, i) => (
             <button
               key={c.id}
               role="tab"
@@ -228,7 +230,7 @@ export default function RuleBook() {
 
       {/* Mobile-Only Accordion (Active exclusively on mobile viewports <= 768px) */}
       <div className="rb-mobile-accordion" role="region" aria-label="Mobile Rule Book Accordion">
-        {RULEBOOK_CATEGORIES.map((c) => {
+        {cats.map((c) => {
           const isOpen = mobileOpenCat === c.id;
           const CIcon = Icon[c.icon] || Icon.Files;
           return (
