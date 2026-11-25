@@ -22,6 +22,21 @@
   color: #b4bccb;
 }
 
+.cy-psd-pdf {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 6px;
+  font: 700 13px/1 var(--cy-hud, 'Chakra Petch', sans-serif);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cy-mint, #7cf2d4);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.cy-psd-pdf:hover { color: #a4f7e2; }
+.cy-psd-pdf:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
 .cy-psd-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);

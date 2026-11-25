@@ -142,6 +142,23 @@
 
 .cy-ps-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
+/* the 5 domains slide open under the card when "View PS" is clicked (the cards themselves are styled in PsDomains.css) */
+.cy-psd-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  scroll-margin-top: calc(var(--nav, 70px) + 16px);
+  transition: grid-template-rows 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.25s ease, visibility 0s linear 0.45s;
+}
+.cy-psd-wrap.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+  transition: grid-template-rows 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.35s ease 0.05s, visibility 0s;
+}
+.cy-psd-inner { min-height: 0; overflow: hidden; }
+
 /* tablet / phone */
 @media (max-width: 820px) {
   .cy-ps { margin-top: 64px; }
@@ -162,6 +179,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .cy-psd-wrap, .cy-psd-wrap.is-open { transition: none; }
   .cy-ps-chip.is-live .cy-ps-dot { animation: none; }
   .cy-ps-btn { transition: none; }
   .cy-ps-btn:hover:not(:disabled) { transform: none; }

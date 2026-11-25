@@ -5,7 +5,7 @@ import { Reveal } from './ui';
 import { PS_DOMAINS } from '../data/psDomains';
 import './PsDomains.css';
 
-export default function PsDomains() {
+export default function PsDomains({ pdf = '' }) {
   const total = PS_DOMAINS.reduce((n, d) => n + (Number(d.count) || 0), 0);
   return (
     <div className="cy-psd" aria-labelledby="cy-psd-heading">
@@ -14,6 +14,9 @@ export default function PsDomains() {
         <p className="cy-psd-sub">
           Every problem statement belongs to one of these domains{total ? ` (${total} in all)` : ''}. Choose the area you want to build in.
         </p>
+        {pdf ? (
+          <a className="cy-psd-pdf" href={pdf} target="_blank" rel="noopener noreferrer">Open the full PDF in a new tab</a>
+        ) : null}
       </Reveal>
 
       <ol className="cy-psd-grid">

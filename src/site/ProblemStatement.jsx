@@ -1,8 +1,9 @@
 // Vibe-A-Thon: "Problem Statement Release" section (sits right before "Why Participate?").
 // Two buttons: View PS (opens the PDF in a new tab) and Download (saves the PDF to the phone / laptop).
 // Edit src/data/problemStatement.js to add the PDF and change the release time. Nothing in this file needs to change.
-// Once the buttons open, the "5 Domains" cards (site/PsDomains.jsx, words in data/psDomains.js) appear under the card.
-import { Suspense, lazy, useEffect, useState } from 'react';
+// Once the buttons open, "View PS" shows / hides the "5 Domains" cards (site/PsDomains.jsx, words in data/psDomains.js) under the card.
+// The PDF itself is opened from the link inside that panel, and saved with Download.
+import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { Reveal } from './ui';
 import { Guard } from './teaserCore';
 import { PS } from '../data/problemStatement';
@@ -10,8 +11,8 @@ import { useSwitch } from './liveSettings';
 import { psRelease } from './psRelease';
 import './ProblemStatement.css';
 
-// The 5 domains are a separate download: the browser fetches them only once the section has unlocked (open = true below),
-// so before the release nobody can see them on the page. The words are in data/psDomains.js.
+// The 5 domains are a separate download: the browser fetches them on the first click of "View PS" (which only works once the
+// section has unlocked), so before the release nobody can see them on the page. The words are in data/psDomains.js.
 const PsDomains = lazy(() => import('./PsDomains'));
 
 const svg = { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true, focusable: 'false' };
@@ -48,10 +49,38 @@ export default function ProblemStatement() {
     return () => { clearInterval(id); document.removeEventListener('visibilitychange', tick); };
   }, [timeOpen]);
 
+  // "View PS" opens / closes the 5 domains under the card. They are fetched on the first click.
+  const [domainsSeen, setDomainsSeen] = useState(false);
+  const [domainsOpen, setDomainsOpen] = useState(false);
+  const wrapRef = useRef(null);
+  const toggleDomains = () => {
+    if (!domainsSeen) {
+      setDomainsSeen(true);
+      // two frames: the panel is drawn closed first, so it can slide open
+      requestAnimationFrame(() => requestAnimationFrame(() => setDomainsOpen(true)));
+    } else {
+      setDomainsOpen((v) => !v);
+    }
+  };
+  // on a phone the panel starts below the screen: bring it up under the menu bar (not needed when its top is already in view)
+  useEffect(() => {
+    if (!domainsOpen) return undefined;
+    const t = setTimeout(() => {
+      const el = wrapRef.current;
+      if (!el) return;
+      const top = el.getBoundingClientRect().top;
+      if (top < window.innerHeight * 0.55) return;
+      const nav = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav'), 10) || 70;
+      const calm = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+      window.scrollBy({ top: top - nav - 16, behavior: calm ? 'auto' : 'smooth' });
+    }, 160);
+    return () => clearTimeout(t);
+  }, [domainsOpen]);
+
   const state = open ? 'live' : timeOpen ? 'soon' : 'locked';
   const chip = open ? 'Released' : timeOpen ? 'Publishing shortly' : 'Locked';
   const note = open
-    ? 'The PDF opens in a new tab. Download saves it to your phone or laptop.'
+    ? 'View PS shows the 5 domains. Download saves the PDF to your phone or laptop.'
     : timeOpen
       ? 'The release time has come. The PDF is being added, check back in a few minutes.'
       : `Unlocks on ${rel.label}${Number.isFinite(releaseMs) ? ` (in ${left(releaseMs - now)})` : ''}.`;
@@ -88,10 +117,16 @@ export default function ProblemStatement() {
         <div className="cy-ps-actions">
           {open ? (
             <>
-              <a className="cy-ps-btn cy-ps-btn-ghost" href={pdf} target="_blank" rel="noopener noreferrer">
+              <button
+                type="button"
+                className="cy-ps-btn cy-ps-btn-ghost"
+                aria-expanded={domainsOpen}
+                aria-controls="cy-psd-wrap"
+                onClick={toggleDomains}
+              >
                 <EyeIcon />
-                <span>View PS</span>
-              </a>
+                <span>{domainsOpen ? 'Hide PS' : 'View PS'}</span>
+              </button>
               <a className="cy-ps-btn cy-ps-btn-main" href={pdf} download={PS.fileName}>
                 <DownloadIcon />
                 <span>Download</span>
@@ -112,13 +147,17 @@ export default function ProblemStatement() {
         </div>
       </Reveal>
 
-      {/* shown only when the buttons are open (release time reached and the PDF added) */}
-      {open && (
-        <Guard>
-          <Suspense fallback={null}>
-            <PsDomains />
-          </Suspense>
-        </Guard>
+      {/* the 5 domains: nothing is on the page until "View PS" is clicked for the first time */}
+      {open && domainsSeen && (
+        <div id="cy-psd-wrap" ref={wrapRef} className={`cy-psd-wrap${domainsOpen ? ' is-open' : ''}`} aria-hidden={!domainsOpen}>
+          <div className="cy-psd-inner">
+            <Guard>
+              <Suspense fallback={null}>
+                <PsDomains pdf={pdf} />
+              </Suspense>
+            </Guard>
+          </div>
+        </div>
       )}
     </section>
   );
