@@ -3,7 +3,8 @@
    Phone: one card per row. Tablet: two per row. Desktop: three per row (the last two share the bottom row).
    ===================================================================== */
 
-.cy-psd { margin-top: 44px; }
+/* 14px of room left and right and 18px below, so the glow is not cut off by the sliding panel (ProblemStatement.css makes the panel 14px wider to match) */
+.cy-psd { margin-top: 44px; padding: 0 14px 18px; }
 
 .cy-psd-head { margin-bottom: 22px; }
 
@@ -21,6 +22,21 @@
   font: 500 15px/1.55 var(--cy-hud, 'Chakra Petch', sans-serif);
   color: #b4bccb;
 }
+
+.cy-psd-pdf {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 6px;
+  font: 700 13px/1 var(--cy-hud, 'Chakra Petch', sans-serif);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cy-mint, #7cf2d4);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.cy-psd-pdf:hover { color: #a4f7e2; }
+.cy-psd-pdf:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 
 .cy-psd-grid {
   display: grid;
@@ -100,6 +116,26 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgb(var(--psd-rgb));
+}
+
+/* 3 second glow after "View PS" opens the panel (the class is on only for 3 s, set in PsDomains.jsx).
+   The halo is a drop-shadow on the grid (the cards have clipped corners, so a box-shadow of their own would be cut), the ring is inside each card. */
+.cy-psd.is-glow .cy-psd-grid { animation: cy-psd-halo 3s ease-in-out 1; }
+.cy-psd.is-glow .cy-psd-card { animation: cy-psd-ring 3s ease-in-out 1; }
+@keyframes cy-psd-halo {
+  0%, 100% { filter: drop-shadow(0 0 0 rgba(124, 242, 212, 0)); }
+  18%, 82% { filter: drop-shadow(0 0 14px rgba(124, 242, 212, 0.75)); }
+  50% { filter: drop-shadow(0 0 8px rgba(124, 242, 212, 0.35)); }
+}
+@keyframes cy-psd-ring {
+  0%, 100% { box-shadow: inset 0 0 0 1px rgba(var(--psd-rgb), 0.14); }
+  18%, 82% { box-shadow: inset 0 0 0 1.5px rgba(var(--psd-rgb), 0.95), inset 0 0 26px rgba(var(--psd-rgb), 0.3); }
+  50% { box-shadow: inset 0 0 0 1px rgba(var(--psd-rgb), 0.5), inset 0 0 14px rgba(var(--psd-rgb), 0.14); }
+}
+/* people who asked for less motion: the same glow, held steady for the 3 seconds */
+@media (prefers-reduced-motion: reduce) {
+  .cy-psd.is-glow .cy-psd-grid { animation: none; filter: drop-shadow(0 0 10px rgba(124, 242, 212, 0.6)); }
+  .cy-psd.is-glow .cy-psd-card { animation: none; box-shadow: inset 0 0 0 1.5px rgba(var(--psd-rgb), 0.9), inset 0 0 20px rgba(var(--psd-rgb), 0.25); }
 }
 
 /* tablet: two per row, an odd last card takes the full row */

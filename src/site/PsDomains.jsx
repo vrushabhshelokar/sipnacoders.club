@@ -1,19 +1,45 @@
 // Vibe-A-Thon: the domains of the problem statements. Sits inside the "Problem Statement Release" section, under the PDF card.
 // It is loaded ONLY after that section has unlocked (see ProblemStatement.jsx), so nothing here is visible or downloaded before.
 // The words live in data/psDomains.js. Nothing in this file needs to change.
+//
+// Every time "View PS" opens the panel, the cards GLOW for 3 seconds (GLOW_MS) so the eye goes to them. The 3 seconds start when the
+// cards are on screen (on a phone the page first scrolls down to them).
+import { useEffect, useRef, useState } from 'react';
 import { Reveal } from './ui';
 import { PS_DOMAINS } from '../data/psDomains';
 import './PsDomains.css';
 
-export default function PsDomains() {
+const GLOW_MS = 3000;   // how long the glow lasts
+
+export default function PsDomains({ pdf = '', glowKey = 0 }) {
+  const root = useRef(null);
+  const [glow, setGlow] = useState(false);
+  // glowKey goes up by one every time the panel is opened
+  useEffect(() => {
+    const el = root.current;
+    if (!glowKey || !el) return undefined;
+    let off; let io; let raf;
+    setGlow(false);
+    const start = () => { raf = requestAnimationFrame(() => { setGlow(true); off = setTimeout(() => setGlow(false), GLOW_MS); }); };
+    if (!('IntersectionObserver' in window)) start();
+    else {
+      io = new IntersectionObserver(([e]) => { if (e.intersectionRatio >= 0.1) { io.disconnect(); start(); } }, { threshold: 0.15 });   // 0.1: ignore the closed (clipped) panel, wait until the cards really show
+      io.observe(el);
+    }
+    return () => { if (io) io.disconnect(); cancelAnimationFrame(raf); clearTimeout(off); };
+  }, [glowKey]);
+
   const total = PS_DOMAINS.reduce((n, d) => n + (Number(d.count) || 0), 0);
   return (
-    <div className="cy-psd" aria-labelledby="cy-psd-heading">
+    <div ref={root} className={`cy-psd${glow ? ' is-glow' : ''}`} aria-labelledby="cy-psd-heading">
       <Reveal className="cy-psd-head">
         <h3 id="cy-psd-heading" className="cy-psd-h">{PS_DOMAINS.length} Domains</h3>
         <p className="cy-psd-sub">
           Every problem statement belongs to one of these domains{total ? ` (${total} in all)` : ''}. Choose the area you want to build in.
         </p>
+        {pdf ? (
+          <a className="cy-psd-pdf" href={pdf} target="_blank" rel="noopener noreferrer">Open the full PDF in a new tab</a>
+        ) : null}
       </Reveal>
 
       <ol className="cy-psd-grid">
