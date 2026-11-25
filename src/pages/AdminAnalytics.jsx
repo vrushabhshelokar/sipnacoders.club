@@ -121,7 +121,7 @@ const SECTIONS = [
         title: 'Alert strip (amber strip at the top of the Vibe-A-Thon page)',
         hint: 'To change the date, edit it in point 1 and press Save changes. Point 1 empty = the usual words. Point 2 is optional: it is shown right after point 1 on the same moving line (empty = only point 1). The strip goes away once the problem statement buttons are switched on.',
         items: [
-          { key: 'psAlertText', type: 'line', max: 120, label: 'Point 1', placeholder: 'Problem Statement tentative publish on 21 Nov, IST', wide: true, hint: 'At most 120 letters.' },
+          { key: 'psAlertText', type: 'line', max: 120, label: 'Point 1', placeholder: 'Problem Statement will be published soon', wide: true, hint: 'At most 120 letters.' },
           { key: 'psAlertText2', type: 'line', max: 120, label: 'Point 2 (new)', placeholder: 'Optional. Shown right after point 1.', wide: true, hint: 'At most 120 letters. Shown right after point 1, on the same moving line. Empty = only point 1.' },
         ],
       },

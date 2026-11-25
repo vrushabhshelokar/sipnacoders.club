@@ -51,7 +51,7 @@ function TimelineEditor({ rows, onChange, psFollows, psWords, canEdit }) {
                 </div>
                 <div className="ad-field">
                   <label htmlFor={`tl-d-${r.id}`}>Date</label>
-                  <input id={`tl-d-${r.id}`} type="text" maxLength={40} disabled={!canEdit || lock} placeholder="12 Dec 2026" value={lock ? psWords.date : r.date} onChange={(e) => upd(i, { date: e.target.value })} />
+                  <input id={`tl-d-${r.id}`} type="text" maxLength={40} disabled={!canEdit || lock} placeholder="6 Dec 2026" value={lock ? psWords.date : r.date} onChange={(e) => upd(i, { date: e.target.value })} />
                 </div>
                 <div className="ad-field">
                   <label htmlFor={`tl-t-${r.id}`}>Time</label>

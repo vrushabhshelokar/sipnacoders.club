@@ -37,7 +37,7 @@ export default function AdminContent({ view, edit, overrides, changed, isAdmin }
         <div className="ad-fields ac-banner-fields">
           <div className="ad-field ad-field-wide">
             <label htmlFor="bn-text">What it says <span className="ac-count">{b.text.length}/200</span></label>
-            <textarea id="bn-text" rows={2} maxLength={200} disabled={!isAdmin} placeholder="Registrations for Vibe-A-Thon close on 12 Dec at 11:59 PM." value={b.text} onChange={(e) => set({ text: e.target.value.replace(/\n/g, ' ') })} />
+            <textarea id="bn-text" rows={2} maxLength={200} disabled={!isAdmin} placeholder="Registrations for Vibe-A-Thon close on 6 Dec at 11:59 PM." value={b.text} onChange={(e) => set({ text: e.target.value.replace(/\n/g, ' ') })} />
             <span className="ad-field-hint">Keep it short, about 90 letters. A phone shows two lines and cuts the rest.</span>
           </div>
           <div className="ad-field">

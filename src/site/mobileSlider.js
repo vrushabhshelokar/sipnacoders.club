@@ -227,7 +227,7 @@ function addPodiumPerks() {
   const first = document.querySelector('#prize-pool .pp-prize-col-card .pp-prize-first');
   const tier = document.querySelector('#prize-pool .pp-tier-block.is-winner');
   if (!first || !tier || first.querySelector('.pp-champ-perks')) return;
-  // the first bullet is the cash breakdown (25,000 / 10,000 / 5,000): the prize cards already show it
+  // the first bullet is the cash breakdown (25,000 / 15,000 / 10,000): the prize cards already show it
   const items = Array.from(tier.querySelectorAll('.pp-tb-rewards li'))
     .map((li) => li.textContent.trim())
     .filter((t) => t && !/^cash\b/i.test(t));
