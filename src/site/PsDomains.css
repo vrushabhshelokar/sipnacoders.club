@@ -1,0 +1,129 @@
+/* =====================================================================
+   VIBE-A-THON: DOMAINS (site/PsDomains.jsx), under the Problem Statement Release card.
+   Phone: one card per row. Tablet: two per row. Desktop: three per row (the last two share the bottom row).
+   ===================================================================== */
+
+.cy-psd { margin-top: 44px; }
+
+.cy-psd-head { margin-bottom: 22px; }
+
+.cy-psd-h {
+  margin: 0;
+  font: 400 clamp(26px, 3.4vw, 38px)/1 var(--cy-disp, 'Anton', sans-serif);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--cy-ash, #e5e7eb);
+}
+
+.cy-psd-sub {
+  margin: 10px 0 0;
+  max-width: 560px;
+  font: 500 15px/1.55 var(--cy-hud, 'Chakra Petch', sans-serif);
+  color: #b4bccb;
+}
+
+.cy-psd-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cy-psd-card {
+  --psd-rgb: 124, 242, 212;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 20px 20px 18px;
+  background: radial-gradient(360px 180px at 0% 0%, rgba(var(--psd-rgb), 0.1), transparent 70%),
+              linear-gradient(168deg, rgba(14, 22, 34, 0.78), rgba(7, 10, 18, 0.94));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(var(--psd-rgb), 0.14);
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+}
+
+.cy-psd-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: rgb(var(--psd-rgb));
+  transform: skewX(-24deg);
+}
+
+.cy-psd-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cy-psd-num {
+  font: 400 30px/1 var(--cy-disp, 'Anton', sans-serif);
+  color: rgba(var(--psd-rgb), 0.85);
+}
+
+.cy-psd-count {
+  padding: 6px 10px;
+  font: 600 12px/1 var(--cy-hud, 'Chakra Petch', sans-serif);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #cbd3e1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.cy-psd-name {
+  margin: 0;
+  font: 700 19px/1.25 var(--cy-hud, 'Chakra Petch', sans-serif);
+  letter-spacing: 0.005em;
+  color: var(--cy-ash, #e5e7eb);
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.cy-psd-focus {
+  margin: 0;
+  font: 500 14px/1.55 var(--cy-hud, 'Chakra Petch', sans-serif);
+  color: #aab3c4;
+}
+.cy-psd-focus span {
+  margin-right: 4px;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(var(--psd-rgb));
+}
+
+/* tablet: two per row, an odd last card takes the full row */
+@media (min-width: 640px) {
+  .cy-psd-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .cy-psd-card { padding: 22px 22px 20px; }
+  .cy-psd-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
+
+/* desktop: three per row; a last row of two shares the width, a last row of one takes it all */
+@media (min-width: 1000px) {
+  .cy-psd-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .cy-psd-card { grid-column: span 2; }
+  .cy-psd-card:last-child:nth-child(odd) { grid-column: span 2; }
+  .cy-psd-card:nth-child(3n + 1):nth-last-child(2),
+  .cy-psd-card:nth-child(3n + 2):last-child { grid-column: span 3; }
+  .cy-psd-card:nth-child(3n + 1):last-child { grid-column: 1 / -1; }
+}
+
+@media (max-width: 820px) {
+  .cy-psd { margin-top: 34px; }
+}
+
+@media (max-width: 400px) {
+  .cy-psd-card { padding: 18px 16px 16px; }
+  .cy-psd-name { font-size: 18px; }
+}

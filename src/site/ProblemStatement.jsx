@@ -1,12 +1,18 @@
 // Vibe-A-Thon: "Problem Statement Release" section (sits right before "Why Participate?").
 // Two buttons: View PS (opens the PDF in a new tab) and Download (saves the PDF to the phone / laptop).
 // Edit src/data/problemStatement.js to add the PDF and change the release time. Nothing in this file needs to change.
-import { useEffect, useState } from 'react';
+// Once the buttons open, the "5 Domains" cards (site/PsDomains.jsx, words in data/psDomains.js) appear under the card.
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { Reveal } from './ui';
+import { Guard } from './teaserCore';
 import { PS } from '../data/problemStatement';
 import { useSwitch } from './liveSettings';
 import { psRelease } from './psRelease';
 import './ProblemStatement.css';
+
+// The 5 domains are a separate download: the browser fetches them only once the section has unlocked (open = true below),
+// so before the release nobody can see them on the page. The words are in data/psDomains.js.
+const PsDomains = lazy(() => import('./PsDomains'));
 
 const svg = { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true, focusable: 'false' };
 const EyeIcon = () => (<svg {...svg}><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg>);
@@ -105,6 +111,15 @@ export default function ProblemStatement() {
           )}
         </div>
       </Reveal>
+
+      {/* shown only when the buttons are open (release time reached and the PDF added) */}
+      {open && (
+        <Guard>
+          <Suspense fallback={null}>
+            <PsDomains />
+          </Suspense>
+        </Guard>
+      )}
     </section>
   );
 }
