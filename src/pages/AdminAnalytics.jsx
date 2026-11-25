@@ -119,7 +119,7 @@ const SECTIONS = [
       },
       {
         title: 'Alert strip (amber strip at the top of the Vibe-A-Thon page)',
-        hint: 'To change the date, edit it in point 1 and press Save changes. Point 1 empty = the usual words. Point 2 is optional: it is shown right after point 1 on the same moving line (empty = only point 1). The strip goes away once the problem statement buttons are switched on and the PDF link is set.',
+        hint: 'To change the date, edit it in point 1 and press Save changes. Point 1 empty = the usual words. Point 2 is optional: it is shown right after point 1 on the same moving line (empty = only point 1). The strip goes away once the problem statement buttons are switched on.',
         items: [
           { key: 'psAlertText', type: 'line', max: 120, label: 'Point 1', placeholder: 'Problem Statement tentative publish on 21 Nov, IST', wide: true, hint: 'At most 120 letters.' },
           { key: 'psAlertText2', type: 'line', max: 120, label: 'Point 2 (new)', placeholder: 'Optional. Shown right after point 1.', wide: true, hint: 'At most 120 letters. Shown right after point 1, on the same moving line. Empty = only point 1.' },
@@ -155,11 +155,11 @@ const SECTIONS = [
       },
       {
         title: 'Problem statements (Round 1 briefing)',
-        hint: 'The "Problem Statement Release" section with the View PS and Download buttons. The buttons stay locked until you switch them on below (no schedule), and they need a PDF link.',
+        hint: 'The "Problem Statement Release" section with the View PS and Download buttons. The buttons stay locked until you switch them on below (no schedule).',
         items: [
           { key: 'psShow', label: 'Problem Statement Release section', on: 'Shown', off: 'Hidden', hint: 'Hides the whole section on the Vibe-A-Thon page.' },
-          { key: 'psUnlockNow', label: 'Problem statement buttons (View PS and Download)', on: 'Open', off: 'Locked', hint: 'Locked until you switch this on, and it does not follow any schedule. Switch on, then press Save changes. Needs the PDF link below.' },
-          { key: 'psPdf', type: 'text', label: 'PDF link', placeholder: '/ps-vibeathon-r1-xxxxxxxxxx.pdf or https://...', wide: true, hint: 'The PDF is in the public folder: write its path here (starts with /, for example /ps-vibeathon-r1-xxxxxxxxxx.pdf). Visitors never see this link while the buttons are Locked. A link to another website opens in a new tab and cannot be saved with the Download button. The saved file is always named PS VIBEATHON.pdf.' },
+          { key: 'psUnlockNow', label: 'Problem statement buttons (View PS and Download)', on: 'Open', off: 'Locked', hint: 'Locked until you switch this on, and it does not follow any schedule. Switch on, then press Save changes: View PS then shows the 5 domains. Download uses the PDF link below (empty = the Round 1 PDF already added to the site).' },
+          { key: 'psPdf', type: 'text', label: 'PDF link', placeholder: 'Empty = the Round 1 PDF added to the site', wide: true, hint: 'Leave this empty to use the Round 1 PDF that is already in the public folder. Only fill it to use another file (a path starting with /, or an https:// link). Visitors never see this link while the buttons are Locked. A link to another website opens in a new tab and cannot be saved with the Download button. The saved file is always named PS VIBEATHON.pdf.' },
           { key: 'psCount', type: 'number', label: 'How many problem statements', min: 1, max: 99 },
         ],
       },

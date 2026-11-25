@@ -1,8 +1,11 @@
 // Public, read-only: the switches the admin saved on the dashboard (registration open/close, popups, countdown dates).
 // The website reads this once per visit. Nobody can change it without the admin login.
 // The one thing kept back: the problem statement PDF link is NOT given out while the problem statement buttons are Locked.
+// Once they are Open and the admin left the PDF link box empty, the Round 1 PDF (DEFAULT_PS_PDF, in the public folder) is used.
 import { KEYS, getRedisClient, parseStoredSettings } from '../api-lib/shared.js';
 import { materialize, parseSchedule } from '../api-lib/control.js';
+
+const DEFAULT_PS_PDF = '/ps-vibeathon-r1-61aeb47606.pdf';   // the Round 1 problem statements PDF (public/ folder). The admin PDF link box overrides it.
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -26,8 +29,9 @@ export default async function handler(req, res) {
     }
   }
 
-  // the PDF link stays private until the admin switches the problem statement buttons to Open
+  // the PDF link stays private until the admin switches the problem statement buttons to Open; then the default PDF is used if the box is empty
   if (!settings.psUnlockNow) delete settings.psPdf;
+  else if (!String(settings.psPdf || '').trim()) settings.psPdf = DEFAULT_PS_PDF;
 
   const payload = JSON.stringify({ settings });
   if (typeof res.status === 'function' && typeof res.send === 'function') {
