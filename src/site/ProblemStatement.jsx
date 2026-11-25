@@ -1,6 +1,7 @@
 // Vibe-A-Thon: "Problem Statement Release" section (sits right before "Why Participate?").
 // Two buttons: View PS (opens the PDF in a new tab) and Download (saves the PDF to the phone / laptop).
-// Edit src/data/problemStatement.js to add the PDF and change the release time. Nothing in this file needs to change.
+// The section is LOCKED until you switch it on in the dashboard (Events tab -> Problem statements -> Problem statement buttons). No schedule, no countdown.
+// Edit src/data/problemStatement.js only to add the PDF path. Nothing in this file needs to change.
 // Once the buttons open, "View PS" shows / hides the "5 Domains" cards (site/PsDomains.jsx, words in data/psDomains.js) under the card.
 // The PDF itself is opened from the link inside that panel, and saved with Download.
 import { Suspense, lazy, useEffect, useRef, useState } from 'react';
@@ -8,7 +9,6 @@ import { Reveal } from './ui';
 import { Guard } from './teaserCore';
 import { PS } from '../data/problemStatement';
 import { useSwitch } from './liveSettings';
-import { psRelease } from './psRelease';
 import './ProblemStatement.css';
 
 // The 5 domains are a separate download: the browser fetches them on the first click of "View PS" (which only works once the
@@ -20,34 +20,16 @@ const EyeIcon = () => (<svg {...svg}><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-1
 const DownloadIcon = () => (<svg {...svg}><path d="M12 3v12" /><path d="m7 11 5 5 5-5" /><path d="M5 21h14" /></svg>);
 const LockIcon = () => (<svg {...svg} width={14} height={14}><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>);
 
-// "3d 5h 12m" (days only when there are some)
-function left(ms) {
-  const m = Math.max(0, Math.ceil(ms / 60000));
-  const d = Math.floor(m / 1440), h = Math.floor((m % 1440) / 60), mm = m % 60;
-  return `${d ? `${d}d ` : ''}${d || h ? `${h}h ` : ''}${mm}m`;
-}
-
 export default function ProblemStatement() {
   // the dashboard (Site controls -> Problem statements) can change these without a deploy; data/problemStatement.js has the defaults
   const show = useSwitch('psShow', true);
   const pdf = String(useSwitch('psPdf', PS.pdf) || '');
   const unlockNow = useSwitch('psUnlockNow', PS.unlockNow);
   const count = useSwitch('psCount', PS.count);
-  const rel = psRelease();
-  const releaseMs = rel.ms;
   const hasFile = pdf.trim() !== '';
-  const [now, setNow] = useState(() => Date.now());
-  const timeOpen = unlockNow || !Number.isFinite(releaseMs) || now >= releaseMs;
-  const open = timeOpen && hasFile;
-
-  // keeps the countdown fresh and opens the buttons by themselves at the release time
-  useEffect(() => {
-    if (timeOpen) return undefined;
-    const tick = () => setNow(Date.now());
-    const id = setInterval(tick, 15000);
-    document.addEventListener('visibilitychange', tick);
-    return () => { clearInterval(id); document.removeEventListener('visibilitychange', tick); };
-  }, [timeOpen]);
+  // manual only: the buttons open when the switch is ON (and a PDF link is set). The release time on the Timeline is just a date shown to people.
+  const switchedOn = !!unlockNow;
+  const open = switchedOn && hasFile;
 
   // "View PS" opens / closes the 5 domains under the card. They are fetched on the first click.
   const [domainsSeen, setDomainsSeen] = useState(false);
@@ -77,13 +59,13 @@ export default function ProblemStatement() {
     return () => clearTimeout(t);
   }, [domainsOpen]);
 
-  const state = open ? 'live' : timeOpen ? 'soon' : 'locked';
-  const chip = open ? 'Released' : timeOpen ? 'Publishing shortly' : 'Locked';
+  const state = open ? 'live' : switchedOn ? 'soon' : 'locked';
+  const chip = open ? 'Released' : switchedOn ? 'Publishing shortly' : 'Locked';
   const note = open
     ? 'View PS shows the 5 domains. Download saves the PDF to your phone or laptop.'
-    : timeOpen
-      ? 'The release time has come. The PDF is being added, check back in a few minutes.'
-      : `Unlocks on ${rel.label}${Number.isFinite(releaseMs) ? ` (in ${left(releaseMs - now)})` : ''}.`;
+    : switchedOn
+      ? 'The problem statements are being added. Check back in a few minutes.'
+      : 'Locked for now. It opens as soon as the problem statements are released.';
 
   if (!show) return null;
 

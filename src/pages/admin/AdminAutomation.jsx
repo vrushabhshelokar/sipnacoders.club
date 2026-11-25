@@ -14,8 +14,8 @@ function buildActions(banner) {
     { group: 'Round 2', id: 'r2-hide', label: 'Put Round 2 back to "Publishing soon"', patch: { round2Details: false } },
     { group: 'Problem statements', id: 'ps-show', label: 'Show the Problem Statement section', patch: { psShow: true } },
     { group: 'Problem statements', id: 'ps-hide', label: 'Hide the Problem Statement section', patch: { psShow: false } },
-    { group: 'Problem statements', id: 'ps-open', label: 'Open the PDF buttons (needs a PDF link)', patch: { psUnlockNow: true } },
-    { group: 'Problem statements', id: 'ps-sched', label: 'Put the PDF buttons back on their release time', patch: { psUnlockNow: false } },
+    { group: 'Problem statements', id: 'ps-open', label: 'Open the problem statement buttons (needs a PDF link)', patch: { psUnlockNow: true } },
+    { group: 'Problem statements', id: 'ps-sched', label: 'Lock the problem statement buttons', patch: { psUnlockNow: false } },
     { group: 'Announcement banner', id: 'bn-show', label: 'Show the banner (with the words saved now)', patch: { banner: { ...banner, on: true } }, needs: banner.text ? '' : 'Write the banner words first (Site content tab) and save them.' },
     { group: 'Announcement banner', id: 'bn-hide', label: 'Hide the banner', patch: { banner: { ...banner, on: false } } },
   );

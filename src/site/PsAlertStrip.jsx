@@ -1,7 +1,7 @@
 // Vibe-A-Thon page: a small amber ALERT strip at the very top of the page (just under the menu bar, above the big card), telling people the problem statements are coming.
 // The words come from the dashboard (Events tab -> Date and time -> Alert strip) or, when point 1 is empty, from alertText in src/data/problemStatement.js.
 // There can be a second point (dashboard: Alert strip point 2, or alertText2 in problemStatement.js). It is shown right after point 1 on the same moving line.
-// The strip goes away by itself once the problem statement PDF is added and its release time has come.
+// The strip goes away once the problem statement buttons are switched on in the dashboard and the PDF link is set.
 // It is mounted in src/pages/Upcoming.jsx and only shows on the Vibe-A-Thon (hackathon) page.
 // To remove the strip, delete <PsAlertStrip /> in src/pages/Upcoming.jsx.
 //
@@ -36,10 +36,10 @@ export default function PsAlertStrip() {
   const unlockNow = useSwitch('psUnlockNow', PS.unlockNow);
   const alertOwn = String(useSwitch('psAlertText', PS.alertText || '') || '').trim();   // point 1: words from the dashboard (or alertText in problemStatement.js)
   const alertOwn2 = String(useSwitch('psAlertText2', PS.alertText2 || '') || '').trim();   // point 2 (optional): shown right after point 1
-  const rel = psRelease();
+  const rel = psRelease();   // only used for the date words of the default strip text, it does not decide anything
 
-  // same rule as the Problem Statement section: published = the PDF is added AND the time has come
-  const published = pdf !== '' && (unlockNow || !Number.isFinite(rel.ms) || Date.now() >= rel.ms);
+  // same rule as the Problem Statement section: published = the switch is ON and the PDF is added (no schedule)
+  const published = pdf !== '' && !!unlockNow;
   // only on the Vibe-A-Thon page: the big card is on and the event is a hackathon
   const hidden = !isTeaserLive() || eventType() !== 'hackathon' || !show || published;
 

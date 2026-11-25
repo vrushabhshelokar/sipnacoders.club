@@ -6,15 +6,16 @@
 //      (no spaces in the file name)
 //   2. Write its path below:   pdf: '/Vibe-A-Thon-Problem-Statements.pdf'
 //   3. git add -A, commit, push.
-// The two buttons (View PS and Download) switch on by themselves at releaseAt. Until then they are locked and show a countdown.
+// The two buttons (View PS and Download) stay LOCKED until you switch them on in the dashboard
+// (Events tab -> Vibe-A-Thon -> Problem statements -> Problem statement buttons -> Open). There is no schedule.
 //
-// To test the open buttons on your own computer before the release time, set  unlockNow: true  (and put it back to false before you push).
+// To test the open buttons on your own computer, set  unlockNow: true  (and put it back to false before you push).
 export const PS = {
   pdf: '',                                              // '' = not added yet (buttons stay locked). Example: '/Vibe-A-Thon-Problem-Statements.pdf'
   fileName: 'Vibe-A-Thon-Problem-Statements.pdf',       // the name the file gets when someone downloads it
-  releaseAt: '2026-11-21T20:00:00+05:30',               // when the buttons switch on (21 Nov 2026, 8:00 PM IST, same as the Timeline)
+  releaseAt: '2026-11-21T20:00:00+05:30',               // only the date shown in the Timeline row. It does NOT open the buttons any more
   releaseLabel: ' ? Nov 2026,  IST',            // the same moment, written for people
   count: 10,                                            // how many problem statements are in the PDF
   alertText: 'Problem Statemenl Soon',   // words of the amber alert strip (dashboard: Events tab -> Date and time can change them without a deploy)
-  unlockNow: false,                                     // true = buttons open right now (testing only)
+  unlockNow: false,                                     // false = locked (normal). true = open (testing only; the dashboard switch is the real control)
 };

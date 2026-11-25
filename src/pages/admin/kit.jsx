@@ -110,7 +110,7 @@ export function useLoad(loader, deps = []) {
 export const KEY_LABELS = {
   vibeRegistration: 'Vibe-A-Thon registration', vibePopup: 'Vibe-A-Thon popup', upcomingShow: 'Upcoming card and menu number', flowShow: 'Event Flow section', round2Details: 'Round 2 details',
   hideAfter: 'Hide card and popup after', eventStart: 'Event start', currentRound: 'Current round', roundEnd1: 'Round 1 ends', roundEnd2: 'Round 2 ends',
-  psShow: 'Problem Statement section', psUnlockNow: 'PDF buttons open now', psReleaseAt: 'PDF release time', psAlertText: 'Alert strip point 1', psAlertText2: 'Alert strip point 2', psPdf: 'PDF link', psCount: 'Number of problem statements',
+  psShow: 'Problem Statement section', psUnlockNow: 'Problem statement buttons', psReleaseAt: 'Problem statement Timeline date', psAlertText: 'Alert strip point 1', psAlertText2: 'Alert strip point 2', psPdf: 'PDF link', psCount: 'Number of problem statements',
   banner: 'Announcement banner', timeline: 'Timeline rows', details: 'Detail boxes',
   eventType: 'Kind of event', eventName: 'Event name', eventLink: 'Register button link', eventDetails: 'Event detail boxes', eventPoints: 'Description points',
   eventBanners: 'Event banners', popupTheme: 'Popup design number', popupDelay: 'Popup delay (seconds)', popupLogo: 'Popup logo', popupDesc: 'Popup words',
