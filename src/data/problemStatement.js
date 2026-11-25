@@ -2,17 +2,19 @@
 // This is the only file you need to edit when the problem statements are ready.
 //
 // HOW TO PUBLISH:
-//   1. Put the PDF in the  public/  folder, for example  public/Vibe-A-Thon-Problem-Statements.pdf
-//      (no spaces in the file name)
-//   2. Write its path below:   pdf: '/Vibe-A-Thon-Problem-Statements.pdf'
-//   3. git add -A, commit, push.
+//   1. The PDF is in the  public/  folder (public/ps-vibeathon-r1-xxxxxxxxxx.pdf). The long odd name is on purpose: the file is public once it is deployed,
+//      so a name nobody can guess keeps it private until you switch the buttons on.
+//   2. In the dashboard (Events tab -> Problem statements) write its path in "PDF link":   /ps-vibeathon-r1-xxxxxxxxxx.pdf
+//      Do NOT write the path in this file: anything written here can be read by visitors inside the site code.
+//      The site only gives the link out after you switch the buttons to Open.
+//   3. When you are ready, switch "Problem statement buttons" to Open and press Save changes.
 // The two buttons (View PS and Download) stay LOCKED until you switch them on in the dashboard
 // (Events tab -> Vibe-A-Thon -> Problem statements -> Problem statement buttons -> Open). There is no schedule.
 //
 // To test the open buttons on your own computer, set  unlockNow: true  (and put it back to false before you push).
 export const PS = {
-  pdf: '',                                              // '' = not added yet (buttons stay locked). Example: '/Vibe-A-Thon-Problem-Statements.pdf'
-  fileName: 'Vibe-A-Thon-Problem-Statements.pdf',       // the name the file gets when someone downloads it
+  pdf: '',                                              // keep EMPTY: the link is set in the dashboard so it stays private until Open (for a test on your own computer, put the path here and put '' back before you push)
+  fileName: 'PS VIBEATHON.pdf',                         // the name the file gets when someone downloads it (Download button saves it straight away with this name)
   releaseAt: '2026-11-21T20:00:00+05:30',               // only the date shown in the Timeline row. It does NOT open the buttons any more
   releaseLabel: ' ? Nov 2026,  IST',            // the same moment, written for people
   count: 10,                                            // how many problem statements are in the PDF

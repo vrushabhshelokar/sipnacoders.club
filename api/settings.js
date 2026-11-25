@@ -1,5 +1,6 @@
 // Public, read-only: the switches the admin saved on the dashboard (registration open/close, popups, countdown dates).
-// The website reads this once per visit. Nothing private is in here, and nobody can change it without the admin login.
+// The website reads this once per visit. Nobody can change it without the admin login.
+// The one thing kept back: the problem statement PDF link is NOT given out while the problem statement buttons are Locked.
 import { KEYS, getRedisClient, parseStoredSettings } from '../api-lib/shared.js';
 import { materialize, parseSchedule } from '../api-lib/control.js';
 
@@ -24,6 +25,9 @@ export default async function handler(req, res) {
       console.error('Settings read error:', err.message);
     }
   }
+
+  // the PDF link stays private until the admin switches the problem statement buttons to Open
+  if (!settings.psUnlockNow) delete settings.psPdf;
 
   const payload = JSON.stringify({ settings });
   if (typeof res.status === 'function' && typeof res.send === 'function') {
