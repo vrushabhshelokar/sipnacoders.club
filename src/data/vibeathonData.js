@@ -151,7 +151,7 @@ export const buildRulebook = (r2 = false) => [
     points: [
       'Round 1 (Online Qualifier): Build and deploy one problem statement module using AI-assisted tools.',
       'Round 1 submission requires a live Vercel deployment URL and a public GitHub repository with a README Vibe Log.',
-      'Round 1 registration & submission deadline: 12 December 2026.',
+      'Round 1 registration & submission deadline: 6 December 2026.',
       'Top 75 qualifying teams announcement: 17–18 December 2026.',
       ...(r2 ? ['Round 2 payment window: 17 December – 22 December 2026 (only for Top 75 qualifiers).'] : []),
       'Round 2 (Offline Finale): 26–27 December 2026 at Sipna COET, Amravati — a continuous 18-hour build marathon.',
@@ -164,7 +164,7 @@ export const buildRulebook = (r2 = false) => [
     icon: 'ClipboardList',
     intro: 'Registration details and two-phase fee structure.',
     points: [
-      'Round 1 Registration Fee: ₹200 per team (payable during initial registration, deadline: 12 December 2026).',
+      'Round 1 Registration Fee: ₹200 per team (payable during initial registration, deadline: 6 December 2026).',
       ...(r2 ? ['Teams qualifying for the Top 75 must pay an additional ₹500 during the payment window (17–22 December 2026).'] : []),
       'Food and campus accommodation for the entire 18-hour event.',
       ...(r2 ? ['Total potential fee for a qualifying team is ₹700 across both phases (non-qualifying teams pay only ₹200).'] : []),
@@ -184,7 +184,7 @@ export const buildRulebook = (r2 = false) => [
     'Include at least one functional AI feature.',
     'Deploy your project on Vercel.',
     'Submit a public GitHub repository with a Vibe Log in README.md.',
-    'Round 1 submissions close on 12 December 2026 at 11:59 PM.',
+    'Round 1 submissions close on 6 December 2026 at 11:59 PM.',
   ],
 },
   {
@@ -196,7 +196,7 @@ export const buildRulebook = (r2 = false) => [
     points: [
       'Projects are evaluated on Innovation, Technical Architecture, Execution, AI Implementation, and Live Demo.',
       'Judging panel decisions are definitive and binding.',
-      'Winners (1st, 2nd, 3rd) receive cash prizes (₹25,000 / ₹10,000 / ₹5,000) and exclusive HackerRank rewards: HackerRank Infinity Subscription, Mock Interview Credits, Access to 1,500+ AI Tools, and Official HackerRank Goodies.',
+      'Winners (1st, 2nd, 3rd) receive cash prizes (₹25,000 / ₹15,000 / ₹10,000) and exclusive HackerRank rewards: HackerRank Infinity Subscription, Mock Interview Credits, Access to 1,500+ AI Tools, and Official HackerRank Goodies.',
       'Other Round 2 finalists receive an official physical HackerRank campus crew Certificate of Participation.',
       'All Round 1 participants receive an official HackerRank campus crew e-Certificate of Participation.',
     ],
@@ -303,7 +303,7 @@ export const PARTICIPANT_TIERS = [
     certBadge: 'CASH + PERKS',
     certType: 'Physical Trophy & Cash',
     rewards: [
-      'Cash prizes from ₹50,000+ pool (₹25,000 1st / ₹10,000 2nd / ₹5,000 3rd)',
+      'Cash prizes from ₹50,000+ pool (₹25,000 1st / ₹15,000 2nd / ₹10,000 3rd)',
       'HackerRank Infinity Subscription',
       'Mock Interview Credits',
       'Official HackerRank Goodies & Access to 1,500+ AI Tools',
@@ -379,7 +379,7 @@ export const EVENT_SCHEDULE = [
     phase: 'PRE-EVENT',
     milestone: 'Registration Opens',
     time: '11:00 AM',
-    date: '16 Nov 2026',
+    date: '26 Nov 2026',
     desc: 'Official registration form goes live. Teams (1–4 members) can register and submit participant details.',
     accent: '#7cf2d4',
     accentRgb: '124, 242, 212',
@@ -401,7 +401,7 @@ export const EVENT_SCHEDULE = [
     phase: 'ROUND 1',
     milestone: 'Round 1 Registration & Submission Deadline',
     time: '11:59 PM',
-    date: '12 Dec 2026',
+    date: '6 Dec 2026',
     desc: 'Final deadline for Round 1 registration (₹200/team) and submission of GitHub repo & live Vercel URL.',
     accent: '#ff5468',
     accentRgb: '255, 84, 104',

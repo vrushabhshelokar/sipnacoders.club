@@ -1,7 +1,7 @@
 // Section 5: Prize Pool, Registration Fees & What's Included
 // Structured Layout:
 // Row 1 (Two Equal Columns):
-//   - Left: PRIZE DISTRIBUTION // FINALE (Total Pool ₹40k+, 18-Hour Finale, 1st, 2nd, 3rd)
+//   - Left: PRIZE DISTRIBUTION // FINALE (Total Pool ₹50k+, 18-Hour Finale, 1st, 2nd, 3rd)
 //   - Right: REGISTRATION MATRIX // TWO-PHASE (Round 1 ₹200, Round 2 ₹500, Inclusions, Total Callout)
 // Row 2 (Full Width):
 //   - PARTICIPANT TIERS // RECOGNITION (Tiers 01, 02, 03 & Certificate Distribution Matrix)
@@ -41,7 +41,7 @@ export default function PrizePool() {
         {/* LEFT COLUMN: PRIZE DISTRIBUTION // FINALE */}
         <Reveal delay={60} className="pp-col-reveal">
           <div className="pp-card pp-prize-col-card" role="region" aria-label="Prize Distribution">
-            <span className="pp-hero-ghost" aria-hidden="true">40K</span>
+            <span className="pp-hero-ghost" aria-hidden="true">50K</span>
 
             <div className="pp-card-ribbon" aria-hidden="true">
               <span className="pp-ribbon-tag">PRIZE DISTRIBUTION // FINALE</span>
