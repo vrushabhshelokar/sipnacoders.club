@@ -29,6 +29,12 @@
       ]
     },
     {
+      "source": "/ps-vibeathon-r1-61aeb47606.pdf",
+      "headers": [
+        { "key": "Content-Disposition", "value": "inline; filename=\"PS-Vibethon.pdf\"" }
+      ]
+    },
+    {
       "source": "/assets/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
