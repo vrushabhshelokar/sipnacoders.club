@@ -1,0 +1,61 @@
+/* "Stay connected" WhatsApp band (Vibe-A-Thon page). Phone first: stacked, full-width button. */
+.wa-band { position: relative; margin: 28px 0 8px; width: 100%; }
+
+.wa-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 14px 16px;
+  padding: 18px 16px;
+  background: linear-gradient(165deg, rgba(37, 211, 102, .10), rgba(12, 17, 26, .72) 62%);
+  border: 1px solid rgba(37, 211, 102, .28);
+  border-left: 3px solid #25d366;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.wa-badge {
+  align-self: start;
+  display: grid; place-items: center;
+  width: 46px; height: 46px;
+  color: #25d366;
+  background: rgba(37, 211, 102, .12);
+  border: 1px solid rgba(37, 211, 102, .35);
+}
+
+.wa-copy { min-width: 0; }
+.wa-tag {
+  display: block; margin-bottom: 4px;
+  font: 700 11px/1.2 var(--cy-hud, 'Chakra Petch', system-ui, sans-serif);
+  letter-spacing: .16em; text-transform: uppercase; color: #25d366;
+}
+.wa-title { margin: 0; font: 600 19px/1.25 var(--cy-hud, 'Chakra Petch', system-ui, sans-serif); color: #fff; }
+.wa-sub { margin: 6px 0 0; font-size: 14px; line-height: 1.5; color: rgba(255, 255, 255, .68); }
+
+.wa-btn {
+  grid-column: 1 / -1;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 0 22px;
+  font: 700 15px/1 var(--cy-hud, 'Chakra Petch', system-ui, sans-serif);
+  letter-spacing: .06em; text-transform: uppercase; text-decoration: none;
+  color: #04140a; background: #25d366;
+  border: 0; cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+  box-shadow: 0 0 0 0 rgba(37, 211, 102, .5);
+}
+.wa-btn:hover { background: #3be67b; box-shadow: 0 6px 22px -6px rgba(37, 211, 102, .65); transform: translateY(-1px); }
+.wa-btn:active { transform: translateY(0); }
+.wa-btn:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+@media (min-width: 768px) {
+  .wa-card { grid-template-columns: auto 1fr auto; padding: 22px 26px; gap: 22px; }
+  .wa-badge { align-self: center; }
+  .wa-btn { grid-column: auto; }
+  .wa-title { font-size: 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wa-btn { transition: none; }
+  .wa-btn:hover { transform: none; }
+}

@@ -10,6 +10,7 @@ export const LINK_FIELDS = [
   ['instagram', 'Instagram page', 'https://www.instagram.com/...'],
   ['linkedin', 'LinkedIn page', 'https://www.linkedin.com/...'],
   ['email', 'Club email address', 'team@sipnacoders.club'],
+  ['whatsappGroup', 'Vibe-A-Thon WhatsApp group (Join group button)', 'https://chat.whatsapp.com/...'],
 ];
 
 // key, label, longest allowed, group heading
@@ -74,6 +75,7 @@ function linkProblem(k, s) {
   if (k !== 'joinForm' && !s.startsWith('https://')) return 'it must start with https://';
   if (k === 'instagram' && !hostIn(s, ['instagram.com'])) return 'it must be an instagram.com address.';
   if (k === 'linkedin' && !hostIn(s, ['linkedin.com', 'lnkd.in'])) return 'it must be a linkedin.com address.';
+  if (k === 'whatsappGroup' && !hostIn(s, ['whatsapp.com', 'wa.me'])) return 'it must be a WhatsApp group invite link (chat.whatsapp.com/...).';
   return '';
 }
 

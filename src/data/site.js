@@ -60,6 +60,7 @@ export const LINKS = {
   linkedin: 'https://www.linkedin.com/company/sipna-coders-club/posts/',
   email: 'team@sipnacoders.club',
   registerForm: 'https://tally.so/embed/VpQzav?hideTitle=1&transparentBackground=1&dynamicHeight=1',
+  whatsappGroup: 'https://chat.whatsapp.com/KokR4O9cgRL3DmMQkyGaxn', // Vibe-A-Thon WhatsApp group ("Join group" button on the Vibe-A-Thon page; can be changed in the dashboard: Site content -> Links)
 };
 
 /* ---------------- numbers on the home page ---------------- */

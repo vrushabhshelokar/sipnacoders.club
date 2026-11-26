@@ -21,6 +21,7 @@ import PrizePool from './PrizePool';
 import EventSchedule from './EventSchedule';
 import EventFlow from './EventFlow';
 import FinaleSchedule from './FinaleSchedule';
+import WhatsAppJoin from './WhatsAppJoin';
 import { TeaserFailed, TeaserLoader } from './TeaserLoader';
 import './HackathonTeaser.css';
 
@@ -153,6 +154,7 @@ export default function HackathonTeaser() {
           <EventSnapshot />
           <StickyNav />
           <MotivationStrip />
+          <WhatsAppJoin />
           <ProblemStatement />
           <WhyParticipate />
           <EventJourney />

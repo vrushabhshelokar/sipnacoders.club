@@ -233,7 +233,7 @@ const hostOf = (s) => { try { return new URL(s).hostname.toLowerCase(); } catch 
 const hostIn = (s, list) => { const h = hostOf(s); return list.some((d) => h === d || h.endsWith(`.${d}`)); };
 
 // the buttons and contact links: only the ones that were changed are stored
-const SITE_LINK_KEYS = ['membershipForm', 'joinForm', 'instagram', 'linkedin', 'email'];
+const SITE_LINK_KEYS = ['membershipForm', 'joinForm', 'instagram', 'linkedin', 'email', 'whatsappGroup'];
 function cleanSiteLinks(v) {
   if (!v || typeof v !== 'object' || Array.isArray(v)) return null;
   const out = {};
@@ -246,6 +246,7 @@ function cleanSiteLinks(v) {
     if (k !== 'joinForm' && !l.startsWith('https://')) return null;     // only the Join button may point to a page of this site
     if (k === 'instagram' && !hostIn(l, ['instagram.com'])) return null;
     if (k === 'linkedin' && !hostIn(l, ['linkedin.com', 'lnkd.in'])) return null;
+    if (k === 'whatsappGroup' && !hostIn(l, ['whatsapp.com', 'wa.me'])) return null;
     out[k] = l;
   }
   return Object.keys(out).length ? out : null;
