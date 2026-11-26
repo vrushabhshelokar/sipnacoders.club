@@ -1,7 +1,7 @@
 /* =====================================================================================
-   Mobile helpers for the Vibe-A-Thon page. Two things, both phone only (laptop looks exactly as before):
+   Mobile helpers for the Vibe-A-Thon page. Phone only (laptop looks exactly as before):
 
-   1) Card sliders: ONE card at a time, with a Previous / Next arrow button (swiping works too).
+   Card sliders: ONE card at a time, with a Previous / Next arrow button (swiping works too).
       Two looks:
         - "slide":  Why Participate? and Have Any Questions? cards slide sideways.
         - "stack":  Prize Distribution with the Registration Matrix card BEHIND it, and Round 1 participants
@@ -9,9 +9,6 @@
                     other card peeks out behind it, tilted and dimmed like a fanned deck of cards.
                     Arrows, dots and a swipe (drag) bring the next card to the front.
       On a laptop the arrows are hidden and the cards stay as they were.
-   2) "HackerRank Reward": the rewards of the winners (Infinity Subscription, Mock Interview Credits,
-      Goodies ...) are copied from the Winners tier into the free space of the Champion (1st prize) card
-      as small dotted lines. The text is read from the page itself, so if the data file changes the card follows.
 
    - It does NOT edit WhyParticipate.jsx / EventJourney.jsx or any data file. It only adds the arrow bar
      next to the card grid after the page has drawn it, and marks the grid with data-ms-track
@@ -220,46 +217,10 @@ function enhance(cfg) {
   paint();
 }
 
-// ---- HackerRank rewards of the winners, inside the Champion (1st prize) card ----
-// The Winners & Runners-Up tier card is cut on phones, so its HackerRank rewards (Infinity Subscription,
-// Mock Interview Credits, Goodies ...) are copied into the free space of the Champion card as small dotted lines.
-function addPodiumPerks() {
-  const first = document.querySelector('#prize-pool .pp-prize-col-card .pp-prize-first');
-  const tier = document.querySelector('#prize-pool .pp-tier-block.is-winner');
-  if (!first || !tier || first.querySelector('.pp-champ-perks')) return;
-  // the first bullet is the cash breakdown (25,000 / 15,000 / 10,000): the prize cards already show it
-  const items = Array.from(tier.querySelectorAll('.pp-tb-rewards li'))
-    .map((li) => li.textContent.trim())
-    .filter((t) => t && !/^cash\b/i.test(t));
-  if (!items.length) return;
-  // the rewards are for every podium team, not only the champion: say so ("ALL 3 WINNERS")
-  const winners = document.querySelectorAll('#prize-pool .pp-prize-col-card .pp-prize-card').length;
-
-  const box = document.createElement('div');
-  box.className = 'pp-champ-perks';
-  const head = document.createElement('div');
-  head.className = 'pp-champ-perks-head';
-  const label = document.createElement('b');
-  label.textContent = 'HackerRank Reward';
-  head.appendChild(label);
-  if (winners > 1) {
-    const who = document.createElement('span');
-    who.textContent = `All ${winners} winners`;
-    head.appendChild(who);
-  }
-  const list = document.createElement('ul');
-  items.forEach((t) => { const li = document.createElement('li'); li.textContent = t; list.appendChild(li); });
-  box.append(head, list);
-  // after the amount, still inside the card (before the little corner tick)
-  const corner = first.querySelector(':scope > .pp-card-corner');
-  first.insertBefore(box, corner);
-}
-
 let queued = false;
 function scan() {
   queued = false;
   SLIDERS.forEach(enhance);
-  addPodiumPerks();
 }
 function schedule() {
   if (queued) return;

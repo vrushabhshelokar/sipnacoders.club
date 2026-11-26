@@ -53,7 +53,7 @@ const SNAPSHOT_ITEMS = [
     id: 'prizes',
     label: 'PRIZE POOL',
     value: '₹50,000+',
-    sub: 'Cash + HR Rewards',
+    sub: 'Cash Prizes',
     icon: 'Trophy',
     accent: '#7cf2d4',
     accentRgb: '124, 242, 212',
