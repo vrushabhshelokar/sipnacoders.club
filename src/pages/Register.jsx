@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { DotLottieReact, setWasmUrl } from '@lottiefiles/dotlottie-react';
 import { Reveal } from '../site/ui';
 import { useSwitch } from '../site/liveSettings';
+import { usePosters, POSTERS } from '../site/posters';
 import RegistrationClosed from '../site/RegistrationClosed';
 import formAnimation from '../assets/form.lottie';
 import formAnimation1 from '../assets/form1.lottie';
@@ -18,6 +19,7 @@ const Anim = ({ on, src }) => (on ? <DotLottieReact src={src} autoplay loop /> :
 
 export default function Register() {
   const open = useSwitch('vibeRegistration', true);   // dashboard -> Site controls
+  const poster = usePosters()[0] || POSTERS[0];       // the same Vibe-A-Thon poster as the popup and the Upcoming card (src/assets/upcoming/)
   const [formReady, setFormReady] = useState(false);   // true when the form has appeared
   const [slow, setSlow] = useState(false);              // true when it is taking long
   useEffect(() => {
@@ -53,13 +55,15 @@ export default function Register() {
           <Reveal>
             <h1 className="sr-only">Register — Vibe-A-Thon</h1>
             <div className="s-register-visual-wrap">
-              <img
-                src="/register-visual.webp"
-                alt="Vibe-A-Thon — The 18-Hour AI Build-A-Thon"
-                className="s-register-visual-img"
-                width={458}
-                height={200}
-              />
+              {poster && (
+                <img
+                  src={poster}
+                  alt="Vibe-A-Thon — The 18-Hour AI Build-A-Thon"
+                  className="s-register-visual-img"
+                  width={900}
+                  height={300}
+                />
+              )}
             </div>
             <p className="s-sub s-sub-lg s-register-sub">
               Fill the form below to participate. Limited seats available.

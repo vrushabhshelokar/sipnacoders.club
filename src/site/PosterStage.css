@@ -212,13 +212,14 @@
   position: relative; display: block; margin: 0;
   width: min(calc((100cqw - 2 * var(--ps-pad)) / (1 + var(--ps-s) / var(--r, .8))), calc((100cqh - 2 * var(--ps-pad)) / (var(--ps-s) + 1 / var(--r, .8))));   /* as big as fits (also when tilted), in its own shape */
   height: auto; aspect-ratio: var(--r, .8); object-fit: cover;
-  border-radius: var(--ps-radius); box-shadow: 0 18px 40px -14px rgba(0, 0, 0, .75), 0 0 0 1px rgba(255, 255, 255, .1), 0 0 34px -8px rgba(var(--a-rgb, 76, 141, 255), .55);
+  border-radius: var(--ps-radius);
+  filter: drop-shadow(0 14px 18px rgba(0, 0, 0, .6)) drop-shadow(0 0 16px rgba(var(--a-rgb, 76, 141, 255), .5));   /* a shadow + glow that follow the shape of the picture (a transparent sticker has no square box) */
   transform: rotate(var(--ps-tilt)); transition: transform .6s var(--ease, cubic-bezier(.2, .8, .2, 1));
   user-select: none; -webkit-user-drag: none;
   animation: ps-shake 3s ease-in-out infinite;
 }
 @supports not (width: 1cqw) {   /* very old browsers: the plain full-size poster */
-  .ps-slide img { position: absolute; inset: 0; width: 100%; height: 100%; aspect-ratio: auto; object-fit: contain; border-radius: 0; box-shadow: none; transform: none; animation: none; }
+  .ps-slide img { position: absolute; inset: 0; width: 100%; height: 100%; aspect-ratio: auto; object-fit: contain; border-radius: 0; filter: none; transform: none; animation: none; }
 }
 /* while the reveal plays the poster holds still in its tilt (the shake starts when the reveal is over) */
 .ps.is-reveal .ps-slide img { animation: none; }
@@ -285,7 +286,7 @@
 .tc-doss .ps { --ps-tilt: 0deg; --ps-pad: 0px; --ps-radius: 0; --ps-s: 0; width: 100%; max-width: 280px; overflow: visible; transform: rotate(-2.5deg); transition: transform .6s var(--ease, cubic-bezier(.2, .8, .2, 1)); }
 .tc-doss .ps.is-poster { animation: ps-shake-doss 3s ease-in-out infinite; }
 .tc-doss .ps.is-poster:hover { animation: none; transform: rotate(0deg) scale(1.012); }
-.tc-doss .ps-slide img { width: min(100cqw, calc(100cqh * var(--r, .8))); border-radius: 0; box-shadow: none; transform: none; animation: none; transition: none; }
+.tc-doss .ps-slide img { width: min(100cqw, calc(100cqh * var(--r, .8))); border-radius: 0; box-shadow: none; filter: none; transform: none; animation: none; transition: none; }
 .tc-doss .ps-poster:hover .ps-slide img, .tc-doss .ps-poster:has(:focus-visible) .ps-slide img, .tc-doss .ps.is-reveal .ps-slide img { transform: none; animation: none; }
 @keyframes ps-shake-doss {
   0%, 80%, 100% { transform: rotate(-2.5deg); }

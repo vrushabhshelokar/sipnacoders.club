@@ -1,3 +1,12 @@
+THE VIBE-A-THON POSTER (one poster, used everywhere)
+====================================================
+hackathon.webp in this folder is the ONE Vibe-A-Thon poster (the torn-paper sticker).
+The same file is shown in the popup ("Something big is coming"), in the Upcoming card and above the Register form.
+To change the poster everywhere: replace hackathon.webp with the new picture (same name, jpg / png / webp all work).
+Do not keep old posters in this folder: every hackathon.* / hackathon1.* ... file is shown (several = a slideshow in the popup and card,
+and the Register page uses the first one).
+A banner uploaded in the admin dashboard (Upcoming event tab) wins over this file, so keep that tab empty to use this poster.
+
 UPCOMING EVENT POSTERS
 ======================
 Put the poster of the next event in THIS folder and name the file after the event type

@@ -410,6 +410,19 @@ a.s-contact:hover { transform: translateY(-3px); border-color: var(--border-2); 
 .s-form-note { margin: 0; font-size: 13.5px; color: var(--muted); }
 
 /* ---------- register / 404 ---------- */
+/* text for screen readers and search engines only (the Register page heading uses it).
+   It lived only in a small animation's css file, so on a page opened directly the heading showed as big text. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 .s-register-pagehead {
   padding-bottom: 24px;
 }
